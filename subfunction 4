@@ -1,0 +1,200 @@
+# RK resource 001 subfunction 4
+# developed by Robin Karlsson
+# contact email: "r.robin.karlsson@gmail.com"
+# contact chess.com profile: "http://www.chess.com/members/view/RobinKarlsson"
+# version 0.8
+
+import mechanize
+import csv
+import urlparse
+import cookielib
+import random
+import re
+import time
+from time import strftime, gmtime
+from datetime import datetime
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.alert import Alert
+from bs4 import BeautifulSoup
+from operator import itemgetter
+from collections import OrderedDict
+from collections import Counter
+from string import punctuation
+
+def inviter(groupinv, choice5, infile, invitenum, payload2, invimage, invvid, invitednum):
+    memint = list()
+    Username = raw_input("Username: ")
+    Password = raw_input("Password: ")
+    
+    browser2 = webdriver.Firefox()
+    browser2.get("https://www.chess.com/login")
+    
+    browser2.find_element_by_name("c1").send_keys(Username)
+    
+    browser2.find_element_by_name("loginpassword").send_keys(Password)
+
+    WebDriverWait(browser2, 10).until(EC.presence_of_element_located((By.ID, "btnLogin")))
+    browser2.find_element_by_id("btnLogin").click()
+
+    logincookie = browser2.get_cookies()
+    browser1 = mechanize.Browser()
+    cookie = cookielib.LWPCookieJar()
+    browser1.set_cookiejar(cookie)
+    
+    for tempcookie in logincookie:
+        cookie.set_cookie(cookielib.Cookie(version = 0, name = tempcookie["name"], value = tempcookie["value"], port = '80', port_specified = False, domain = tempcookie["domain"], domain_specified = True, domain_initial_dot = False, path = tempcookie["path"], path_specified = True, secure = tempcookie["secure"], expires = tempcookie["expiry"], discard = False, comment = None, comment_url = None, rest = None, rfc2109 = False))
+
+    browser1.set_handle_equiv(True)
+    browser1.set_handle_redirect(True)
+    browser1.set_handle_gzip(True)
+    browser1.set_handle_referer(True)
+    browser1.set_handle_robots(False)
+    browser1.set_handle_refresh(mechanize._http.HTTPRefreshProcessor(), max_time=1)
+
+    memtinv = remove_doublets(infile, "")
+
+    already_picked = list()
+    while invitenum > len(memtinv):
+        invitenum = int(raw_input("\nYou are trying to invite more members than there are in your invites list. Pick a new number of members to invite: "))
+
+    while len(already_picked) < invitenum:
+        picked = random.choice(memtinv)
+
+        if not picked in already_picked:
+            already_picked.append(picked)
+
+    for member in already_picked:
+        response = browser1.open("http://www.chess.com/members/view/" + member)
+        soup = BeautifulSoup(response)
+
+        for placeholder in soup.find_all(class_ = "flag"):
+            country = placeholder["title"]
+        #if country == "International":
+            #country = "the great planet Terra"
+
+        for placeholder in soup.find_all("strong"):
+            name = placeholder.text
+            break
+        if name == " ":
+            name = member
+
+        if choice5 == "1":
+            payload = something
+                
+        elif choice5 == "2":
+            payload = something
+
+        browser2.get(groupinv)
+
+        try:
+            WebDriverWait(browser2, 10).until(EC.presence_of_element_located((By.ID, "c15")))
+            browser2.find_element_by_name("c15").send_keys(member)
+        except:
+            break
+
+        print "\nSending invite to: " + member
+        memint.append(member)
+
+        browser2.switch_to_frame("tinymcewindow_ifr")
+        browser2.find_element_by_id("tinymce").clear()
+        browser2.find_element_by_id("tinymce").send_keys(payload)
+        browser2.switch_to_default_content()
+            
+        browser2.find_element_by_id("tinymcewindow_imageuploader").click()
+        time.sleep(2)
+
+        browser2.switch_to_window(browser2.window_handles[1])
+        WebDriverWait(browser2, 10).until(EC.presence_of_element_located((By.ID, "photourl")))
+        browser2.find_element_by_id("photourl").send_keys(invimage)
+        browser2.find_element_by_id("insert").click()
+        browser2.switch_to_window(browser2.window_handles[0])
+
+        browser2.switch_to_frame("tinymcewindow_ifr")
+        browser2.find_element_by_id("tinymce").send_keys(payload2)
+        browser2.switch_to_default_content()
+
+        browser2.find_element_by_id("tinymcewindow_mce_media").click()
+        time.sleep(1)
+
+        alert = browser2.switch_to_alert()
+        alert.send_keys(invvid)
+        alert.accept()
+        time.sleep(2)
+
+        if set(["6"]).intersection(choice5):
+            raw_input("testrun, to unlock actually sending the invites you will have to let RobinKarlsson know what message you wish to use... press enter to continue")
+
+        if set(["1", "2", "3", "4", "5", "7", "8", "9", "10", "11"]).intersection(choice5):
+            browser2.find_element_by_id("c18").click()
+                    
+        invitednum += 1
+
+    if set(["1", "2"]).intersection(choice5):
+        if invitednum > 30:
+            invitednum = 30
+
+        if choice5 == "1":
+            payload = something
+        if choice5 == "2":
+            payload = something
+
+
+        browser2.get("http://www.chess.com/groups/forumview/invite-schedule")
+        time.sleep(2)
+
+        browser2.switch_to_frame("tinymcewindow_ifr")
+        browser2.find_element_by_id("tinymce").clear()
+        browser2.find_element_by_id("tinymce").send_keys(payload)
+        browser2.switch_to_default_content()
+        
+        browser2.find_element_by_id("c27").click()
+        time.sleep(1)
+
+    browser2.quit()
+
+    path1 = raw_input("\n\nDo you wish to remove the used names from your invites list? (y/n) ")
+    if path1 == "y":
+        updinvlist = set(memtinv).difference(set(memint))
+        updinvlist = misc1(updinvlist)
+        #print updinvlist
+        with open(infile, "w") as placeholder2:
+            placeholder2.write(updinvlist)
+
+
+pathway = "y"
+while set(["y"]).intersection(pathway):
+    flow = ""
+    roadblock1 = set(["4"])
+
+    while not roadblock1.intersection(flow):
+        flow = raw_input("\nEnter your choice here: ")
+
+        if not roadblock1.intersection(flow):
+            print " invalid choice, try again!"
+
+    if flow == "4":
+        choice5 = raw_input("INPUT")
+
+        if choice5 == something:
+            groupinv = INPUT
+            infile = INPUT
+            payload2 = INPUT
+            invimage = INPUT
+            invvid = INPUT
+            invitenum = int(raw_input(INPUT))
+
+        if choice5 == something else:
+            groupinv = INPUT
+            infile = INPUT
+            payload2 = INPUT
+            invimage = INPUT
+            invvid = "INPUT"
+            invitenum = int(raw_input(INPUT))
+
+        inviter(groupinv, choice5, infile, invitenum, payload2, invimage, invvid, 0)
+        
+	pathway = raw_input("Run again? (y/n) ")
