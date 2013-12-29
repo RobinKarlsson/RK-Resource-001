@@ -170,6 +170,9 @@ def vcman(vclinklist, yourside):
                                 placeholder2.write(re.sub(r"^http?:\/\/.*[\r\n]*", "", memsellink.replace("http://www.chess.com/members/view/", ", "), flags=re.MULTILINE))
 
                     nextbtn += 1
+                    
+        with open("temp/temp.txt", "a") as placeholder2:
+            placeholder2.write(",")
         
     browser3.quit()
     
