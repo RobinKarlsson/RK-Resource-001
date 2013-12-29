@@ -158,7 +158,112 @@ def tmparchecker(pagelist, targetname):
         except IndexError:
             placeholder = list()
     return tmpar, timeoutlist, winssdic, losedic
-    
+
+def ratinglister():
+    ratinglist = list()
+    ratinglist2 = list()
+    for line in open("temp/temp.txt","rb"):
+        if '<span class="arrow menu-icons right-arrow"></span></div>' and '<div class="right">' in line:
+            line = line.replace('<span class="arrow menu-icons right-arrow"></span></div>', "")
+            line = line.replace('<div class="right">', "")
+            line = line.replace(",", "")
+            line = line.replace('<span class="arrow menu-icons right-arrow"></span>', "")
+            line = line.replace('<td>', "")
+            line = line.split()
+            i = 0
+            while i <= len(line):
+                ratinglist.append(line[-i])
+                i += 1
+    for rating in ratinglist[0:len(ratinglist)]:
+        try:
+            rating = int(rating)
+        except ValueError:
+            rating = 0
+        ratinglist2.append(rating)
+    return ratinglist2
+
+def loginlister():
+    for line in open("temp/temp.txt","rb"):
+        if '        </li>, <li class="last">' in line:
+            line = line.strip()
+            line = line.replace('</li>, <li class="last">', "")
+            line = line.replace(",", "")
+            line = line.replace("Jan", "01")
+            line = line.replace("Feb", "02")
+            line = line.replace("Mar", "03")
+            line = line.replace("Apr", "04")
+            line = line.replace("May", "05")
+            line = line.replace("Jun", "06")
+            line = line.replace("Jul", "07")
+            line = line.replace("Aug", "08")
+            line = line.replace("Sep", "09")
+            line = line.replace("Oct", "10")
+            line = line.replace("Nov", "11")
+            line = line.replace("Dec", "12")
+            line = line.split()
+            try:
+                line = map(int, line)
+            except ValueError:
+                break
+            loginlist = line
+
+    try:
+        loginlist[0], loginlist[2] = loginlist[2], loginlist[0]
+        loginlist[1], loginlist[2] = loginlist[2], loginlist[1]
+    except:
+        loginlist = (1990, 01, 01)
+    return loginlist
+
+def timeoutlister():
+    timeoutlist = list()
+    for line in open("temp/temp.txt","rb"):
+        if '<span class="no-color normal">(last 90 days)</span> </td>' in line:
+            placeholder = line.index('<span class="no-color normal">(last 90 days)</span> </td>')
+
+            placeholder2 = 0
+            while placeholder2 < 6:
+                timeoutlist.append(line[placeholder - placeholder2:placeholder])
+                placeholder2 += 1
+    try:
+        timeotstr = str(timeoutlist[-1])
+    except:
+        timeotstr = "100"
+    timeotstr = timeotstr.replace("%", "")
+    timeotstr = timeotstr.replace("d", "")
+    timeotstr = timeotstr.replace(">", "")
+    timeoutratio = int(timeotstr)
+    return timeoutratio
+
+def membersicelister():
+    for line in open("temp/temp.txt", "rb"):
+        if "        </li>" in line:
+            line = line.strip()
+            line = line.replace("</li>", "")
+            line = line.replace(",", "")
+            line = line.replace("Jan", "01")
+            line = line.replace("Feb", "02")
+            line = line.replace("Mar", "03")
+            line = line.replace("Apr", "04")
+            line = line.replace("May", "05")
+            line = line.replace("Jun", "06")
+            line = line.replace("Jul", "07")
+            line = line.replace("Aug", "08")
+            line = line.replace("Sep", "09")
+            line = line.replace("Oct", "10")
+            line = line.replace("Nov", "11")
+            line = line.replace("Dec", "12")
+            line = line.split()
+            line = map(int, line)
+            break
+
+    try:
+        line[0], line[2] = line[2], line[0]
+        line[1], line[2] = line[2], line[1]
+    except:
+        line = (1990, 01, 01)
+        
+    return line
+
 def allinone(membernamelist, minrating, maxrating, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, maxtimeoutratio):
     ratinglist2 = list()
     maxratinglist2 = list()
