@@ -1,0 +1,203 @@
+# RK resource 001 subfunction 5
+# developed by Robin Karlsson
+# contact email: "r.robin.karlsson@gmail.com"
+# contact chess.com profile: "http://www.chess.com/members/view/RobinKarlsson"
+# version 0.8
+
+import mechanize
+import re
+import csv
+import time
+import urlparse
+import cookielib
+from collections import Counter
+from collections import OrderedDict
+from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
+def getvclinks(yourside):
+    linklist = list()
+    yourside = re.sub(r"[^a-z A-Z 0-9]","", yourside)
+    yourside = yourside.replace(" ", "-").lower()
+    browser = mechanize.Browser()
+
+    browser.set_handle_equiv(True)
+    browser.set_handle_redirect(True)
+    browser.set_handle_gzip(True)
+    browser.set_handle_referer(True)
+    browser.set_handle_robots(False)
+    browser.set_handle_refresh(mechanize._http.HTTPRefreshProcessor(), max_time=1)
+
+    pagenum = 1
+    while pagenum <= 100:
+
+        response = browser.open("http://www.chess.com/groups/votechess_diagrams/" + yourside + "/?sortby=completed&page=" + str(pagenum))
+        soup = BeautifulSoup(response)
+        souplinks = re.findall("/votechess/game(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", str(soup.find_all("a")))
+        for link in souplinks:
+            linklist.append("http://www.chess.com" + link)
+
+        soupbrake = str(soup.find_all(class_ = "next-on"))
+        if soupbrake == "[]":
+            break
+
+        pagenum += 1
+    
+    linklist = list(OrderedDict.fromkeys(linklist))
+    return linklist
+    
+def vcman(vclinklist, yourside):
+    
+    Username = raw_input("Username: ")
+    Password = raw_input("Password: ")
+    
+    browser3 = webdriver.Firefox()
+    browser3.get("https://www.chess.com/login")
+    
+    browser3.find_element_by_name("c1").send_keys(Username)
+    browser3.find_element_by_name("loginpassword").send_keys(Password)
+
+    WebDriverWait(browser3, 10).until(EC.presence_of_element_located((By.ID, "btnLogin")))
+    browser3.find_element_by_id("btnLogin").click()
+    time.sleep(2)
+
+    browser1 = mechanize.Browser()
+    cookie = cookielib.LWPCookieJar()
+    browser1.set_cookiejar(cookie)
+
+    browser1.set_handle_equiv(True)
+    browser1.set_handle_redirect(True)
+    browser1.set_handle_gzip(True)
+    browser1.set_handle_referer(True)
+    browser1.set_handle_robots(False)
+    browser1.set_handle_refresh(mechanize._http.HTTPRefreshProcessor(), max_time=1)
+
+    logincookie = browser3.get_cookies()
+    
+    for tempcookie in logincookie:
+        cookie.set_cookie(cookielib.Cookie(version = 0, name = tempcookie["name"], value = tempcookie["value"], port = "80", port_specified = False, domain = tempcookie["domain"], domain_specified = True, domain_initial_dot = False, path = tempcookie["path"], path_specified = True, secure = tempcookie["secure"], expires = tempcookie["expiry"], discard = False, comment = None, comment_url = None, rest = None, rfc2109 = False))
+
+
+    for vcmatch in vclinklist:
+        movelist = list()
+        browser3.get(vcmatch)
+        WebDriverWait(browser3, 10).until(EC.presence_of_element_located((By.ID, "c33")))
+        browser3.find_element_by_id("c33").click()
+        time.sleep(2)
+
+        response = browser1.open(vcmatch)
+        soup = BeautifulSoup(response)
+        boardpos = str(re.findall("boardFlip: (?:[a-zA-Z]|(?:%[a-fA-F]))+", str(soup.find_all(class_ = "chess_viewer")))[0]).replace("boardFlip: ", "")
+
+        yourpos = soup.find_all(class_ = "playername")
+        yourpos = (str(yourpos[0]).replace('<span class="playername">', "").replace("</span>", ""), str(yourpos[1]).replace('<span class="playername">', "").replace("</span>", ""))
+
+        vcelem = browser3.find_elements_by_partial_link_text('')
+
+        while yourside not in yourpos:
+            yoursidechoice = raw_input("\n\nCan't find your group in one of the games. Please specify which group is yours\n  1. " + yourpos[0] + "\n  2. " + yourpos[1] + "\nYour group is number: ")
+
+            if yoursidechoice == "1":
+                yourside = yourpos[0]
+            if yoursidechoice == "2":
+                yourside = yourpos[1]
+                
+        if boardpos == "false":
+
+            if str(yourpos[0]).replace('<span class="playername">', "").replace("</span>", "") == yourside:
+                for placeholder in vcelem:
+                    currentvcmovlink = placeholder.get_attribute("href") or ""
+                    if vcmatch + "&mv=" in currentvcmovlink:
+                        movelist.append(currentvcmovlink)
+                movelist = movelist[1::2]
+
+            if str(yourpos[1]).replace('<span class="playername">', "").replace("</span>", "") == yourside:
+                for placeholder in vcelem:
+                    currentvcmovlink = placeholder.get_attribute("href") or ""
+                    if vcmatch + "&mv=" in currentvcmovlink:
+                        movelist.append(currentvcmovlink)
+                movelist = movelist[0::2]
+
+        if boardpos == "true":
+            if str(yourpos[1]).replace('<span class="playername">', "").replace("</span>", "") == yourside:
+                for placeholder in vcelem:
+                    currentvcmovlink = placeholder.get_attribute("href") or ""
+                    if vcmatch + "&mv=" in currentvcmovlink:
+                        movelist.append(currentvcmovlink)
+                movelist = movelist[1::2]
+    
+        for pointer in movelist:
+            print "\nchecking " + pointer
+
+            response = browser1.open(pointer)
+            links1 = []
+            text1 = []
+
+            for link in browser1.links():
+                url2 = urlparse.urljoin(link.base_url, link.url)
+                text1.append(link.text)
+
+                links1.append("http://" + (urlparse.urlparse(url2).hostname or "") + (urlparse.urlparse(url2).path or ""))
+        
+            for link,text in zip(links1,text1):
+                with open("temp/temp.txt", "a") as placeholder2:
+                    placeholder2.write(re.sub(r"^http?:\/\/.*[\r\n]*", "", link.replace("http://www.chess.com/members/view/", ", "), flags=re.MULTILINE))
+            
+            soup = BeautifulSoup(response)
+            p2 = str(soup.find_all(class_ = "next-on"))
+            
+            if "next-on" in p2:
+                browser3.get(pointer)
+                nextbtn = 2
+                while not nextbtn == 0:
+                
+                    try:
+                        browser3.find_element_by_css_selector('li.next-on>a').click()
+                    except:
+                        break
+                    time.sleep(2)
+                    print "\nextracting names from " + pointer + " page " + str(nextbtn)
+                    vcelem = browser3.find_elements_by_partial_link_text('')
+                    for curvcparmem in vcelem:
+                        memsellink = curvcparmem.get_attribute("href") or ""
+
+                        if "http://www.chess.com/members/view/" in memsellink:
+                            with open("temp/temp.txt", "a") as placeholder2:
+                                placeholder2.write(re.sub(r"^http?:\/\/.*[\r\n]*", "", memsellink.replace("http://www.chess.com/members/view/", ", "), flags=re.MULTILINE))
+
+                    nextbtn += 1
+        
+    browser3.quit()
+    
+
+pathway = "y"
+while set(["y"]).intersection(pathway):
+    flow = ""
+    roadblock1 = set(["5"])
+
+    while not roadblock1.intersection(flow):
+        flow = raw_input("\nEnter your choice here: ")
+
+        if not roadblock1.intersection(flow):
+            print " invalid choice, try again!"
+
+    if flow == "5":
+        yourside = raw_input("Name of group to check: ")
+
+        vclinklist = getvclinks(yourside)
+        vcman(vclinklist, yourside)
+
+        parmemvc = Counter()
+
+        for placeholder2 in open ("temp/temp.txt", "r"):
+          for membervc in placeholder2.split ():
+            parmemvc[membervc] += 0.5
+
+        for key, value in sorted(parmemvc.items(), key = itemgetter(1), reverse = True):
+            print "\n" + key + " has made " + str(value).replace(".0", "") + " posts"
+            
+	pathway = raw_input("Run again? (y/n) ")
