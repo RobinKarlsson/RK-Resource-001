@@ -198,6 +198,6 @@ while set(["y"]).intersection(pathway):
             parmemvc[membervc] += 0.5
 
         for key, value in sorted(parmemvc.items(), key = itemgetter(1), reverse = True):
-            print "\n" + key + " has made " + str(int(value)).replace(".0", "") + " posts"
+            print "\n" + key + " has made " + str(int(value)) + " posts"
             
 	pathway = raw_input("Run again? (y/n) ")
