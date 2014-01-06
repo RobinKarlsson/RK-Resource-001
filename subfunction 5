@@ -175,14 +175,13 @@ def vcman(vclinklist, yourside):
     
 
 pathway = "y"
-while set(["y"]).intersection(pathway):
+while pathway in (["y"]):
     flow = ""
-    roadblock1 = set(["5"])
 
-    while not roadblock1.intersection(flow):
+    while flow not in ([5]):
         flow = raw_input("\nEnter your choice here: ")
 
-        if not roadblock1.intersection(flow):
+        if flow not in ([5]):
             print " invalid choice, try again!"
 
     if flow == "5":
