@@ -2,7 +2,7 @@
 # developed by Robin Karlsson
 # contact email: "r.robin.karlsson@gmail.com"
 # contact chess.com profile: "http://www.chess.com/members/view/RobinKarlsson"
-# version 0.8
+# version 0.8.5
 
 import mechanize
 import re
@@ -99,7 +99,9 @@ def vcman(vclinklist, yourside):
         vcelem = browser3.find_elements_by_partial_link_text('')
 
         while yourside not in yourpos:
-            yoursidechoice = raw_input("\n\nCan't find your group in one of the games. Please specify which group is yours\n  1. " + yourpos[0] + "\n  2. " + yourpos[1] + "\nYour group is number: ")
+            yoursidechoice = ""
+            while yoursidechoice not in (["1", "2"]):
+                yoursidechoice = raw_input("\n\nCan't find your group in one of the games. Please specify which group is yours\n  1. " + yourpos[0] + "\n  2. " + yourpos[1] + "\nYour group is number: ")
 
             if yoursidechoice == "1":
                 yourside = yourpos[0]
@@ -115,7 +117,7 @@ def vcman(vclinklist, yourside):
                         movelist.append(currentvcmovlink)
                 movelist = movelist[1::2]
 
-            if str(yourpos[1]).replace('<span class="playername">', "").replace("</span>", "") == yourside:
+            elif str(yourpos[1]).replace('<span class="playername">', "").replace("</span>", "") == yourside:
                 for placeholder in vcelem:
                     currentvcmovlink = placeholder.get_attribute("href") or ""
                     if vcmatch + "&mv=" in currentvcmovlink:
@@ -172,7 +174,7 @@ def vcman(vclinklist, yourside):
                     nextbtn += 1
         
     browser3.quit()
-    
+
 
 pathway = "y"
 while pathway in (["y"]):
@@ -180,9 +182,6 @@ while pathway in (["y"]):
 
     while flow not in ([5]):
         flow = raw_input("\nEnter your choice here: ")
-
-        if flow not in ([5]):
-            print " invalid choice, try again!"
 
     if flow == "5":
         yourside = raw_input("Name of group to check: ")
@@ -198,5 +197,3 @@ while pathway in (["y"]):
 
         for key, value in sorted(parmemvc.items(), key = itemgetter(1), reverse = True):
             print "\n" + key + " has made " + str(int(value)) + " posts"
-            
-	pathway = raw_input("Run again? (y/n) ")
