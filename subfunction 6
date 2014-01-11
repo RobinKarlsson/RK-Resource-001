@@ -2,7 +2,7 @@
 # developed by Robin Karlsson
 # contact email: "r.robin.karlsson@gmail.com"
 # contact chess.com profile: "http://www.chess.com/members/view/RobinKarlsson"
-# version 0.8
+# version 0.8.5
 
 import mechanize
 import re
@@ -10,7 +10,6 @@ import csv
 from collections import OrderedDict
 from bs4 import BeautifulSoup
 from collections import Counter
-
 
 def gettmlinks(targetname):
     linklist = list()
@@ -40,7 +39,7 @@ def gettmlinks(targetname):
         soup = BeautifulSoup(response)
 
         soupbrake = str(soup.find_all(class_ = "next-on"))
-        souplinks = re.findall("/groups/team_match(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", str(soup.find_all("a")))
+        souplinks = re.findall("/groups/team_match(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]i|(?:%[0-9a-fA-F][0-9a-fA-F]))+", str(soup.find_all("a")))
         for link in souplinks:
             linklist.append("http://www.chess.com" + link)
 
@@ -164,11 +163,7 @@ def ratinglister():
     ratinglist2 = list()
     for line in open("temp/temp.txt","rb"):
         if '<span class="arrow menu-icons right-arrow"></span></div>' and '<div class="right">' in line:
-            line = line.replace('<span class="arrow menu-icons right-arrow"></span></div>', "")
-            line = line.replace('<div class="right">', "")
-            line = line.replace(",", "")
-            line = line.replace('<span class="arrow menu-icons right-arrow"></span>', "")
-            line = line.replace('<td>', "")
+            line = line.replace('<span class="arrow menu-icons right-arrow"></span></div>', "").replace('<div class="right">', "").replace(",", "").replace('<span class="arrow menu-icons right-arrow"></span>', "").replace('<td>', "")
             line = line.split()
             i = 0
             while i <= len(line):
@@ -186,20 +181,7 @@ def loginlister():
     for line in open("temp/temp.txt","rb"):
         if '        </li>, <li class="last">' in line:
             line = line.strip()
-            line = line.replace('</li>, <li class="last">', "")
-            line = line.replace(",", "")
-            line = line.replace("Jan", "01")
-            line = line.replace("Feb", "02")
-            line = line.replace("Mar", "03")
-            line = line.replace("Apr", "04")
-            line = line.replace("May", "05")
-            line = line.replace("Jun", "06")
-            line = line.replace("Jul", "07")
-            line = line.replace("Aug", "08")
-            line = line.replace("Sep", "09")
-            line = line.replace("Oct", "10")
-            line = line.replace("Nov", "11")
-            line = line.replace("Dec", "12")
+            line = line.replace('</li>, <li class="last">', "").replace(",", "").replace("Jan", "01").replace("Feb", "02").replace("Mar", "03").replace("Apr", "04").replace("May", "05").replace("Jun", "06").replace("Jul", "07").replace("Aug", "08").replace("Sep", "09").replace("Oct", "10").replace("Nov", "11").replace("Dec", "12")
             line = line.split()
             try:
                 line = map(int, line)
@@ -228,9 +210,7 @@ def timeoutlister():
         timeotstr = str(timeoutlist[-1])
     except:
         timeotstr = "100"
-    timeotstr = timeotstr.replace("%", "")
-    timeotstr = timeotstr.replace("d", "")
-    timeotstr = timeotstr.replace(">", "")
+    timeotstr = timeotstr.replace("%", "").replace("d", "").replace(">", "")
     timeoutratio = int(timeotstr)
     return timeoutratio
 
@@ -238,20 +218,7 @@ def membersicelister():
     for line in open("temp/temp.txt", "rb"):
         if "        </li>" in line:
             line = line.strip()
-            line = line.replace("</li>", "")
-            line = line.replace(",", "")
-            line = line.replace("Jan", "01")
-            line = line.replace("Feb", "02")
-            line = line.replace("Mar", "03")
-            line = line.replace("Apr", "04")
-            line = line.replace("May", "05")
-            line = line.replace("Jun", "06")
-            line = line.replace("Jul", "07")
-            line = line.replace("Aug", "08")
-            line = line.replace("Sep", "09")
-            line = line.replace("Oct", "10")
-            line = line.replace("Nov", "11")
-            line = line.replace("Dec", "12")
+            line = line.replace("</li>", "").replace(",", "").replace("Jan", "01").replace("Feb", "02").replace("Mar", "03").replace("Apr", "04").replace("May", "05").replace("Jun", "06").replace("Jul", "07").replace("Aug", "08").replace("Sep", "09").replace("Oct", "10").replace("Nov", "11").replace("Dec", "12")
             line = line.split()
             line = map(int, line)
             break
@@ -317,12 +284,8 @@ def allinone(membernamelist, minrating, maxrating, lastloginyear, lastloginmonth
         if timeoutratio <= maxtimeoutratio:
             timeoutlist2.append(membername)
 
-    passmembers = str(set(ratinglist2) & set(loginlist2) & set(membersinlist) & set(timeoutlist2) & set(maxratinglist2))
-    passmembers = passmembers.replace("set([", "")
-    passmembers = passmembers.replace("])", "")
-    passmembers = passmembers.replace("'", "")
-    return passmembers
-    
+    passmembers = str(set(ratinglist2) & set(loginlist2) & set(membersinlist) & set(timeoutlist2) & set(maxratinglist2)).replace("set([", "").replace("])", "").replace("'", "")
+    return passmembers    
 
 pathway = "y"
 while pathway in (["y"]):
