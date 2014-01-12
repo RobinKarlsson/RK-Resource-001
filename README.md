@@ -38,7 +38,7 @@ Extract a list of members present in a single or more pages on chess.com
 
 Send invites for a group, or iterate over the list of supported groups in an endless loop.
 
-Supported groups: Star Trek: The Dominion, Karemma Ministry of Trade, The Breen Confederacy, The Cardassian Empire, Death Star III, Space Angels, Legio XIII Gemina, Andromeda
+Supported groups: Star Trek: The Dominion, Karemma Ministry of Trade, The Breen Confederacy, The Cardassian Empire, Death Star III, Space Angels, Legio XIII Gemina, Andromeda, Family Guy
 
  
 
