@@ -291,11 +291,8 @@ pathway = "y"
 while pathway in (["y"]):
     flow = ""
 
-    while flow not in ([6]):
+    while flow not in (["6"]):
         flow = raw_input("\nEnter your choice here: ")
-
-        if flow not in ([6]):
-            print " invalid choice, try again!"
             
     if flow == "6":
         targetnameorg = raw_input("\n\n\nName of the group you wish to check: ")
