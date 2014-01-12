@@ -2,8 +2,11 @@ RK-Resource-001
 ===============
 
 Robin Karlssons chess.com resource 
+
 contact email: "r.robin.karlsson@gmail.com"
+
 contact chess.com profile: "http://www.chess.com/members/view/RobinKarlsson"
+
 version 0.8.5
 
 
