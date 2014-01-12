@@ -180,11 +180,8 @@ pathway = "y"
 while pathway in (["y"]):
     flow = ""
 
-    while flow not in ([5]):
+    while flow not in (["5"]):
         flow = raw_input("\nEnter your choice here: ")
-
-    if flow == "5":
-        yourside = raw_input("Name of group to check: ")
 
         vclinklist = getvclinks(yourside)
         vcman(vclinklist, yourside)
