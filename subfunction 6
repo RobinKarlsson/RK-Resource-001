@@ -158,134 +158,200 @@ def tmparchecker(pagelist, targetname):
             placeholder = list()
     return tmpar, timeoutlist, winssdic, losedic
 
-def ratinglister():
-    ratinglist = list()
-    ratinglist2 = list()
-    for line in open("temp/temp.txt","rb"):
-        if '<span class="arrow menu-icons right-arrow"></span></div>' and '<div class="right">' in line:
-            line = line.replace('<span class="arrow menu-icons right-arrow"></span></div>', "").replace('<div class="right">', "").replace(",", "").replace('<span class="arrow menu-icons right-arrow"></span>', "").replace('<td>', "")
-            line = line.split()
-            i = 0
-            while i <= len(line):
-                ratinglist.append(line[-i])
-                i += 1
-    for rating in ratinglist[0:len(ratinglist)]:
-        try:
-            rating = int(rating)
-        except ValueError:
-            rating = 0
-        ratinglist2.append(rating)
-    return ratinglist2
+def memberprocesser(target):
+    minrat = raw_input("\n\nMin rating allowed. leave empty to skip: ")
 
-def loginlister():
-    for line in open("temp/temp.txt","rb"):
-        if '        </li>, <li class="last">' in line:
-            line = line.strip()
-            line = line.replace('</li>, <li class="last">', "").replace(",", "").replace("Jan", "01").replace("Feb", "02").replace("Mar", "03").replace("Apr", "04").replace("May", "05").replace("Jun", "06").replace("Jul", "07").replace("Aug", "08").replace("Sep", "09").replace("Oct", "10").replace("Nov", "11").replace("Dec", "12")
-            line = line.split()
-            try:
-                line = map(int, line)
-            except ValueError:
-                break
-            loginlist = line
-
-    try:
-        loginlist[0], loginlist[2] = loginlist[2], loginlist[0]
-        loginlist[1], loginlist[2] = loginlist[2], loginlist[1]
-    except:
-        loginlist = (1990, 01, 01)
-    return loginlist
-
-def timeoutlister():
-    timeoutlist = list()
-    for line in open("temp/temp.txt","rb"):
-        if '<span class="no-color normal">(last 90 days)</span> </td>' in line:
-            placeholder = line.index('<span class="no-color normal">(last 90 days)</span> </td>')
-
-            placeholder2 = 0
-            while placeholder2 < 6:
-                timeoutlist.append(line[placeholder - placeholder2:placeholder])
-                placeholder2 += 1
-    try:
-        timeotstr = str(timeoutlist[-1])
-    except:
-        timeotstr = "100"
-    timeotstr = timeotstr.replace("%", "").replace("d", "").replace(">", "")
-    timeoutratio = int(timeotstr)
-    return timeoutratio
-
-def membersicelister():
-    for line in open("temp/temp.txt", "rb"):
-        if "        </li>" in line:
-            line = line.strip()
-            line = line.replace("</li>", "").replace(",", "").replace("Jan", "01").replace("Feb", "02").replace("Mar", "03").replace("Apr", "04").replace("May", "05").replace("Jun", "06").replace("Jul", "07").replace("Aug", "08").replace("Sep", "09").replace("Oct", "10").replace("Nov", "11").replace("Dec", "12")
-            line = line.split()
-            line = map(int, line)
-            break
-
-    try:
-        line[0], line[2] = line[2], line[0]
-        line[1], line[2] = line[2], line[1]
-    except:
-        line = (1990, 01, 01)
-        
-    return line
-
-def allinone(membernamelist, minrating, maxrating, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, maxtimeoutratio):
-    ratinglist2 = list()
-    maxratinglist2 = list()
-    loginlist2 = list()
-    membersinlist = list()
-    timeoutlist2 = list()
-    browser = mechanize.Browser()
+    lastloginyear = raw_input("\nLast logged in year. leave empty to skip (YYYY): ")
+    if lastloginyear != "":
+        lastloginyear = int(lastloginyear)
+        lastloginmonth = int(raw_input("Last logged in month (MM): "))
+        lastloginday = int(raw_input("Last logged in day (DD): "))
     
-    for membername in membernamelist:
-        memberlink = "http://www.chess.com/members/view/" + membername
-        print "\n\nChecking member: " + membername
-        response = browser.open(memberlink)
-        soup = BeautifulSoup(response)
+    membersinceyear = raw_input("\nMember since before year. leave empty to skip (YYYY): ")
+    if membersinceyear!= "":
+        membersinceyear = int(membersinceyear)
+        membersincemonth = int(raw_input("Member since before month (MM): "))
+        membersinceday = int(raw_input("Member since before day (DD): "))
+
+    youngeryear = raw_input("\nBorn after year. leave empty to skip (YYYY): ")
+    if youngeryear!= "":
+        youngeryear = int(youngeryear)
+        youngermonth = int(raw_input("Born after month (MM): "))
+        youngerday = int(raw_input("Born after day (DD): "))
         
-        souprating = str(soup.find_all(class_ = "right"))
-        with open("temp/temp.txt", "w") as placeholder2:
-            placeholder2.write(souprating)
-        ratinglist = ratinglister()
-        for rating in ratinglist:
-            if rating >= int(minrating):
-                ratinglist2.append(membername)
-                break
+    olderyear = raw_input("\nBorn before year. leave empty to skip (YYYY): ")
+    if olderyear!= "":
+        olderyear = int(olderyear)
+        oldermonth = int(raw_input("Born before month (MM): "))
+        olderday = int(raw_input("Born before day (DD): "))
 
-        soupmaxrating = str(soup.find_all(class_ = "right"))
-        with open("temp/temp.txt", "w") as placeholder2:
-            placeholder2.write(souprating)
-        ratinglist = ratinglister()
-        for rating in ratinglist:
-            if rating <= int(maxrating):
-                maxratinglist2.append(membername)
-                break
+    timemax = raw_input("\nMax timeoutratio allowed. leave empty to skip: ")
+    maxgroup = raw_input("\nMax number of groups member may be in. leave empty to skip: ")
+    mingroup = raw_input("Min number of groups member may be in. leave empty to skip: ")
 
-        souplogin = str(soup.find_all(class_ = "last"))
-        with open("temp/temp.txt", "w") as placeholder2:
-            placeholder2.write(souplogin)
-        loginlist = loginlister()
-        if datetime(loginlist[0], loginlist[1], loginlist[2]) >= datetime(lastloginyear, lastloginmonth, lastloginday):
-            loginlist2.append(membername)
+    heritage = raw_input("\nMember should be from. leave empty to skip: ")
 
-        soupsince = str(soup.find_all(class_ = "columns two clearfix bottom-12"))
-        with open("temp/temp.txt", "w") as placeholder2:
-            placeholder2.write(soupsince)
-        memberslist = membersicelister()
-        if datetime(memberslist[0], memberslist[1], memberslist[2]) <= datetime(membersinceyear, membersincemonth, membersinceday):
-            membersinlist.append(membername)
+    memgender = "a"
+    while memgender not in (["m", "f", ""]):
+        memgender = raw_input("\nMember should be gender (determined by comparing member name to a list of male and female names). leave empty to skip (m/f): ")
 
-        souptimeout = str(soup.find_all("td"))
-        with open("temp/temp.txt", "w") as placeholder2:
-            placeholder2.write(souptimeout)
-        timeoutratio = timeoutlister()
-        if timeoutratio <= maxtimeoutratio:
-            timeoutlist2.append(membername)
+    browser = mechanize.Browser()
+    browser.set_handle_equiv(True)
+    browser.set_handle_redirect(True)
+    browser.set_handle_gzip(True)
+    browser.set_handle_referer(True)
+    browser.set_handle_robots(False)
+    browser.set_handle_refresh(mechanize._http.HTTPRefreshProcessor(), max_time=1)
+    
+    target = target.replace(" ", "").split(",")
+    passmem = list()
+    for targetx in target:
+        print "checking " + targetx
+        response = browser.open("http://www.chess.com/members/view/" + targetx)
+        if "://www.chess.com/members/view/" not in browser.geturl():
+            continue
+        soup = BeautifulSoup(response)
 
-    passmembers = str(set(ratinglist2) & set(loginlist2) & set(membersinlist) & set(timeoutlist2) & set(maxratinglist2)).replace("set([", "").replace("])", "").replace("'", "")
-    return passmembers    
+        if membersinceyear != "" or lastloginyear != "":
+            memsinlist = memsin(soup)
+
+            if lastloginyear != "":
+                lonln = memsinlist[1]
+                if datetime(lonln[0], lonln[1], lonln[2]) < datetime(lastloginyear, lastloginmonth, lastloginday):
+                    continue
+
+        if timemax != "":
+            if timeoutchecker(soup) > int(timemax):
+                continue
+
+        if membersinceyear != "":
+            memsi = memsinlist[0]
+            if datetime(memsi[0], memsi[1], memsi[2]) > datetime(membersinceyear, membersincemonth, membersinceday):
+                continue
+
+        if minrat != "":
+            minrat = int(minrat)
+            ratinglist = ratingchecker(soup)
+            pas = "n"
+            for rating in ratinglist:
+                if rating >= minrat:
+                    pas = "y"
+                    break
+            if pas == "n":
+                continue
+
+        if maxgroup != "" or mingroup != "":
+            groupcount = groupmemlister(soup)
+
+            if maxgroup != "":
+                if groupcount > int(maxgroup):
+                    continue
+            if mingroup != "":
+                if groupcount < int(mingroup):
+                    continue
+
+        if youngeryear != "" or olderyear != "":
+            birthdate = birthlister(soup)
+            if birthdate == "":
+                continue
+            while "" in birthdate:
+                birthdate.remove("")
+
+            birthdate = [int(birthdate[2]), int(birthdate[0]), int(birthdate[1])]
+
+            if youngeryear != "":
+                if datetime(birthdate[0], birthdate[1], birthdate[2]) < datetime(youngeryear, youngermonth, youngerday):
+                    continue
+            if olderyear != "":
+                if datetime(birthdate[0], birthdate[1], birthdate[2]) > datetime(olderyear, oldermonth, olderday):
+                    continue
+
+        if heritage != "":
+            nation = nationlister(soup)
+
+            if heritage not in nation:
+                continue
+
+        if memgender != "":
+            name = namechecker(soup)
+            if name == " ":
+                continue
+            name = name.split(" ")[0].lower()
+            Found = "n"
+
+            if memgender == "f":
+                with open("namelists/female", "rb") as fnlist:
+                    for line in fnlist:
+                        if name in line:
+                            Found = "y"
+                            break
+            elif memgender == "m":
+                with open("namelists/male", "rb") as mnlist:
+                    for line in mnlist:
+                        if name in line:
+                            Found = "y"
+                            break
+            if Found == "n":
+                continue
+
+        passmem.append(targetx)
+    return passmem
+
+def namechecker(soup):
+    for placeholder in soup.find_all("strong"):
+        strplaceholder = str(placeholder)
+        if "Click here" not in strplaceholder and "ChessTV" not in strplaceholder:
+            return str(placeholder.text)
+
+def timeoutchecker(soup):
+    for placeholder in soup.find_all(class_ = "even"):
+        if "Timeouts:" in str(placeholder):
+            timeout = int(placeholder.text.replace("Timeouts:", "").strip().replace("% (last 90 days)", ""))
+            break
+    return timeout
+
+def ratingchecker(soup):
+    ratinglist = list()
+    recorder = "off"
+    for placeholder in soup.find_all(class_ = "right"):
+        if "View All Stats" in placeholder:
+            recorder = "on"
+        elif "Games Archive" in placeholder:
+            break
+        elif recorder == "on":
+            try:
+                ratinglist.append(int(placeholder.text))
+            except ValueError:
+                "nada"
+    return ratinglist
+
+def memsin(soup):
+    memsinlist = list()
+    for placeholder in soup.find_all(class_ = "section-content section-content-2"):
+        longnumlist = placeholder.text.strip().replace("  ", "").replace(",", "").replace("Member Since:", "").replace("Profile Views:", " ").replace("Last Login:", " ").replace("\n", "").replace("Jan", "01").replace("Feb", "02").replace("Mar", "03").replace("Apr", "04").replace("May", "05").replace("Jun", "06").replace("Jul", "07").replace("Aug", "08").replace("Sep", "09").replace("Oct", "10").replace("Nov", "11").replace("Dec", "12").split(" ")
+    return [int(longnumlist[2]), int(longnumlist[0]), int(longnumlist[1])], [int(longnumlist[5]), int(longnumlist[3]), int(longnumlist[4])]
+
+def groupmemlister(soup):
+    groupcountlist = list()
+    for placeholder in soup.find_all(class_ = "parenthesis-link"):
+        memgroups = placeholder.text
+    return int(memgroups)
+
+def nationlister(soup):
+    nationlist = list()
+    for placeholder in soup.find_all(class_ = "bottom-12"):
+        break
+    return str(placeholder.text.strip())
+
+def birthlister(soup):
+    for placeholder in soup.find_all(class_ = "section-content section-content-2"):
+        try:
+            placeholder = [birth for birth in str(placeholder).split("\n") if "Birthday:" in birth][0]
+            pos = placeholder.find("Birthday:")
+            birthday = placeholder[pos + 19: pos + 31].replace(",", "").replace("Jan", "01").replace("Feb", "02").replace("Mar", "03").replace("Apr", "04").replace("May", "05").replace("Jun", "06").replace("Jul", "07").replace("Aug", "08").replace("Sep", "09").replace("Oct", "10").replace("Nov", "11").replace("Dec", "12").split(" ")
+        except IndexError:
+            birthday = ""
+    return birthday
 
 pathway = "y"
 while pathway in (["y"]):
@@ -329,24 +395,11 @@ while pathway in (["y"]):
                 choicetm = "2"
         
         if choicetm == "2":
-            minrating = raw_input("\nMin rating allowed: ")
-            maxrating = raw_input("Max rating allowed: ")
             membernamelist = list()
             for key in joined:
                 membernamelist.append(key)
 
-            print "\n\nNumber of members that will be checked: " + str(len(membernamelist))
-            lastloginyear = int(raw_input("\nLast logged in year (YYYY): "))
-            lastloginmonth = int(raw_input("Last logged in month (MM): "))
-            lastloginday = int(raw_input("Last logged in day (DD): "))
-
-            membersinceyear = int(raw_input("\nMember since before year (YYYY): "))
-            membersincemonth = int(raw_input("Member since before month (MM): "))
-            membersinceday = int(raw_input("Member since before day (DD): "))
-
-            maxtimeoutratio = int(raw_input("\nmaximum timeout ratio allowed: "))
-
-            passmembers = allinone(membernamelist, minrating, maxrating, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, maxtimeoutratio)
+            passmembers = memberprocesser(membernamelist)
             joined2 = dict()
             membernamelist = list()
             for key in joined:
