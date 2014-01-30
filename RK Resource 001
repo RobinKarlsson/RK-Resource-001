@@ -1,0 +1,1987 @@
+# RK resource 001
+# developed by Robin Karlsson
+# contact email: "r.robin.karlsson@gmail.com"
+# contact chess.com profile: "http://www.chess.com/members/view/RobinKarlsson"
+# version 0.8.7
+
+import mechanize
+import os
+import sys
+import csv
+import urlparse
+import cookielib
+import random
+import base64
+import stat
+import re
+import time
+from time import strftime, gmtime
+from datetime import datetime
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.alert import Alert
+from bs4 import BeautifulSoup
+from operator import itemgetter
+from collections import OrderedDict
+from collections import Counter
+from string import punctuation
+
+def com2(xxxxxxxxxxxxxx, xxxxxxxxxxxxx, xxxxxxxxxxxxxxxx, xxxxxxxxxxxxxxxxxxx):
+    for xxxxxxxxxxxxxxxxx in xrange(len(xxxxxxxxxxxxx)):
+        xxxxxxxxxxxxxxxxxxx.append(chr(ord(xxxxxxxxxxxxx[xxxxxxxxxxxxxxxxx]) + ord(xxxxxxxxxxxxxx[xxxxxxxxxxxxxxxxx % len(xxxxxxxxxxxxxx)]) % xxxxxxxxxxxxxxxx))
+    return base64.urlsafe_b64encode("".join(xxxxxxxxxxxxxxxxxxx))
+
+def com3(xxxxxxxxxxxxxx, xxxxxxxxxxxxx, xxxxxxxxxxxxxxxx, xxxxxxxxxxxxxxxxxxx):
+    xxxxxxxxxxxxx = base64.urlsafe_b64decode(xxxxxxxxxxxxx)
+    for xxxxxxxxxxxxxxxxx in xrange(len(xxxxxxxxxxxxx)):
+        xxxxxxxxxxxxxxxxxxx.append(chr(abs(ord(xxxxxxxxxxxxx[xxxxxxxxxxxxxxxxx]) - ord(xxxxxxxxxxxxxx[xxxxxxxxxxxxxxxxx % len(xxxxxxxxxxxxxx)]) % xxxxxxxxxxxxxxxx)))
+    return "".join(xxxxxxxxxxxxxxxxxxx)
+
+if os.stat("mem/dommem").st_size > 0:
+    for placeholder in open("mem/dommem", "rb"):
+        dommem = com3("keydom", placeholder, 256, []).replace("\n", "").split(", ")
+else:
+    dommem = list()
+
+tmban = set(['bijayees1234', 'freaky25', 'Quack-Peep', 'ADOKA', 'redneck7-1-1990', 'falkon26', 'dryan43', 'mcwelch101', 'TasmanianTiger', 'lennyjane18', 'jeremybloom', '143abhi', 'Sawblade24'])
+domban = set(['okinawaoly', 'rubenhasratyan', 'kohai', 'swarmflow', 'Backer1', 'mitchthebuyer', 'Gelnon', 'Phaethonas', 'CaptainPike', 'Stormbringer', 'Steve212000', 'doctorstorm', 'dogs10099', 'chessmaster010l'])
+
+def gettmlinks(targetname):
+    linklist = list()
+    browser = mechanize.Browser()
+
+    browser.set_handle_equiv(True)
+    browser.set_handle_redirect(True)
+    browser.set_handle_gzip(True)
+    browser.set_handle_referer(True)
+    browser.set_handle_robots(False)
+    browser.set_handle_refresh(mechanize._http.HTTPRefreshProcessor(), max_time=1)
+
+    response = browser.open("http://www.chess.com/groups/matches/" + targetname + "?show_all_current=1")
+    soup = BeautifulSoup(response)
+    souplinks = re.findall("/groups/team_match(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", str(soup.find_all("a")))
+    for link in souplinks:
+        linklist.append("http://www.chess.com" + link)
+
+    pointerlist = (0, 1, 2)
+    for pointer in pointerlist:
+        del linklist[-1]
+
+    linkarchive = linklist.pop(-1)
+    pointer = 1
+    while 0 == 0:
+        response = browser.open(str(linkarchive) + "&page=" + str(pointer))
+        soup = BeautifulSoup(response)
+
+        soupbrake = str(soup.find_all(class_ = "next-on"))
+        souplinks = re.findall("/groups/team_match(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]i|(?:%[0-9a-fA-F][0-9a-fA-F]))+", str(soup.find_all("a")))
+        for link in souplinks:
+            linklist.append("http://www.chess.com" + link)
+
+        if soupbrake == "[]":
+            break
+
+        pointer += 1
+
+    linklist = list(set(linklist))
+    return linklist
+
+def birthdsorter(birthdaylist):
+    choice = ""
+    while choice not in (["1"]):
+        choice = raw_input("\n\nOptions:\n 1. print the collected information sorted by birthdays\nYour choice: ")
+
+    if choice == "1":
+        birthdaylist = sorted(birthdaylist)
+        for element in birthdaylist:
+            print str(element[1]) + "/" + str(element[0]) + " - " + element[3] + ", born " + str(element[2])
+
+def csvsoworker(memlist):
+    col_width = max(len(element) for row in memlist for element in row) + 2
+
+    choice = ""
+    while choice not in (["1", "2"]):
+        choice = raw_input("\n\noptions\n 1. Get data from the csv-file\n 2. get all the usernames in an invites friendly format\nYour choice: ")
+
+    if choice == "1":
+        cdone = "y"
+        choicelist = (["0"])
+        while cdone != "n":
+            choice = ""
+            while choice not in (["1", "2", "3", "4", "5"]) or choice in choicelist:
+                choice = raw_input("\n\nwhat would you like to include?\n 1. " + (memlist[0])[1] + "\n 2. " + (memlist[0])[2] + "\n 3. " + (memlist[0])[3] + "\n 4. " + (memlist[0])[4] + "\n 5. " + (memlist[0])[5] + "\nYour choice: ")
+            choicelist.append(choice)
+
+            cdone = ""
+            while cdone not in (["y", "n"]):
+                cdone = raw_input("include more data? (y/n) ")
+
+        memlist2 = list()
+        choicelist = sorted(choicelist)
+        for cpointer in memlist:
+            nlist = list()
+            for pospointer in choicelist:
+                try:
+                    nlist.append(float(cpointer[int(pospointer)]))
+                except ValueError:
+                    nlist.append(cpointer[int(pospointer)])
+            memlist2.append(nlist)
+
+        ltitle = memlist2[0]
+        del memlist2[0]
+
+        print "\n\nsort by\n 1. most valuable tm participant"
+        counter = 2
+        coulist = (["1"])
+        for pointer in ltitle:
+            count2id = str(counter)
+            coulist.append(count2id)
+            print " " + count2id + ". " + pointer
+            counter += 1
+
+        choice2 = ""
+        while choice2 not in coulist:
+            choice2 = raw_input("Your choice: ")
+        choice2 = int(choice2)
+
+        if choice2 == 1:
+            "nothing"
+        elif choice2 == 2:
+            memlist2 = sorted(memlist2, key=lambda tup: tup[0].lower())
+        else:
+            memlist2 = sorted(memlist2, reverse = True, key=lambda tup: tup[choice2 - 2])
+
+        print "\n\n" + "".join(element.ljust(col_width) for element in ltitle) + "\n"
+        llength = len(memlist2[0])
+        for cpointer in memlist2:
+            counter = 0
+            while counter < llength:
+                cpointer[counter] = str(cpointer[counter])
+                counter += 1
+            print "".join(element.ljust(col_width) for element in cpointer)
+
+    elif choice == "2":
+        del memlist[0]
+        memlist2 = list()
+
+        for cpointer in memlist:
+            memlist2.append(cpointer[0])
+
+        print "\n\n" + str(memlist2).replace("'", "").replace("[", "").replace("]", "")
+
+def getvclinks(yourside):
+    linklist = list()
+    yourside = re.sub(r"[^a-z A-Z 0-9]","", yourside)
+    yourside = yourside.replace(" ", "-").lower()
+    browser = mechanize.Browser()
+
+    browser.set_handle_equiv(True)
+    browser.set_handle_redirect(True)
+    browser.set_handle_gzip(True)
+    browser.set_handle_referer(True)
+    browser.set_handle_robots(False)
+    browser.set_handle_refresh(mechanize._http.HTTPRefreshProcessor(), max_time=1)
+
+    pagenum = 1
+    while pagenum <= 100:
+        response = browser.open("http://www.chess.com/groups/votechess_diagrams/" + yourside + "/?sortby=completed&page=" + str(pagenum))
+        soup = BeautifulSoup(response)
+        souplinks = re.findall("/votechess/game(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", str(soup.find_all("a")))
+        for link in souplinks:
+            linklist.append("http://www.chess.com" + link)
+
+        soupbrake = str(soup.find_all(class_ = "next-on"))
+        if soupbrake == "[]":
+            break
+
+        pagenum += 1
+    linklist = list(OrderedDict.fromkeys(linklist))
+    return linklist
+
+def pmreplacer(text, name, country, timeoutratio):
+    return text.replace("/name", name).replace("/nation", country).replace("/timeoutratio", timeoutratio).replace("/newline", "\n")
+
+def pmdriver(target, choice):
+    print "\n\n\nYour message will be in the format:\nmain text\nimage\nsecondary text\n\n\nsupported commands, will be replaced with each members respective info\n /name - members name or username (if name is unavailable)\n /nation - members nation of origin\n /timeoutratio - members timeoutratio\n /newline - pagebreak\n\n\n"
+    subject = raw_input("subject line: ")
+    payload = raw_input("main text: ")
+    payloadimg = raw_input("url of image you want to use: ")
+    payload2 = raw_input("secondary text: ")
+    nnation = raw_input("If member nation is International, use this instead: ")
+
+    Username = raw_input("\n\n\nUsername: ")
+    Password = raw_input("Password: ")
+
+    browser0 = webdriver.Firefox()
+    browser0.get("https://www.chess.com/login")
+
+    browser0.find_element_by_name("c1").send_keys(Username)
+
+    browser0.find_element_by_name("loginpassword").send_keys(Password)
+
+    WebDriverWait(browser0, 10).until(EC.presence_of_element_located((By.ID, "btnLogin")))
+    browser0.find_element_by_id("btnLogin").click()
+
+    logincookie = browser0.get_cookies()
+
+    if choice == "1":
+        memtpm = spider_ml(target, logincookie)
+    elif choice == "2":
+        memtpm = target
+
+    choice2 = ""
+    while choice2 not in (["y", "n"]):
+        choice2 = raw_input("\n\n\nSort out those who dont fill a few requirements? (y/n) ")
+    if choice2 == "y":
+        memtpm = memberprocesser(memtpm)
+
+    browser1 = mechanize.Browser()
+    cookie = cookielib.LWPCookieJar()
+    browser1.set_cookiejar(cookie)
+
+    for tempcookie in logincookie:
+        cookie.set_cookie(cookielib.Cookie(version = 0, name = tempcookie["name"], value = tempcookie["value"], port = '80', port_specified = False, domain = tempcookie["domain"], domain_specified = True, domain_initial_dot = False, path = tempcookie["path"], path_specified = True, secure = tempcookie["secure"], expires = tempcookie["expiry"], discard = False, comment = None, comment_url = None, rest = None, rfc2109 = False))
+
+    browser1.set_handle_equiv(True)
+    browser1.set_handle_redirect(True)
+    browser1.set_handle_gzip(True)
+    browser1.set_handle_referer(True)
+    browser1.set_handle_robots(False)
+    browser1.set_handle_refresh(mechanize._http.HTTPRefreshProcessor(), max_time=1)
+
+    for membername2 in memtpm:
+        membername = "http://www.chess.com/members/view/" + membername2
+        response = browser1.open(membername)
+        soup = BeautifulSoup(response)
+
+        timeoutratio = str(timeoutchecker(soup))
+        for placeholder in soup.find_all(class_ = "flag"):
+            country = placeholder["title"]
+        if country == "International":
+            country = nnation
+
+        for placeholder in soup.find_all("strong"):
+            if "Click here" not in str(placeholder) and "ChessTV" not in str(placeholder):
+                name = placeholder.text
+                break
+        if name == " ":
+            name = membername2
+
+        subject = pmreplacer(subject, name, country, timeoutratio)
+        payload = pmreplacer(payload, name, country, timeoutratio) + "\n"
+        payload2 = "\n" + pmreplacer(payload2, name, country, timeoutratio)
+
+        for link in soup.find_all("a", href=True):
+            if link.text == "Send a Message":
+                browser0.get("http://www.chess.com" + link["href"])
+                time.sleep(2)
+
+        try:
+            WebDriverWait(browser0, 10).until(EC.presence_of_element_located((By.ID, "c15")))
+            browser0.find_element_by_name("c15").send_keys(subject)
+        except:
+            continue
+
+        browser0.switch_to_frame("tinymcewindow_ifr")
+        browser0.find_element_by_id("tinymce").clear()
+        browser0.find_element_by_id("tinymce").send_keys(payload)
+        browser0.switch_to_default_content()
+
+        browser0.find_element_by_id("tinymcewindow_imageuploader").click()
+        time.sleep(1)
+
+        browser0.switch_to_window(browser0.window_handles[1])
+        WebDriverWait(browser0, 10).until(EC.presence_of_element_located((By.ID, "photourl")))
+        browser0.find_element_by_id("photourl").send_keys(payloadimg)
+        browser0.find_element_by_id("insert").click()
+        browser0.switch_to_window(browser0.window_handles[0])
+
+        browser0.switch_to_frame("tinymcewindow_ifr")
+        browser0.find_element_by_id("tinymce").send_keys(payload2)
+        browser0.switch_to_default_content()
+        time.sleep(1)
+
+        browser0.find_element_by_id("c16").click()
+        time.sleep(10)
+
+def tmparchecker(pagelist, targetname):
+    tmpar = list()
+    timeoutlist = list()
+    winssdic = dict()
+    losedic = dict()
+    browser = mechanize.Browser()
+
+    browser.set_handle_equiv(True)
+    browser.set_handle_redirect(True)
+    browser.set_handle_gzip(True)
+    browser.set_handle_referer(True)
+    browser.set_handle_robots(False)
+    browser.set_handle_refresh(mechanize._http.HTTPRefreshProcessor(), max_time=1)
+    print "\n\n"
+
+    for page in pagelist:
+        if "http://www.chess.com/groups/team_match?id=" not in page:
+            continue
+        print "processing: " + page
+        alltmresults = list()
+        counter2 = 0
+        response = browser.open(page)
+        soup = BeautifulSoup(response)
+
+        soupgroup = str(soup.find_all(class_ = "default border-top alternate"))
+        soupgroup = re.findall("/groups/home/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", soupgroup)
+
+        souppar = soup.find_all(class_ = "align-left")
+        souppar1 = soup.find_all("tr")
+        souppar2 = soup.find_all("strong")
+
+        for placeholder in souppar2:
+            try:
+                alltmresults.append(float(placeholder.text))
+            except ValueError:
+                alltmresults = alltmresults
+
+        try:
+            if targetname == str(soupgroup[0]).replace("/groups/home/", ""):
+                for placeholder in souppar[0::4]:
+                    placeholder = str(placeholder)
+                    placeholder = re.findall("http://www.chess.com/members/view/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", placeholder)
+                    try:
+                        placeholder = str(placeholder[0]).replace("http://www.chess.com/members/view/", "")
+                        tmpar.append(placeholder)
+
+                        if placeholder in winssdic:
+                            winssdic[placeholder] += alltmresults[1 + counter2]
+                        else:
+                            winssdic[placeholder] = alltmresults[1 + counter2]
+
+                        if placeholder in losedic:
+                            losedic[placeholder] += alltmresults[2 + counter2]
+                        else:
+                            losedic[placeholder] = alltmresults[2 + counter2]
+
+                        counter2 += 2
+                    except IndexError:
+                        placeholder = list()
+
+                for placeholder in souppar1:
+                    counter = 0
+                    placeholder = str(placeholder)
+
+                    if "menu-icons timeline right-8" in placeholder:
+                        timeouts = placeholder.count('class="menu-icons timeline right-8" title="Timeout"')
+                        while counter < timeouts:
+                            timeouters1 = str(re.findall("http://www.chess.com/members/view/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", placeholder)[0]).replace("http://www.chess.com/members/view/", "")
+                            timeoutlist.append(timeouters1)
+                            counter += 1
+
+            elif targetname == str(soupgroup[1]).replace("/groups/home/", ""):
+                for placeholder in souppar[3::4]:
+                    placeholder = str(placeholder)
+                    placeholder = re.findall("http://www.chess.com/members/view/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", placeholder)
+                    try:
+                        placeholder = str(placeholder[0]).replace("http://www.chess.com/members/view/", "")
+                        tmpar.append(placeholder)
+
+                        if placeholder in winssdic:
+                            winssdic[placeholder] += alltmresults[2 + counter2]
+                        else:
+                            winssdic[placeholder] = alltmresults[2 + counter2]
+
+                        if placeholder in losedic:
+                            losedic[placeholder] += alltmresults[1 + counter2]
+                        else:
+                            losedic[placeholder] = alltmresults[1 + counter2]
+
+                        counter2 += 2
+                    except IndexError:
+                        placeholder = list()
+
+                for placeholder in souppar1:
+                    counter = 0
+                    placeholder = str(placeholder)
+
+                    if "menu-icons timeline left-8" in placeholder:
+                        timeouts = placeholder.count('class="menu-icons timeline left-8" title="Timeout"')
+                        while counter < timeouts:
+                            timeouters1 = str(re.findall("http://www.chess.com/members/view/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", placeholder)[3]).replace("http://www.chess.com/members/view/", "")
+                            timeoutlist.append(timeouters1)
+                            counter += 1
+
+            else:
+                print "\n\nfailed to find your group in this match: " + page + "!!!\n"
+
+        except IndexError:
+            placeholder = list()
+    return tmpar, timeoutlist, winssdic, losedic
+
+def step42(choice1, set1):
+    targetlist = list()
+    while choice1 not in set1:
+        targetlist.append(raw_input("\nPaste the url here: "))
+
+        choice1 = ""
+        while choice1 not in (["y", "n"]):
+            choice1 = raw_input("\nDo you wish to check any additional pages? (y/n): ")
+    return targetlist
+
+def spider_checker(target, logincookie):
+    browser = mechanize.Browser()
+    cookie = cookielib.LWPCookieJar()
+    browser.set_cookiejar(cookie)
+
+    if logincookie != "":
+        for tempcookie in logincookie:
+            cookie.set_cookie(cookielib.Cookie(version = 0, name = tempcookie["name"], value = tempcookie["value"], port = '80', port_specified = False, domain = tempcookie["domain"], domain_specified = True, domain_initial_dot = False, path = tempcookie["path"], path_specified = True, secure = tempcookie["secure"], expires = tempcookie["expiry"], discard = False, comment = None, comment_url = None, rest = None, rfc2109 = False))
+
+    browser.set_handle_equiv(True)
+    browser.set_handle_redirect(True)
+    browser.set_handle_gzip(True)
+    browser.set_handle_referer(True)
+    browser.set_handle_robots(False)
+    browser.set_handle_refresh(mechanize._http.HTTPRefreshProcessor(), max_time=1)
+
+    usrlist = list()
+    for pointer2 in target:
+        response = browser.open(pointer2)
+        if "http://www.chess.com/groups/view/" in browser.geturl():
+            break
+
+        soup = BeautifulSoup(response)
+        p2 = str(soup.find_all(class_ = "next-on"))
+
+        for link in browser.links(url_regex="chess.com/members/view/"):
+            ltext = link.text
+            if ltext != "View Profile":
+                usrlist.append(ltext.replace("[IMG]", ""))
+
+        if "next-on" not in p2:
+            break
+    return usrlist
+
+def ageproc(target):
+    browser = mechanize.Browser()
+    browser.set_handle_equiv(True)
+    browser.set_handle_redirect(True)
+    browser.set_handle_gzip(True)
+    browser.set_handle_referer(True)
+    browser.set_handle_robots(False)
+    browser.set_handle_refresh(mechanize._http.HTTPRefreshProcessor(), max_time=1)
+
+    flist = []
+    for targetx in target:
+        print "checking: " + targetx
+        tlst = [targetx]
+        response = browser.open("http://www.chess.com/members/view/" + targetx)
+        if "://www.chess.com/members/view/" not in browser.geturl():
+            continue
+        soup = BeautifulSoup(response)
+
+        birthdate = birthlister(soup)
+        if birthdate == "":
+            continue
+        while "" in birthdate:
+            birthdate.remove('')
+
+        birthdate = map(int, birthdate)
+        flist.append(birthdate + tlst)
+    return flist
+
+def inviter(choicelist, invitenum):
+    Username = raw_input("Username: ")
+    Password = raw_input("Password: ")
+
+    browser2 = webdriver.Firefox()
+
+    #try:
+     #   browser2 = webdriver.PhantomJS()
+    #except:
+     #   try:
+      #      browser2 = webdriver.Firefox()
+       # except:
+        #    try:
+         #       browser2 = webdriver.Chrome()
+          #  except:
+           #     sys.exit()
+
+    browser2.get("https://www.chess.com/login")
+
+    WebDriverWait(browser2, 10).until(EC.presence_of_element_located((By.ID, "btnLogin")))
+    browser2.find_element_by_name("c1").send_keys(Username)
+
+    browser2.find_element_by_name("loginpassword").send_keys(Password)
+
+    browser2.find_element_by_id("btnLogin").click()
+
+    logincookie = browser2.get_cookies()
+    browser1 = mechanize.Browser()
+    cookie = cookielib.LWPCookieJar()
+    browser1.set_cookiejar(cookie)
+
+    for tempcookie in logincookie:
+        cookie.set_cookie(cookielib.Cookie(version = 0, name = tempcookie["name"], value = tempcookie["value"], port = '80', port_specified = False, domain = tempcookie["domain"], domain_specified = True, domain_initial_dot = False, path = tempcookie["path"], path_specified = True, secure = tempcookie["secure"], expires = tempcookie["expiry"], discard = False, comment = None, comment_url = None, rest = None, rfc2109 = False))
+
+    browser1.set_handle_equiv(True)
+    browser1.set_handle_redirect(True)
+    browser1.set_handle_gzip(True)
+    browser1.set_handle_referer(True)
+    browser1.set_handle_robots(False)
+    browser1.set_handle_refresh(mechanize._http.HTTPRefreshProcessor(), max_time=1)
+
+    invinf = "no"
+    if choicelist[0] == "42":
+        invinf = "yes"
+        choicelist = (["1", "2", "3", "4", "5", "7", "8", "9", "10", "11"])
+
+    elif choicelist[0] == "84":
+        choicelist = list()
+        invinf = "yes"
+        block = ""
+        while block not in (["n"]):
+            tempval = ""
+            while tempval not in (["1", "2", "3", "4", "5", "7", "8", "9", "10", "11"]):
+                tempval = raw_input("Group number: ")
+            choicelist.append(tempval)
+            block = raw_input("Add another group? (y/n) ")
+
+    redo = "yes"
+    counter = 1
+    while redo == "yes":
+        for choice5 in choicelist:
+            counter += 1
+            counted = "y"
+            if counter > 120:
+                browser2.quit()
+                browser2 = webdriver.Firefox()
+                browser2.get("https://www.chess.com/login")
+                WebDriverWait(browser2, 10).until(EC.presence_of_element_located((By.ID, "btnLogin")))
+                browser2.find_element_by_name("c1").send_keys(Username)
+                browser2.find_element_by_name("loginpassword").send_keys(Password)
+                browser2.find_element_by_id("btnLogin").click()
+                counter = 1
+
+            invitenum2 = invitenum
+            memint = list()
+
+            if choice5 == "1":
+                invgroup = "The Dominion"
+                infile = "Invite Lists/Star Trek: The Dominion"
+                alrfile = "Invite Lists/Star Trek: The Dominion already invited"
+            elif choice5 == "2":
+                invgroup = "The Karemma"
+                infile = "Invite Lists/Karemma Commerse Ministry"
+                alrfile = "Invite Lists/Karemma Commerse Ministry already invited"
+            elif choice5 == "3":
+                invgroup = "The Breen Confederacy"
+                infile = "Invite Lists/The Breen Confederacy"
+                alrfile = "Invite Lists/The Breen Confederacy already invited"
+            elif choice5 == "4":
+                invgroup = "The Cardassian Empire"
+                infile = "Invite Lists/The Cardassian Empire"
+                alrfile = "Invite Lists/The Cardassian Empire already invited"
+            elif choice5 == "5":
+                invgroup = "Death Star III"
+                infile = "Invite Lists/Death Star III"
+                alrfile = "Invite Lists/Death Star III already invited"
+            elif choice5 == "6":
+                "empty"
+            elif choice5 == "7":
+                invgroup = "Legio XIII Gemina"
+                infile = "Invite Lists/Legio XIII Gemina"
+                alrfile = "Invite Lists/Legio XIII Gemina already invited"
+            elif choice5 == "8":
+                invgroup = "Andromeda"
+                infile = "Invite Lists/Andromeda"
+                alrfile = "Invite Lists/Andromeda already invited"
+            elif choice5 == "9":
+                invgroup = "Family Guy"
+                infile = "Invite Lists/Family Guy"
+                alrfile = "Invite Lists/Family Guy already invited"
+            elif choice5 == "10":
+                invgroup = "Space 1999"
+                infile = "Invite Lists/Space 1999"
+                alrfile = "Invite Lists/Space 1999 already invited"
+            elif choice5 == "11":
+                invgroup = "Space 2099"
+                infile = "Invite Lists/Space 2099"
+                alrfile = "Invite Lists/Space 2099 already invited"
+
+            memtinv = remove_doublets(infile, "")
+            memalrinv = remove_doublets(alrfile, "")
+            memtinv = [x for x in memtinv if x not in memalrinv]
+
+            already_picked = list()
+            if invitenum2 > len(memtinv):
+                invitenum2 = len(memtinv)
+
+            while len(already_picked) < invitenum2:
+                picked = random.choice(memtinv)
+
+                if not picked in already_picked:
+                    already_picked.append(picked)
+
+            for member in already_picked:
+                if counted == "y":
+                    counted = ""
+                else:
+                    counter += 1
+                if counter > 120:
+                    browser2.quit()
+                    browser2 = webdriver.Firefox()
+                    browser2.get("https://www.chess.com/login")
+                    WebDriverWait(browser2, 10).until(EC.presence_of_element_located((By.ID, "btnLogin")))
+                    browser2.find_element_by_name("c1").send_keys(Username)
+                    browser2.find_element_by_name("loginpassword").send_keys(Password)
+                    browser2.find_element_by_id("btnLogin").click()
+                    counter = 1
+                response = browser1.open("http://www.chess.com/members/view/" + member)
+                soup = BeautifulSoup(response)
+
+                for placeholder in soup.find_all(class_ = "flag"):
+                    country = placeholder["title"]
+
+                for placeholder in soup.find_all("strong"):
+                    if "Click here" not in str(placeholder) and "ChessTV" not in str(placeholder):
+                        name = placeholder.text
+                        break
+                if name == " ":
+                    name = member
+
+                if choice5 == "1": #The Dominion
+                    invimtop = "http://4.bp.blogspot.com/_KcFkeN0I6po/SxKzhR0mUCI/AAAAAAAAEbE/jcE4_kPJu6Q/s1600/7of9.jpg"
+                    groupinv = "http://www.chess.com/groups/invite_members?id=15896"
+                    payload2 = "\n\nBenjamin Sisko was a chemist's son\nbut Sisko is no more.\nWhat Sisko thought was H2O\nwas H2SO4\n\n"
+                    invimage = "http://d1lalstwiwz2br.cloudfront.net/images_users/tiny_mce/RobinKarlsson/phpiGxzYM.jpeg"
+                    invvid = "https://www.youtube.com/watch?v=JKPISUSOjiw"
+                    payload = "\n\nPuzzles, Riddles, Chess!!!\n\nThe largest Star Trek themed group on chess.com wants you, " + name + ", for the grand Dominions " + country + " contingent\n\nWith over 700 members we run vote chess, team matches, doubles chess and an in-house members league. Join now, and together we will impose order on this galaxy!!!\n\n"
+                
+                elif choice5 == "2": #Karemma Commerce Ministry
+                    groupinv = "http://www.chess.com/groups/invite_members?id=26088"
+                    payload2 = "\nThe Karemma are the merchants of the Dominion, responsible for the absolute majority of transportation and mercantile establishments throughout the gamma quadrant. And as the organization that negotiates trade agreements for this proud and powerful race, the Karemma Commerse Ministry power are rivaled only by the Founders\n\nSo join us, and together we will see profits rise above our wildest expectations\n"
+                    invimage = "http://static1.wikia.nocookie.net/__cb20050911110619/memoryalpha/en/images/a/ab/Karemma_starship.jpg"
+                    invvid = "http://www.youtube.com/watch?v=FvGZzzNLnBY"
+                    payload = "Hello " + name + ". Welcome to the Karemma Commerce Ministry, the most influential trading organization of the gamma quadrant.\n"
+
+                elif choice5 == "3": #The Breen Confederacy
+                    groupinv = "http://www.chess.com/groups/invite_members?id=21974"
+                    payload2 = '\n    "Never turn your back on a Breen"\n\n        -A Romulan saying\n'
+                    invimage = "http://images1.wikia.nocookie.net/__cb20061013002747/stexpanded/images/e/e4/BreenShip.jpg"
+                    invvid = "http://www.youtube.com/watch?v=j2rH2Uh2MWs"
+                    payload = "Welcome, " + name + ", to the grand Breen Confederacy's " + country + " contingent. An elite group aligned with the Dominion, specialising in votechess and thematic matches.\n\n"
+                
+                elif choice5 == "4": #The Cardassian Empire
+                    groupinv = "http://www.chess.com/groups/invite_members?id=20126"
+                    payload2 = "\n\nWelcome to our Capital world, Cardassia Prime, headed by our esteemed leader Gul Dukat. Our military might as well as inteliigence is SUPREME!\n\nSo come and join us, and relish in our phenomenal victories!\n\n"
+                    invimage = "http://static1.wikia.nocookie.net/__cb20061230121459/memoryalpha/en/images/2/24/Cardassia.jpg"
+                    invvid = "http://www.youtube.com/watch?v=GiyXGQk_pc0"
+                    payload = "Welcome, " + name + ", to the Cardassian Empire, the strongest power in the Alpha Quadrant\n\n"
+             
+                elif choice5 == "5": #Death Star III
+                    groupinv = "http://www.chess.com/groups/invite_members?id=17618"
+                    payload2 = "\nThe Death Star has a crew of 265,675, as well as 52,276 gunners, 607,360 troops, 30,984 stormtroopers, and 180,216 pilots Its hangars contain assault shuttles, blastboats, Strike cruisers, land vehicles, support ships, and 7,293 TIE Fighters. It is protected by 10,000 turbolaser batteries, 2,600 Ion Cannons, and 768 Tractor Beam projectors.\n\nWelcome To Our Leader, Darth Vader :) Join us and together we will rule this galaxy!!!!\n\n"
+                    invimage = "http://loyalkng.com/wp-content/uploads/2009/05/deathstarfiring2.jpg"
+                    invvid = "http://www.youtube.com/watch?v=pJ27mQgWpis"
+                    payload = "Hello " + name + ". Welcome to the Death Star, a Dynamically Dangerous Spacestation and Superweapon capable of Destroying an Entire Planet with its Powerful Superlaser..\n\n"
+                
+                elif choice5 == "6": 
+                    groupinv = "http://www.chess.com/groups/invite_members?id=18512"
+                    payload2 = ""
+                    invimage = "http://static.fjcdn.com/pictures/C3PEDO_7905dd_216367.jpg"
+                    invvid = "https://www.youtube.com/watch?v=JKPISUSOjiw"
+                    payload = "Hello " + name + " from " + country + "\nloooong message\n"
+
+                elif choice5 == "7": #Legio XIII Gemina
+                    groupinv = "http://www.chess.com/groups/invite_members?id=22596"
+                    payload2 = "\n\nin 41 BC emperor Augustus reconstituted the thirteenth legion (dispanded 45 BC, following the final battle of Munda) to deal with the rebellion of Sextus Pompeius in Sicily.\nThe legion thus acquired the cognomen Gemina (twin), after being reinforced with veteran legionnaries from other legions following the war against Mark Antony and the battle of Actium\n"
+                    invimage = "http://3219a2.medialib.glogster.com/jessicaann77/media/bd/bdab41001c3686ad707a2050c9a41ba876e06939/xslegionrecruiting.jpg"
+                    invvid = "http://www.youtube.com/watch?v=kFmDt_E3WbU"
+                    if country == "International":
+                        country = "the outskirts of our Roman empire"
+                    payload = "Augustus needs you, triarii " + name + ", for the reconstituted legio XIII gemina. As a veteran of the disbanded 13th legion you have proven your worth in battle, and once more your skills are needed in defence against the barbarian hordes roaming " + country + "\nThis is your true destiny, will you answer the call of Rome and once more march toward victories that shall be legend!! Forever etching the name " + name + " in history\n\n"
+
+                elif choice5 == "8": #Andromeda
+                    groupinv = "http://www.chess.com/groups/invite_members?id=21262"
+                    payload2 = "\n\nConstructed in CY 9768 Andromeda Ascendant is the tenth Glorious Heritage-class heavy cruiser, High Guard ship of the line, built by the Systems Commonwealth. And as such she is one of the bright stars of the High Guard fleet, capable of high-endurance, independent operations. Glorious Heritage-class ships are often called upon to perform disaster relief and refugee support operations due to their spacious interiors and ability to ferry large quantities of emergency supplies and additional personnel. They are also the preferred platform for first contact missions, given their formidable combat capabilities and their ability to operate without a battlegroup - often critical to assuring potential Commonwealth members that the High Guard comes in peace.\n\n"
+                    invimage = "http://www.sciforums.com/attachment.php?attachmentid=4853"
+                    invvid = "http://www.youtube.com/watch?v=Y8uE-HXASuE"
+                    if country == "International":
+                        country = "international water"
+                    payload = "Welcome to the Systems Commonwealth flagship, the Andromeda Ascendant, high guard recruit " + name + ". As a human hailing from the geographical block that constituted " + country + " in the 21st century you have been selected for, if you choose to accept, special service onboard this Glorious Heritage-class heavy cruiser. As a crewmember of the Andromeda you will be taking part in rescue missions, map distant starsystems and conduct first contact missions with alien civilizations uneducated in the fine art of chess.\n\n"
+
+                elif choice5 == "9": #Family Guy
+                    groupinv = "http://www.chess.com/groups/invite_members?id=14966"
+                    payload2 = "\n\nWe are a happy bunch of people who like to come together and talk about our favorite FG episodes or jokes, recent events in the series and maybe even play a little bit of chess every now and then, to pass the time :))\n\n"
+                    invimage = "http://digitaljournal.com/img/1/4/8/8/6/8/i/5/8/6/o/family_guy.jpg"
+                    invvid = "http://www.youtube.com/watch?v=LhnRHOYRncc"
+                    if country == "International":
+                        country = "International water"
+                    payload = "Welcome " + name + " to the most awesome Family Guy fan club on chess.com... This is for everyone who likes family guy no matter if you're an alien or terran, from " + country + " or atlantis, a fan of Brian or Peter, we are all welcome.\n\n"
+
+                elif choice5 == "10": #Space1999
+                    invimtop = "http://th07.deviantart.net/fs70/PRE/f/2011/331/8/2/moonbase_alpha_next_generation_by_heavy_fantasy-d4hg1v4.jpg"
+                    groupinv = "http://www.chess.com/groups/invite_members?id=26614"
+                    payload2 = "\n\nPrimarily a scientific research station, Moonbase Alpha houses 311 personnel including scientists, astronauts, medical personnel, and security officers.\nSpace: 1999: Nuclear waste from Earth, which was stored on the Moon's far side, explodes in a catastrophic accident on 13 September 1999, knocking the Moon out of orbit and sending it, and the 311 inhabitants of Moonbase Alpha, hurtling uncontrollably into space\nWATCH CLOSELY:))"
+                    invimage = "http://upload.wikimedia.org/wikipedia/en/3/39/Space1999_Year1_Title.jpg"
+                    invvid = "http://www.youtube.com/watch?v=8WZW4groJro"
+                    payload = "\n\nWe want you, " + name + ", for this rogue moons " + country + " settlement.\n\n"
+
+                elif choice5 == "11": #Space 2099
+                    invimtop = "http://th07.deviantart.net/fs70/PRE/f/2011/331/8/2/moonbase_alpha_next_generation_by_heavy_fantasy-d4hg1v4.jpg"
+                    groupinv = "http://www.chess.com/groups/invite_members?id=26624"
+                    payload2 = "\nPrimarily a scientific research station, Moonbase Alpha houses 311 personnel including scientists, astronauts, medical personnel, and security officers.\nSpace: 1999: Nuclear waste from Earth, which was stored on the Moon's far side, explodes in a catastrophic accident on 13 September 1999, knocking the Moon out of orbit and sending it, and the 311 inhabitants of Moonbase Alpha, hurtling uncontrollably into space\nWATCH CLOSELY:))"
+                    invimage = "http://www.thescifiworld.net/img/interviews/space2099_08-big.jpg"
+                    invvid = "http://www.youtube.com/watch?v=8WZW4groJro"
+                    payload = "\n\nWe want you, " + name + ", for this rogue moons " + country + " settlement.\n"
+
+                browser2.get(groupinv)
+
+                try:
+                    WebDriverWait(browser2, 10).until(EC.presence_of_element_located((By.ID, "c15")))
+                    browser2.find_element_by_name("c15").send_keys(member)
+                except:
+                    break
+
+                print "\nInviting " + member + " to " + invgroup
+                memint.append(member)
+
+                browser2.switch_to_frame("tinymcewindow_ifr")
+                browser2.find_element_by_id("tinymce").clear()
+
+                if choice5 in (["1", "10", "11"]):
+                    browser2.switch_to_default_content()
+                    browser2.find_element_by_id("tinymcewindow_imageuploader").click()
+                    time.sleep(1)
+                
+                    browser2.switch_to_window(browser2.window_handles[1])
+                    WebDriverWait(browser2, 10).until(EC.presence_of_element_located((By.ID, "photourl")))
+                    browser2.find_element_by_id("photourl").send_keys(invimtop)
+                    browser2.find_element_by_id("insert").click()
+                    browser2.switch_to_window(browser2.window_handles[0])
+                
+                    browser2.switch_to_frame("tinymcewindow_ifr")
+
+                browser2.find_element_by_id("tinymce").send_keys(payload.replace("  ", " ").replace(" .", ".").replace(" ,", ","))
+                browser2.switch_to_default_content()
+  
+                browser2.find_element_by_id("tinymcewindow_imageuploader").click()
+                time.sleep(1)
+
+                browser2.switch_to_window(browser2.window_handles[1])
+                WebDriverWait(browser2, 10).until(EC.presence_of_element_located((By.ID, "photourl")))
+                browser2.find_element_by_id("photourl").send_keys(invimage)
+                browser2.find_element_by_id("insert").click()
+                browser2.switch_to_window(browser2.window_handles[0])
+
+                browser2.switch_to_frame("tinymcewindow_ifr")
+                browser2.find_element_by_id("tinymce").send_keys(payload2)
+                browser2.switch_to_default_content()
+
+                browser2.find_element_by_id("tinymcewindow_mce_media").click()
+
+                alert = browser2.switch_to_alert()
+                alert.send_keys(invvid)
+                alert.accept()
+                time.sleep(1)
+
+                browser2.find_element_by_id("c18").click()
+
+            updinvlist = set(memtinv).difference(set(memint))
+            updinvlist = misc1(updinvlist)
+            memint = misc1(memint)
+            with open(infile, "w") as placeholder2:
+                placeholder2.write(updinvlist)
+
+            with open(alrfile, "a") as placeholder3:
+                placeholder3.write(memint)
+
+        if invinf == "no":
+            browser2.quit()
+            redo = "no"
+
+def login():
+    Username = raw_input("Username: ")
+    Password = raw_input("Password: ")
+
+    if Username == "" or Password == "":
+        return ""
+    
+    browser0 = webdriver.Firefox()
+    browser0.get("https://www.chess.com/login")
+    
+    browser0.find_element_by_name("c1").send_keys(Username)
+    
+    browser0.find_element_by_name("loginpassword").send_keys(Password)
+
+    WebDriverWait(browser0, 10).until(EC.presence_of_element_located((By.ID, "btnLogin")))
+    browser0.find_element_by_id("btnLogin").click()
+    
+    logincookie = browser0.get_cookies()
+    browser0.quit()
+    
+    return logincookie
+
+def misc1(sortedlines2):
+    sortedlines2 = str(sortedlines2).replace("'", "").replace("set(", "").replace(")", "").replace("]", "").replace("[", "")
+    return sortedlines2
+
+def remove_doublets(filename, target):
+    for target in csv.reader(open(filename, "rb")):
+        placeholder = target
+    sortedlines = OrderedDict.fromkeys((line for line in target if line))
+    sortedlines = str(sortedlines.keys()).replace("' ", "").replace("'", "").replace(",", "").replace("]", "").replace("[", "").replace("  ", " ")
+    sortedlines = sortedlines.split()
+    return sortedlines
+
+def vcman(vclinklist, yourside):
+    
+    Username = raw_input("Username: ")
+    Password = raw_input("Password: ")
+    
+    browser3 = webdriver.Firefox()
+    browser3.get("https://www.chess.com/login")
+    
+    browser3.find_element_by_name("c1").send_keys(Username)
+    browser3.find_element_by_name("loginpassword").send_keys(Password)
+
+    WebDriverWait(browser3, 10).until(EC.presence_of_element_located((By.ID, "btnLogin")))
+    browser3.find_element_by_id("btnLogin").click()
+    time.sleep(2)
+
+    browser1 = mechanize.Browser()
+    cookie = cookielib.LWPCookieJar()
+    browser1.set_cookiejar(cookie)
+
+    browser1.set_handle_equiv(True)
+    browser1.set_handle_redirect(True)
+    browser1.set_handle_gzip(True)
+    browser1.set_handle_referer(True)
+    browser1.set_handle_robots(False)
+    browser1.set_handle_refresh(mechanize._http.HTTPRefreshProcessor(), max_time=1)
+
+    logincookie = browser3.get_cookies()
+
+    for tempcookie in logincookie:
+        cookie.set_cookie(cookielib.Cookie(version = 0, name = tempcookie["name"], value = tempcookie["value"], port = "80", port_specified = False, domain = tempcookie["domain"], domain_specified = True, domain_initial_dot = False, path = tempcookie["path"], path_specified = True, secure = tempcookie["secure"], expires = tempcookie["expiry"], discard = False, comment = None, comment_url = None, rest = None, rfc2109 = False))
+
+    for vcmatch in vclinklist:
+        movelist = list()
+        browser3.get(vcmatch)
+        WebDriverWait(browser3, 10).until(EC.presence_of_element_located((By.ID, "c33")))
+        browser3.find_element_by_id("c33").click()
+        time.sleep(2)
+
+        response = browser1.open(vcmatch)
+        soup = BeautifulSoup(response)
+        boardpos = str(re.findall("boardFlip: (?:[a-zA-Z]|(?:%[a-fA-F]))+", str(soup.find_all(class_ = "chess_viewer")))[0]).replace("boardFlip: ", "")
+
+        yourpos = soup.find_all(class_ = "playername")
+        yourpos = (str(yourpos[0]).replace('<span class="playername">', "").replace("</span>", ""), str(yourpos[1]).replace('<span class="playername">', "").replace("</span>", ""))
+
+        vcelem = browser3.find_elements_by_partial_link_text('')
+
+        while yourside not in yourpos:
+            yoursidechoice = ""
+            while yoursidechoice not in (["1", "2"]):
+                yoursidechoice = raw_input("\n\nCan't find your group in one of the games. Please specify which group is yours\n  1. " + yourpos[0] + "\n  2. " + yourpos[1] + "\nYour group is number: ")
+
+            if yoursidechoice == "1":
+                yourside = yourpos[0]
+            if yoursidechoice == "2":
+                yourside = yourpos[1]
+                
+        if boardpos == "false":
+
+            if str(yourpos[0]).replace('<span class="playername">', "").replace("</span>", "") == yourside:
+                for placeholder in vcelem:
+                    currentvcmovlink = placeholder.get_attribute("href") or ""
+                    if vcmatch + "&mv=" in currentvcmovlink:
+                        movelist.append(currentvcmovlink)
+                movelist = movelist[1::2]
+
+            elif str(yourpos[1]).replace('<span class="playername">', "").replace("</span>", "") == yourside:
+                for placeholder in vcelem:
+                    currentvcmovlink = placeholder.get_attribute("href") or ""
+                    if vcmatch + "&mv=" in currentvcmovlink:
+                        movelist.append(currentvcmovlink)
+                movelist = movelist[0::2]
+
+        if boardpos == "true":
+            if str(yourpos[1]).replace('<span class="playername">', "").replace("</span>", "") == yourside:
+                for placeholder in vcelem:
+                    currentvcmovlink = placeholder.get_attribute("href") or ""
+                    if vcmatch + "&mv=" in currentvcmovlink:
+                        movelist.append(currentvcmovlink)
+                movelist = movelist[1::2]
+    
+        for pointer in movelist:
+            print "\nchecking " + pointer
+
+            response = browser1.open(pointer)
+            links1 = []
+            text1 = []
+
+            for link in browser1.links():
+                url2 = urlparse.urljoin(link.base_url, link.url)
+                text1.append(link.text)
+
+                links1.append("http://" + (urlparse.urlparse(url2).hostname or "") + (urlparse.urlparse(url2).path or ""))
+
+            for link,text in zip(links1,text1):
+                with open("temp/temp.txt", "a") as placeholder2:
+                    placeholder2.write(re.sub(r"^http?:\/\/.*[\r\n]*", "", link.replace("http://www.chess.com/members/view/", " "), flags=re.MULTILINE))
+
+            soup = BeautifulSoup(response)
+            p2 = str(soup.find_all(class_ = "next-on"))
+
+            if "next-on" in p2:
+                browser3.get(pointer)
+                nextbtn = 2
+                while not nextbtn == 0:
+
+                    try:
+                        browser3.find_element_by_css_selector('li.next-on>a').click()
+                    except:
+                        break
+                    time.sleep(2)
+                    print "\nchecking " + pointer + " page " + str(nextbtn)
+                    vcelem = browser3.find_elements_by_partial_link_text('')
+                    for curvcparmem in vcelem:
+                        memsellink = curvcparmem.get_attribute("href") or ""
+
+                        if "http://www.chess.com/members/view/" in memsellink:
+                            with open("temp/temp.txt", "a") as placeholder2:
+                                placeholder2.write(re.sub(r"^http?:\/\/.*[\r\n]*", "", memsellink.replace("http://www.chess.com/members/view/", " "), flags=re.MULTILINE))
+
+                    nextbtn += 1
+
+    browser3.quit()
+
+def memberprocesser(target):
+    minrat = raw_input("\n\nMin rating allowed. leave empty to skip: ")
+
+    lastloginyear = raw_input("\nLast logged in year. leave empty to skip (YYYY): ")
+    if lastloginyear != "":
+        lastloginyear = int(lastloginyear)
+        lastloginmonth = int(raw_input("Last logged in month (MM): "))
+        lastloginday = int(raw_input("Last logged in day (DD): "))
+
+    membersinceyear = raw_input("\nMember since before year. leave empty to skip (YYYY): ")
+    if membersinceyear!= "":
+        membersinceyear = int(membersinceyear)
+        membersincemonth = int(raw_input("Member since before month (MM): "))
+        membersinceday = int(raw_input("Member since before day (DD): "))
+
+    youngeryear = raw_input("\nBorn after year. leave empty to skip (YYYY): ")
+    if youngeryear!= "":
+        youngeryear = int(youngeryear)
+        youngermonth = int(raw_input("Born after month (MM): "))
+        youngerday = int(raw_input("Born after day (DD): "))
+
+    olderyear = raw_input("\nBorn before year. leave empty to skip (YYYY): ")
+    if olderyear!= "":
+        olderyear = int(olderyear)
+        oldermonth = int(raw_input("Born before month (MM): "))
+        olderday = int(raw_input("Born before day (DD): "))
+
+    timemax = raw_input("\nMax timeoutratio allowed. leave empty to skip: ")
+    maxgroup = raw_input("\nMax number of groups member may be in. leave empty to skip: ")
+    mingroup = raw_input("Min number of groups member may be in. leave empty to skip: ")
+
+    heritage = raw_input("\nMember should be from. leave empty to skip: ")
+
+    memgender = "a"
+    while memgender not in (["m", "f", ""]):
+        memgender = raw_input("\nMember should be gender (determined by comparing member name to a list of male and female names). leave empty to skip (m/f): ")
+
+    browser = mechanize.Browser()
+    browser.set_handle_equiv(True)
+    browser.set_handle_redirect(True)
+    browser.set_handle_gzip(True)
+    browser.set_handle_referer(True)
+    browser.set_handle_robots(False)
+    browser.set_handle_refresh(mechanize._http.HTTPRefreshProcessor(), max_time=1)
+
+    target = target.replace(" ", "").split(",")
+    passmem = list()
+    for targetx in target:
+        print "checking " + targetx
+        response = browser.open("http://www.chess.com/members/view/" + targetx)
+        if "://www.chess.com/members/view/" not in browser.geturl():
+            continue
+        soup = BeautifulSoup(response)
+
+        if membersinceyear != "" or lastloginyear != "":
+            memsinlist = memsin(soup)
+
+            if lastloginyear != "":
+                lonln = memsinlist[1]
+                if datetime(lonln[0], lonln[1], lonln[2]) < datetime(lastloginyear, lastloginmonth, lastloginday):
+                    continue
+
+        if timemax != "":
+            if timeoutchecker(soup) > int(timemax):
+                continue
+
+        if membersinceyear != "":
+            memsi = memsinlist[0]
+            if datetime(memsi[0], memsi[1], memsi[2]) > datetime(membersinceyear, membersincemonth, membersinceday):
+                continue
+
+        if minrat != "":
+            minrat = int(minrat)
+            ratinglist = ratingchecker(soup)
+            pas = "n"
+            for rating in ratinglist:
+                if rating >= minrat:
+                    pas = "y"
+                    break
+            if pas == "n":
+                continue
+
+        if maxgroup != "" or mingroup != "":
+            groupcount = groupmemlister(soup)
+
+            if maxgroup != "":
+                if groupcount > int(maxgroup):
+                    continue
+            if mingroup != "":
+                if groupcount < int(mingroup):
+                    continue
+
+        if youngeryear != "" or olderyear != "":
+            birthdate = birthlister(soup)
+            if birthdate == "":
+                continue
+            while "" in birthdate:
+                birthdate.remove("")
+
+            birthdate = [int(birthdate[2]), int(birthdate[0]), int(birthdate[1])]
+
+            if youngeryear != "":
+                if datetime(birthdate[0], birthdate[1], birthdate[2]) < datetime(youngeryear, youngermonth, youngerday):
+                    continue
+            if olderyear != "":
+                if datetime(birthdate[0], birthdate[1], birthdate[2]) > datetime(olderyear, oldermonth, olderday):
+                    continue
+
+        if heritage != "":
+            nation = nationlister(soup)
+
+            if heritage not in nation:
+                continue
+
+        if memgender != "":
+            name = namechecker(soup)
+            if name == " ":
+                continue
+            name = name.split(" ")[0].lower()
+            Found = "n"
+
+            if memgender == "f":
+                with open("namelists/female", "rb") as fnlist:
+                    for line in fnlist:
+                        if name in line:
+                            Found = "y"
+                            break
+            elif memgender == "m":
+                with open("namelists/male", "rb") as mnlist:
+                    for line in mnlist:
+                        if name in line:
+                            Found = "y"
+                            break
+            if Found == "n":
+                continue
+
+        passmem.append(targetx)
+    return passmem
+
+def namechecker(soup):
+    for placeholder in soup.find_all("strong"):
+        strplaceholder = str(placeholder)
+        if "Click here" not in strplaceholder and "ChessTV" not in strplaceholder:
+            return str(placeholder.text)
+
+def timeoutchecker(soup):
+    for placeholder in soup.find_all(class_ = "even"):
+        if "Timeouts:" in str(placeholder):
+            timeout = int(placeholder.text.replace("Timeouts:", "").strip().replace("% (last 90 days)", ""))
+            break
+    return timeout
+
+def ratingchecker(soup):
+    ratinglist = list()
+    recorder = "off"
+    for placeholder in soup.find_all(class_ = "right"):
+        if "View All Stats" in placeholder:
+            recorder = "on"
+        elif "Games Archive" in placeholder:
+            break
+        elif recorder == "on":
+            try:
+                ratinglist.append(int(placeholder.text))
+            except ValueError:
+                "nada"
+    return ratinglist
+
+def memsin(soup):
+    memsinlist = list()
+    for placeholder in soup.find_all(class_ = "section-content section-content-2"):
+        longnumlist = placeholder.text.strip().replace("  ", "").replace(",", "").replace("Member Since:", "").replace("Profile Views:", " ").replace("Last Login:", " ").replace("\n", "").replace("Jan", "01").replace("Feb", "02").replace("Mar", "03").replace("Apr", "04").replace("May", "05").replace("Jun", "06").replace("Jul", "07").replace("Aug", "08").replace("Sep", "09").replace("Oct", "10").replace("Nov", "11").replace("Dec", "12").split(" ")
+    return [int(longnumlist[2]), int(longnumlist[0]), int(longnumlist[1])], [int(longnumlist[5]), int(longnumlist[3]), int(longnumlist[4])]
+
+def groupmemlister(soup):
+    groupcountlist = list()
+    for placeholder in soup.find_all(class_ = "parenthesis-link"):
+        memgroups = placeholder.text
+    return int(memgroups)
+
+def nationlister(soup):
+    nationlist = list()
+    for placeholder in soup.find_all(class_ = "bottom-12"):
+        break
+    return str(placeholder.text.strip())
+
+def birthlister(soup):
+    for placeholder in soup.find_all(class_ = "section-content section-content-2"):
+        try:
+            placeholder = [birth for birth in str(placeholder).split("\n") if "Birthday:" in birth][0]
+            pos = placeholder.find("Birthday:")
+            birthday = placeholder[pos + 19: pos + 31].replace(",", "").replace("Jan", "01").replace("Feb", "02").replace("Mar", "03").replace("Apr", "04").replace("May", "05").replace("Jun", "06").replace("Jul", "07").replace("Aug", "08").replace("Sep", "09").replace("Oct", "10").replace("Nov", "11").replace("Dec", "12").split(" ")
+        except IndexError:
+            birthday = ""
+    return birthday
+
+def memremoverf(un1):
+    pointer = ""
+    while pointer != "n":
+        while pointer not in (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13"]):
+            pointer = raw_input("\nChose group to filter out\n 1. Star Trek: The Dominion\n 2. The Breen Confederacy\n 3. The Cardassian Empire\n 4. Death Star III\n 5. Karemma\n 6. Space 1999\n 7. Space 2099\n 8. Andromeda\n 9. Legio XIII Gemina\n 10. Utopia\n 11. Space Angels\n 12. Chess!\n 13. Carpe Diem\nYour choice: ")
+
+        if pointer == "1":
+            un1 = un1.difference(dommem)
+
+        elif pointer == "2":
+            if os.stat("mem/breenmem").st_size > 0:
+                for placeholder in open("mem/breenmem", "rb"):
+                    breenmem = com3("keybreen", placeholder, 256, []).replace("\n", "").split(", ")
+                un1 = un1.difference(breenmem)
+
+        elif pointer == "3":
+            if os.stat("mem/carmem").st_size > 0:
+                for placeholder in open("mem/carmem", "rb"):
+                    cardassiamem = com3("keycarda", placeholder, 256, []).replace("\n", "").split(", ")
+                un1 = un1.difference(cardassiamem)
+
+        elif pointer == "4":
+            if os.stat("mem/deathmem").st_size > 0:
+                for placeholder in open("mem/deathmem", "rb"):
+                    deathmem = com3("keydeath", placeholder, 256, []).replace("\n", "").split(", ")
+                un1 = un1.difference(deathmem)
+
+        elif pointer == "5":
+            if os.stat("mem/karemma").st_size > 0:
+                for placeholder in open("mem/karemma", "rb"):
+                    karemem = com3("keykar", placeholder, 256, []).replace("\n", "").split(", ")
+                un1 = un1.difference(karemem)
+
+        elif pointer == "6":
+            if os.stat("mem/1999").st_size > 0:
+                for placeholder in open("mem/1999", "rb"):
+                    nininin = com3("key1999", placeholder, 256, []).replace("\n", "").split(", ")
+                un1 = un1.difference(nininin)
+
+        elif pointer == "7":
+            if os.stat("mem/2099").st_size > 0:
+                for placeholder in open("mem/2099", "rb"):
+                    twninin = com3("key2099", placeholder, 256, []).replace("\n", "").split(", ")
+                un1 = un1.difference(twninin)
+
+        elif pointer == "8":
+            if os.stat("mem/andromeda").st_size > 0:
+                for placeholder in open("mem/andromeda", "rb"):
+                    andromeda = com3("keyandromeda", placeholder, 256, []).replace("\n", "").split(", ")
+                un1 = un1.difference(andromeda)
+
+        elif pointer == "9":
+            if os.stat("mem/legio").st_size > 0:
+                for placeholder in open("mem/legio", "rb"):
+                    legio = com3("keylegio", placeholder, 256, []).replace("\n", "").split(", ")
+                un1 = un1.difference(legio)
+
+        elif pointer == "10":
+            if os.stat("mem/utopia").st_size > 0:
+                for placeholder in open("mem/utopia", "rb"):
+                    utopia = com3("keyutopia", placeholder, 256, []).replace("\n", "").split(", ")
+                un1 = un1.difference(utopia)
+
+        elif pointer == "11":
+            if os.stat("mem/angelmem").st_size > 0:
+                for placeholder in open("mem/angelmem", "rb"):
+                    angelmem = com3("keyangel", placeholder, 256, []).replace("\n", "").split(", ")
+                un1 = un1.difference(angelmem)
+
+        elif pointer == "12":
+            if os.stat("mem/chessmem").st_size > 0:
+                for placeholder in open("mem/chessmem", "rb"):
+                    chmem = com3("keyChess", placeholder, 256, []).replace("\n", "").split(", ")
+                un1 = un1.difference(chmem)
+
+        elif pointer == "13":
+            if os.stat("mem/CarpeDiemmem").st_size > 0:
+                for placeholder in open("mem/CarpeDiemmem", "rb"):
+                    cdmem = com3("keyCD", placeholder, 256, []).replace("\n", "").split(", ")
+                un1 = un1.difference(cdmem)
+
+        while pointer not in (["y", "n"]):
+            pointer = raw_input("Filter out members from another group? (y/n)")
+    return un1
+
+def step3456(choice1, blocker):
+    targetlist = list()
+    while choice1 not in blocker:
+        url1 = raw_input("\nPaste the url here: ") + "&page="
+        start1 = int(raw_input("\nEnter pagenumber to start on: "))
+        stop1 = int(raw_input("\nEnter pagenumber to end on: "))
+
+        while start1 <= stop1:
+            targetlist.append(url1 + str(start1))
+            start1 += 1
+
+        choice1 = ""
+        while choice1 not in (["y", "n"]):
+            choice1 = raw_input("\nDo you wish to process any additional targets? (y/n): ")
+
+    return targetlist
+
+def notclosedcheck(memlist):
+    browser = mechanize.Browser()
+    browser.set_handle_equiv(True)
+    browser.set_handle_redirect(True)
+    browser.set_handle_gzip(True)
+    browser.set_handle_referer(True)
+    browser.set_handle_robots(False)
+    browser.set_handle_refresh(mechanize._http.HTTPRefreshProcessor(), max_time=1)
+
+    memlist2 = list()
+    for mem in memlist:
+        response = browser.open("http://www.chess.com/members/view/" + mem)
+        soup = str(BeautifulSoup(response))
+
+        if mem in soup:
+            memlist2.append(mem)
+    return memlist2
+
+def spider_ml(target, logincookie):
+    browser = mechanize.Browser()
+    cookie = cookielib.LWPCookieJar()
+    browser.set_cookiejar(cookie)
+
+    if logincookie != "":
+        for tempcookie in logincookie:
+            cookie.set_cookie(cookielib.Cookie(version = 0, name = tempcookie["name"], value = tempcookie["value"], port = "80", port_specified = False, domain = tempcookie["domain"], domain_specified = True, domain_initial_dot = False, path = tempcookie["path"], path_specified = True, secure = tempcookie["secure"], expires = tempcookie["expiry"], discard = False, comment = None, comment_url = None, rest = None, rfc2109 = False))
+
+    browser.set_handle_equiv(True)
+    browser.set_handle_redirect(True)
+    browser.set_handle_gzip(True)
+    browser.set_handle_referer(True)
+    browser.set_handle_robots(False)
+    browser.set_handle_refresh(mechanize._http.HTTPRefreshProcessor(), max_time=1)
+
+    print "\nworking\n"
+    usrlist = list()
+    for pointer in target:
+        print "\nextracting names from " + pointer
+        browser.open(pointer)
+        for link in browser.links(url_regex="chess.com/members/view/"):
+            ltext = link.text
+            if ltext != "View Profile":
+                usrlist.append(ltext.replace("[IMG]", ""))
+    return usrlist
+
+pathway = "y"
+while pathway in (["y"]):
+
+    with open("temp/temp.txt", "w") as placeholder2:
+        print "chess.com RK Resource 001\nversion 0.8.7\ndeveloped by Robin Karlsson\ncontact email: 'r.robin.karlsson@gmail.com'\ncontact chess.com profile: 'http://www.chess.com/members/view/RobinKarlsson'\n"
+    with open("temp/temp2.txt", "w") as placeholder2:
+        print "What would you like to do?\n\n 1. Create a list of members from a group.\n 2. Check a team match for members banned from matches by the Dominion.\n 3. Send invites for a group.\n 4. Check a groups finished votechess matches and count number of posts per member\n 5. Check a groups team matches and count the number of times each member has participated.\n 6. Check a list of members for those with a rating above and/or below a specific value, last online & member since a specific date and a timeout ratio below a specific value.\n 7. Presentation of a csv-file from option 6.\n 8. Remove doublets and filter out members who are in specific groups from a preexisting textfile.\n 9. Look for members who has left your team\n 10. Count number of group notes per member\n 11. Collect birthdays for a list of members\n 12. Send personal messages to members"
+
+    flow = ""
+    while flow not in (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]):
+        flow = raw_input("\nEnter your choice here: ")
+
+    if flow == "1":
+        print "\n\n\nchess.com members list extractor\n"
+        print "Locate the members list url of the group you wish to target.\n\n  example: http://www.chess.com/groups/membersearch?allnew=1&id=8893\n\nCopy the url.\n"
+        target = step3456("", (["n"]))
+
+        logincookie = login()
+
+        un1 = set(spider_ml(target, logincookie))
+
+        remmem = ""
+        while remmem not in (["y", "n"]):
+            remmem = raw_input("\n\nFilter out members of a group? (y/n) ")
+
+        if remmem == "y":
+            un1 = memremoverf(un1)
+
+        un1 = un1.difference(domban)
+        #un1 = un1.difference(tmban)
+        un1 = misc1(un1)
+
+        choice6 = ""
+        while choice6 not in (["1", "2"]):
+            choice6 = raw_input("\n\nDo you wish to\n 1. Print the extracted names onscreen\n 2. Save them to a file\n\nEnter choice here: ")
+
+        if choice6 == "1":
+            print "\n\n" + un1
+
+        elif choice6 == "2":
+            memfile1 = raw_input("\nName of the file to which your list will be saved: ")
+            with open(memfile1, "a") as placeholder2:
+                placeholder2.write(un1)
+
+    elif flow == "2":
+        print "\n\n\nchess.com checker\n"
+        print "This little script looks through a team match for members who has been banned from tm's by the Dominion\n\nLocate the team match's url.\nCopy the url."
+        target = ([raw_input("\nLink to the tm: ")])
+
+        logincookie = login()
+
+        un2 = set(spider_checker(target, logincookie))
+
+        un2 = un2.intersection(tmban)
+        un2 = misc1(un2)
+        print "\n\nThe following members banned from team matches was found in this match: " + un2 + "\n\n\nThank you for using the chess.com checker. We wish you a continued pleasant day and hope the script worked to your satisfaction.\n"
+
+    elif flow == "3":
+        choice5 = ""
+        while choice5 not in (["1", "2", "3", "4", "5", "7", "8", "9", "10", "11", "42", "84"]):
+            choice5 = raw_input("\n\nWhich group would you like to send invites for?\n\n    Dominion affiliated groups:\n 1. Star Trek: The Dominion\n 2. Karemma Commerce Ministry\n 3. The Breen Confederacy\n 4. The Cardassian Empire\n 5. Death Star III\n\n    Non Dominion groups:\n \n 7. Legio XIII Gemina\n 8. Andromeda\n 9. Family Guy\n 10. Space 1999\n 11. Space 2099\n\n 42. endless loop that goes through all the groups, indefinitely\n 84. Create you own custom infinite loop from the supported groups\n\nEnter choice here: ")
+
+        #invitenum = int(raw_input("How many do you wish to invite? (reommended number for best effect is between 90 and 120) "))
+        invitenum = 120
+        inviter(([choice5]), invitenum)
+
+    elif flow == "4":
+        yourside = raw_input("Name of group to check: ")
+
+        vclinklist = getvclinks(yourside)
+        vcman(vclinklist, yourside)
+
+        parmemvc = Counter()
+
+        for placeholder2 in open ("temp/temp.txt", "r"):
+          for membervc in placeholder2.split ():
+            parmemvc[membervc] += 0.5
+
+        for key, value in sorted(parmemvc.items(), key = itemgetter(1), reverse = True):
+            print "\n" + key + " has made " + str(int(value)) + " posts"
+
+    elif flow == "5":
+        pathtm = ""
+        while pathtm not in (["1", "2"]):
+            pathtm = raw_input(" 1. Check all tm's for a group\n 2. Check a single tm\nYour choice: ")
+        targetnameorg = raw_input("\n\n\nName of the group you wish to check: ")
+        targetname = re.sub(r"[^a-z A-Z 0-9]","", targetnameorg)
+        targetname = targetname.replace(" ", "-").lower()
+
+        if pathtm == "1":
+            targetnameorgf = targetnameorg
+            pagelist = gettmlinks(targetname)
+        if pathtm == "2":
+            pagelist = raw_input("team match id: ")
+            targetnameorgf = "team match: " + pagelist + " ... "
+            pagelist = (["http://www.chess.com/groups/team_match?id=" + pagelist])
+
+        tmpar, tmtimeout, winssdic, losedic = tmparchecker(pagelist, targetname)
+
+        tmparcount = Counter(tmpar)
+        tmtimeoutcount = Counter(tmtimeout)
+        joined = {}
+        membernamelist = list()
+
+        outputfile = open(targetnameorgf + " " + strftime("%Y-%m-%d", gmtime()) + ".csv", "wb")
+        csvwriter = csv.writer(outputfile, delimiter = " ", quoting=csv.QUOTE_MINIMAL)
+
+        for pointer in set(tmparcount.keys())|set(winssdic.keys())|set(losedic.keys())|set(tmtimeoutcount.keys()):
+            joined[pointer] = (float(tmparcount.get(pointer, 0))/10 + (float(tmparcount.get(pointer, 0))*2 - float(winssdic.get(pointer, 0)) - float(losedic.get(pointer, 0)))*5/4 + float(winssdic.get(pointer, 0)) - float(losedic.get(pointer, 0)) - tmtimeoutcount.get(pointer, 0)*3, tmparcount.get(pointer, 0), winssdic.get(pointer, 0), losedic.get(pointer, 0), tmtimeoutcount.get(pointer, 0))
+
+        csvwriter.writerow(("Member name", "tm's participated in", "points won", "points lost", "ongoing games", "timeouts"))
+
+        for key, value in sorted(joined.items(), key = itemgetter(1), reverse = True):
+            csvwriter.writerow((key, value[1], value[2], value[3], value[1]*2 - value[2] - value[3], value[4]))
+
+        choicetm = ""
+        while choicetm not in (["y", "n"]):
+            choicetm = raw_input("continue to remove those who dosn't fill your requirements? (y/n) ")
+
+        if choicetm == "y":
+            membernamelist = list()
+            for key in joined:
+                membernamelist.append(key)
+
+            passmembers = memberprocesser(membernamelist)
+            joined2 = dict()
+            membernamelist = list()
+            for key in joined:
+                if key in passmembers:
+                    joined2[key] = joined[key]
+
+            csvwriter.writerow(("Member name (those who fill your requirements)", "tm's participated in", "points won", "points lost", "ongoing games", "timeouts"))
+
+            for key, value in sorted(joined2.items(), key = itemgetter(1), reverse = True):
+
+                csvwriter.writerow((key, value[1], value[2], value[3], value[1]*2 - value[2] - value[3], value[4]))
+
+        outputfile.close()
+
+    elif flow == "6":
+        membernamelist = raw_input("\n\nList of members to check: ")
+
+        passmembers = memberprocesser(membernamelist)
+
+        choice6 = ""
+        while choice6 not in (["1", "2"]):
+            choice6 = raw_input("\n\nDo you wish to\n 1. Print the names of those who fill your criterias onscreen\n 2. Save them to a file\n\nEnter choice here: ")
+
+        if choice6 == "1":
+            print "\n\n" + str(passmembers).replace("'", "").replace("[", "").replace("]", "")
+
+        if choice6 == "2":
+            memfile1 = raw_input("\nName of the file to which your list will be saved: ")
+            with open(memfile1, "a") as placeholder2:
+                placeholder2.write(str(passmembers).replace("'", "").replace("[", "").replace("]", ""))
+
+    elif flow == "7":
+        memlist = list()
+        clist = list()
+        flist = list()
+
+        counter3 = 1
+        print "\n\ncsv files in directory"
+        filesindic = os.listdir(".")
+        for fname in filesindic:
+            if fname.endswith(".csv"):
+                flist.append(fname)
+                print " " + str(counter3) + ". " + fname
+                clist.append(str(counter3))
+                counter3 += 1
+
+        choice = ""
+        while choice not in (["1", "2"]):
+            choice = raw_input("\noptions:\n 1. Get data from one of the csvfiles\n 2. Compare two csv-files\nYour choice: ")
+
+        if choice == "1":
+            choice1 = ""
+            while choice1 not in clist:
+                choice1 = raw_input("\nwhich one do you wish to check? ")
+
+            with open(flist[int(choice1) - 1], "rb") as f:
+                csvreader = csv.reader(f, delimiter = " ")
+                choice5 = ""
+                while choice5 not in (["1", "2"]):
+                    choice5 = raw_input("\n\nWhat part of the csv-file do you wish to inspect?\n 1. everyone who has ever plaid for said group\n 2. those who fill your requirements\n\nYour choice, young padawan? ")
+
+                if choice5 == "1":
+                    for row in csvreader:
+                        if row[0] == "Member name (those who fill your requirements)":
+                            break
+
+                        memlist.append(row)
+
+                elif choice5 == "2":
+                    recorder = ""
+                    for row in csvreader:
+                        if row[0] == "Member name (those who fill your requirements)":
+                            recorder = "yy"
+                            row[0] = "Member name"
+                
+                        if recorder == "yy":
+                            memlist.append(row)
+
+            csvsoworker(memlist)
+
+        elif choice == "2":
+            ichoice = ""
+            while ichoice not in (["1", "2", "3", "4", "5"]):
+                ichoice = raw_input("\nwhat values would you like to compare?\n 1. tm's participated in\n 2. points won\n 3. points lost\n 4. ongoing games\n 5. timeouts\nYour choice: ")
+            ichoice = int(ichoice)
+
+            with open(flist[int(raw_input("\nnumber of the older file ")) - 1], "rb") as f:
+                csvreader = csv.reader(f, delimiter = " ")
+                for row in csvreader:
+                    if row[0] == "Member name (those who fill your requirements)":
+                        break
+                    memlist.append((row[0], row[ichoice]))
+
+            memlist2 = list()
+            with open(flist[int(raw_input("number of the new file ")) - 1], "rb") as f:
+                csvreader = csv.reader(f, delimiter = " ")
+                for row in csvreader:
+                    if row[0] == "Member name (those who fill your requirements)":
+                        break
+                    memlist2.append((row[0], row[ichoice]))
+
+            col_width = max(len(element) for row in memlist for element in row) + 2
+            print "\n\n" + "".join(element.ljust(col_width) for element in (memlist[0][0], memlist[0][1] + " old", memlist[0][1] + " new", "difference")) + "\n"
+            for tup in memlist2:
+                if tup not in memlist:
+                    for tup2 in memlist:
+                        if tup[tup.index(tup[0])] in tup2 and max(float(tup[1]), float(tup2[1])) != 0.0:
+                            print "".join(element.ljust(col_width) for element in (tup[0], str(min(float(tup[1]), float(tup2[1]))).replace(".0", ""), str(max(float(tup[1]), float(tup2[1]))).replace(".0", ""), str(abs(float(tup[1]) - float(tup2[1]))).replace(".0", "")))
+
+    elif flow == "8":
+        print "\n\n\nRemoves doublets and unwanted elements from your list (ie those who are either already members or banned/unwanted)\n\nFiles in directory:\n"
+        flist = list()
+        counter3 = 1
+        for fname in os.listdir("."):
+            if os.path.isfile(fname):
+                if not fname.endswith(".csv"):
+                    if not fname.endswith(".py"):
+                        if not fname.endswith(".pyc"):
+                            if not fname.endswith("~"):
+                                print " " + str(counter3) + ". " + fname
+                                flist.append(fname)
+                                counter3 += 1
+
+        preexlist = ""
+        while preexlist not in flist:
+            preexlist = raw_input("\nFull name of the file containing your invites list: ")
+
+        un4 = set(remove_doublets(preexlist, ""))
+        un4 = memremoverf(un4)
+        un4 = un4.difference(domban)
+        un4 = misc1(un4)
+
+        with open(preexlist1, "w") as placeholder2:
+            placeholder2.write(un4)
+
+    elif flow == "9":
+        choiceorg = ""
+        while choiceorg not in (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "42"]):
+            choiceorg = raw_input("\nWhich group do you wish to check?\n 1. Star Trek: The Dominion\n 2. The Breen Confederacy\n 3. The Cardassian Empire\n 4. Death Star III\n 5. Karemma Ministry of Trade\n 6. Space 1999\n 7. Space 2099\n 8. Andromeda\n 9. legio XIII gemina\n 10. The Majestical Utopia\n 11. Space Angels\n 12. Chess!\n 13. Carpe Diem\n\n 42. Check all groups\n\nYour choice: ")
+        print "\n\nWe will start by extracting the latest memberslist for your group\n"
+        logincookie = login()
+
+        if choiceorg == "42":
+            choiceorg = (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13"])
+        else:
+            choiceorg = ([choiceorg])
+
+        for choice in choiceorg:
+            with open("temp/temp.txt", "w") as placeholder2:
+                "eraser"
+            memlist = list()
+            target = list()
+            counter = 1
+
+            if choice == "1":
+                group = "the Dominion"
+                while counter <= 100:
+                    target.append('http://www.chess.com/groups/managemembers?id=15896&page=' + str(counter))
+                    counter += 1
+
+                un1 = spider_checker(target, logincookie)
+                if len(un1) == 0:
+                    continue
+
+                for member in dommem:
+                    if member not in un1 and member not in domban and member not in tmban:
+                        memlist.append(member)
+
+                if len(memlist) != 0:
+                    memlist = notclosedcheck(memlist)
+
+                with open("mem/dommem", "w") as placeholder:
+                    placeholder.write(com2("keydom", str(un1).replace("'", "").replace("[", "").replace("]", ""), 256, []))
+
+            elif choice == "2":
+                if os.stat("mem/breenmem").st_size > 0:
+                    for placeholder in open("mem/breenmem", "rb"):
+                        breenmem = com3("keybreen", placeholder, 256, []).replace("\n", "").split(", ")
+                else:
+                    breenmem = list()
+
+                group = "the Breen Confederacy"
+                while counter <= 100:
+                    target.append('http://www.chess.com/groups/managemembers?id=21974&page=' + str(counter))
+                    counter += 1
+
+                un2 = spider_checker(target, logincookie)
+                if len(un2) == 0:
+                    continue
+
+                for member in breenmem:
+                    if member not in un2 and member not in domban and member not in tmban:
+                        memlist.append(member)
+
+                if len(memlist) != 0:
+                    memlist = notclosedcheck(memlist)
+
+                with open("mem/breenmem", "w") as placeholder:
+                    placeholder.write(com2("keybreen", str(un2).replace("'", "").replace("[", "").replace("]", ""), 256, []))
+
+            elif choice == "3":
+                if os.stat("mem/carmem").st_size > 0:
+                    for placeholder in open("mem/carmem", "rb"):
+                        cardassiamem = com3("keycarda", placeholder, 256, []).replace("\n", "").split(", ")
+                else:
+                    cardassiamem = list()
+
+                group = "the Cardassian Empire"
+                while counter <= 100:
+                    target.append('http://www.chess.com/groups/managemembers?id=20126&page=' + str(counter))
+                    counter += 1
+
+                un3 = spider_checker(target, logincookie)
+                if len(un3) == 0:
+                    continue
+
+                for member in cardassiamem:
+                    if member not in un3 and member not in domban and member not in tmban:
+                        memlist.append(member)
+
+                if len(memlist) != 0:
+                    memlist = notclosedcheck(memlist)
+
+                with open("mem/carmem", "w") as placeholder:
+                    placeholder.write(com2("keycarda", str(un3).replace("'", "").replace("[", "").replace("]", ""), 256, []))
+
+            elif choice == "4":
+                if os.stat("mem/deathmem").st_size > 0:
+                    for placeholder in open("mem/deathmem", "rb"):
+                        deathmem = com3("keydeath", placeholder, 256, []).replace("\n", "").split(", ")
+                else:
+                    deathmem = list()
+
+                group = "Death Star III"
+                while counter <= 100:
+                    target.append('http://www.chess.com/groups/managemembers?id=17618&page=' + str(counter))
+                    counter += 1
+
+                un4 = spider_checker(target, logincookie)
+                if len(un4) == 0:
+                    continue
+
+                for member in deathmem:
+                    if member not in un4 and member not in domban and member not in tmban:
+                        memlist.append(member)
+
+                if len(memlist) != 0:
+                    memlist = notclosedcheck(memlist)
+
+                with open("mem/deathmem", "w") as placeholder:
+                    placeholder.write(com2("keydeath", str(un4).replace("'", "").replace("[", "").replace("]", ""), 256, []))
+
+            elif choice == "5":
+                if os.stat("mem/karemma").st_size > 0:
+                    for placeholder in open("mem/karemma", "rb"):
+                        karemem = com3("keykar", placeholder, 256, []).replace("\n", "").split(", ")
+                else:
+                    karemem = list()
+
+                group = "Karemma Ministry of Trade"
+                while counter <= 100:
+                    target.append('http://www.chess.com/groups/managemembers?id=26088&page=' + str(counter))
+                    counter += 1
+
+                un5 = spider_checker(target, logincookie)
+                if len(un5) == 0:
+                    continue
+
+                for member in karemem:
+                    if member not in un5 and member not in domban and member not in tmban:
+                        memlist.append(member)
+
+                if len(memlist) != 0:
+                    memlist = notclosedcheck(memlist)
+
+                with open("mem/karemma", "w") as placeholder:
+                    placeholder.write(com2("keykar", str(un5).replace("'", "").replace("[", "").replace("]", ""), 256, []))
+
+            elif choice == "6":
+                if os.stat("mem/1999").st_size > 0:
+                    for placeholder in open("mem/1999", "rb"):
+                        nininin = com3("key1999", placeholder, 256, []).replace("\n", "").split(", ")
+                else:
+                    nininin = list()
+
+                group = "Space 1999"
+                while counter <= 100:
+                    target.append('http://www.chess.com/groups/managemembers?id=26614&page=' + str(counter))
+                    counter += 1
+
+                un6 = spider_checker(target, logincookie)
+                if len(un6) == 0:
+                    continue
+
+                for member in nininin:
+                    if member not in un6 and member not in domban and member not in tmban:
+                        memlist.append(member)
+
+                if len(memlist) != 0:
+                    memlist = notclosedcheck(memlist)
+
+                with open("mem/1999", "w") as placeholder:
+                    placeholder.write(com2("key1999", str(un6).replace("'", "").replace("[", "").replace("]", ""), 256, []))
+
+            elif choice == "7":
+                if os.stat("mem/2099").st_size > 0:
+                    for placeholder in open("mem/2099", "rb"):
+                        twninin = com3("key2099", placeholder, 256, []).replace("\n", "").split(", ")
+                else:
+                    twninin = list()
+
+                group = "Space 2099"
+                while counter <= 100:
+                    target.append('http://www.chess.com/groups/managemembers?id=26624&page=' + str(counter))
+                    counter += 1
+
+                un7 = spider_checker(target, logincookie)
+                if len(un7) == 0:
+                    continue
+
+                for member in twninin:
+                    if member not in un7 and member not in domban and member not in tmban:
+                        memlist.append(member)
+
+                if len(memlist) != 0:
+                    memlist = notclosedcheck(memlist)
+
+                with open("mem/2099", "w") as placeholder:
+                    placeholder.write(com2("key2099", str(un7).replace("'", "").replace("[", "").replace("]", ""), 256, []))
+
+            elif choice == "8":
+                if os.stat("mem/andromeda").st_size > 0:
+                    for placeholder in open("mem/andromeda", "rb"):
+                        andromeda = com3("keyandromeda", placeholder, 256, []).replace("\n", "").split(", ")
+                else:
+                    andromeda = list()
+
+                group = "Andromeda"
+                while counter <= 100:
+                    target.append('http://www.chess.com/groups/managemembers?id=21262&page=' + str(counter))
+                    counter += 1
+
+                un8 = spider_checker(target, logincookie)
+                if len(un8) == 0:
+                    continue
+
+                for member in andromeda:
+                    if member not in un8 and member not in domban and member not in tmban:
+                        memlist.append(member)
+
+                if len(memlist) != 0:
+                    memlist = notclosedcheck(memlist)
+
+                with open("mem/andromeda", "w") as placeholder:
+                    placeholder.write(com2("keyandromeda", str(un8).replace("'", "").replace("[", "").replace("]", ""), 256, []))
+
+            elif choice == "9":
+                if os.stat("mem/legio").st_size > 0:
+                    for placeholder in open("mem/legio", "rb"):
+                        legio = com3("keylegio", placeholder, 256, []).replace("\n", "").split(", ")
+                else:
+                    legio = list()
+
+                group = "Legio XIII Gemina"
+                while counter <= 100:
+                    target.append('http://www.chess.com/groups/managemembers?id=22596&page=' + str(counter))
+                    counter += 1
+
+                un9 = spider_checker(target, logincookie)
+                if len(un9) == 0:
+                    continue
+
+                for member in legio:
+                    if member not in un9 and member not in domban and member not in tmban:
+                        memlist.append(member)
+
+                if len(memlist) != 0:
+                    memlist = notclosedcheck(memlist)
+
+                with open("mem/legio", "w") as placeholder:
+                    placeholder.write(com2("keylegio", str(un9).replace("'", "").replace("[", "").replace("]", ""), 256, []))
+
+            elif choice == "10":
+                if os.stat("mem/utopia").st_size > 0:
+                    for placeholder in open("mem/utopia", "rb"):
+                        utopia = com3("keyutopia", placeholder, 256, []).replace("\n", "").split(", ")
+                else:
+                    utopia = list()
+
+                group = "Majestical Utopia"
+                while counter <= 100:
+                    target.append('http://www.chess.com/groups/managemembers?id=23674&page=' + str(counter))
+                    counter += 1
+
+                un10 = spider_checker(target, logincookie)
+                if len(un10) == 0:
+                    continue
+
+                for member in utopia:
+                    if member not in un10 and member not in domban and member not in tmban:
+                        memlist.append(member)
+
+                if len(memlist) != 0:
+                    memlist = notclosedcheck(memlist)
+
+                with open("mem/utopia", "w") as placeholder:
+                    placeholder.write(com2("keyutopia", str(un10).replace("'", "").replace("[", "").replace("]", ""), 256, []))
+
+            elif choice == "11":
+                if os.stat("mem/angelmem").st_size > 0:
+                    for placeholder in open("mem/angelmem", "rb"):
+                        angelmem = com3("keyangel", placeholder, 256, []).replace("\n", "").split(", ")
+                else:
+                    angelmem = list()
+
+                group = "Space Angels"
+                while counter <= 100:
+                    target.append('http://www.chess.com/groups/managemembers?id=18512&page=' + str(counter))
+                    counter += 1
+
+                un11 = spider_checker(target, logincookie)
+                if len(un11) == 0:
+                    continue
+
+                for member in angelmem:
+                    if member not in un11 and member not in domban and member not in tmban:
+                        memlist.append(member)
+
+                if len(memlist) != 0:
+                    memlist = notclosedcheck(memlist)
+
+                with open("mem/angelmem", "w") as placeholder:
+                    placeholder.write(com2("keyangel", str(un11).replace("'", "").replace("[", "").replace("]", ""), 256, []))
+
+            elif choice == "12":
+                if os.stat("mem/chessmem").st_size > 0:
+                    for placeholder in open("mem/chessmem", "rb"):
+                        chmem = com3("keyChess", placeholder, 256, []).replace("\n", "").split(", ")
+                else:
+                    chmem = list()
+
+                group = "Chess!"
+                while counter <= 100:
+                    target.append('http://www.chess.com/groups/managemembers?id=18810&page=' + str(counter))
+                    counter += 1
+
+                un12 = spider_checker(target, logincookie)
+                if len(un12) == 0:
+                    continue
+
+                for member in chmem:
+                    if member not in un12 and member not in domban and member not in tmban:
+                        memlist.append(member)
+
+                if len(memlist) != 0:
+                    memlist = notclosedcheck(memlist)
+
+                with open("mem/chessmem", "w") as placeholder:
+                    placeholder.write(com2("keyChess", str(un12).replace("'", "").replace("[", "").replace("]", ""), 256, []))
+
+            elif choice == "13":
+                if os.stat("mem/CarpeDiemmem").st_size > 0:
+                    for placeholder in open("mem/CarpeDiemmem", "rb"):
+                        cdmem = com3("keyCD", placeholder, 256, []).replace("\n", "").split(", ")
+                else:
+                    cdmem = list()
+
+                group = "Carpe Diem"
+                while counter <= 100:
+                    target.append('http://www.chess.com/groups/managemembers?id=14704&page=' + str(counter))
+                    counter += 1
+
+                un13 = spider_checker(target, logincookie)
+                if len(un13) == 0:
+                    continue
+
+                for member in cdmem:
+                    if member not in un13 and member not in domban and member not in tmban:
+                        memlist.append(member)
+
+                if len(memlist) != 0:
+                    memlist = notclosedcheck(memlist)
+
+                with open("mem/CarpeDiemmem", "w") as placeholder:
+                    placeholder.write(com2("keyCD", str(un13).replace("'", "").replace("[", "").replace("]", ""), 256, []))
+
+            print "\n\nMembers who are no longer in " + group + ": " + str(memlist).replace("'", "").replace("[", "").replace("]", "")
+
+    elif flow == "10":
+        grcheck = raw_input("group to check: ")
+        grcheck = re.sub(r"[^a-z A-Z 0-9]","", grcheck)
+        grcheck = grcheck.replace(" ", "-").lower()
+        grcheck = "http://www.chess.com/groups/notes/" + grcheck + "?page="
+        logincookie = login()
+
+        browser = mechanize.Browser()
+        cookie = cookielib.LWPCookieJar()
+        browser.set_cookiejar(cookie)
+
+        for tempcookie in logincookie:
+            cookie.set_cookie(cookielib.Cookie(version = 0, name = tempcookie["name"], value = tempcookie["value"], port = '80', port_specified = False, domain = tempcookie["domain"], domain_specified = True, domain_initial_dot = False, path = tempcookie["path"], path_specified = True, secure = tempcookie["secure"], expires = tempcookie["expiry"], discard = False, comment = None, comment_url = None, rest = None, rfc2109 = False))
+
+        browser.set_handle_equiv(True)
+        browser.set_handle_redirect(True)
+        browser.set_handle_gzip(True)
+        browser.set_handle_referer(True)
+        browser.set_handle_robots(False)
+        browser.set_handle_refresh(mechanize._http.HTTPRefreshProcessor(), max_time=1)
+
+        target = list()
+        counter = 1
+        while counter <= 100:
+            target.append(grcheck + str(counter))
+            counter += 1
+
+        notedic = dict()
+        for targetp in target:
+            print targetp
+            response = browser.open(targetp)
+            soup = BeautifulSoup(response)
+
+            links1 = browser.links()
+            for link in links1:
+                ltext = link.text
+                if "/members/view/" in str(link) and ltext != "View profile[IMG]":
+                    if ltext in notedic:
+                        notedic[ltext] += 1
+                    else:
+                        notedic[ltext] = 1
+            soupbrake = str(soup.find_all(class_ = "next-on"))
+            if soupbrake == "[]":
+                break
+
+        sorteddic = OrderedDict(sorted(notedic.items(), key = lambda x: x[1], reverse = True))
+
+        for nam, num in sorteddic.items():
+            print nam + " has made " + str(num) + " notes"
+
+    elif flow == "11":
+        target = raw_input("\n\nList of members to check: ").replace(" ", "").split(",")
+        birthdaylist = ageproc(target)
+        birthdsorter(birthdaylist)
+
+    elif flow == "12":
+        choice = ""
+        while choice not in (["1", "2"]):
+            choice = raw_input("\n\noptions:\n 1. send a pm to all members from a set of pages\n 2. manually enter the usernames of those you wish to pm\nYour choice, young padawan: ")
+        if choice == "1":
+            target = step3456("", (["n"]))
+        elif choice == "2":
+            target = raw_input("\n\nlist of members to pm: ").replace(" ", "").split(",")
+        pmdriver(target, choice)
+
+    pathway = ""
+    while pathway not in (["y", "n"]):
+        pathway = raw_input("\n\n\nRun again? (y/n) ")
+
+os.remove("temp/temp.txt")
+os.remove("temp/temp2.txt")
