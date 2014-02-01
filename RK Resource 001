@@ -206,10 +206,10 @@ def pmreplacer(text, name, country, timeoutratio):
 
 def pmdriver(target, choice):
     print "\n\n\nYour message will be in the format:\nmain text\nimage\nsecondary text\n\n\nsupported commands, will be replaced with each members respective info\n /name - members name or username (if name is unavailable)\n /nation - members nation of origin\n /timeoutratio - members timeoutratio\n /newline - pagebreak\n\n\n"
-    subject = raw_input("subject line: ")
-    payload = raw_input("main text: ")
+    subjectorg = raw_input("subject line: ")
+    payloadorg = raw_input("main text: ")
     payloadimg = raw_input("url of image you want to use: ")
-    payload2 = raw_input("secondary text: ")
+    payload2org = raw_input("secondary text: ")
     nnation = raw_input("If member nation is International, use this instead: ")
 
     Username = raw_input("\n\n\nUsername: ")
@@ -251,8 +251,10 @@ def pmdriver(target, choice):
     browser1.set_handle_referer(True)
     browser1.set_handle_robots(False)
     browser1.set_handle_refresh(mechanize._http.HTTPRefreshProcessor(), max_time=1)
+    print "\n\n"
 
     for membername2 in memtpm:
+        print "sending pm to " + membername2
         membername = "http://www.chess.com/members/view/" + membername2
         response = browser1.open(membername)
         soup = BeautifulSoup(response)
@@ -270,9 +272,9 @@ def pmdriver(target, choice):
         if name == " ":
             name = membername2
 
-        subject = pmreplacer(subject, name, country, timeoutratio)
-        payload = pmreplacer(payload, name, country, timeoutratio) + "\n"
-        payload2 = "\n" + pmreplacer(payload2, name, country, timeoutratio)
+        subject = pmreplacer(subjectorg, name.strip(), country.strip(), timeoutratio)
+        payload = pmreplacer(payloadorg, name.strip(), country.strip(), timeoutratio) + "\n"
+        payload2 = "\n" + pmreplacer(payload2org, name.strip(), country.strip(), timeoutratio)
 
         for link in soup.find_all("a", href=True):
             if link.text == "Send a Message":
@@ -305,7 +307,7 @@ def pmdriver(target, choice):
         time.sleep(1)
 
         browser0.find_element_by_id("c16").click()
-        time.sleep(10)
+        time.sleep(5)
 
 def tmparchecker(pagelist, targetname):
     tmpar = list()
@@ -460,7 +462,7 @@ def spider_checker(target, logincookie):
 
         if "next-on" not in p2:
             break
-    return usrlist
+    return list(set(usrlist))
 
 def ageproc(target):
     browser = mechanize.Browser()
@@ -862,6 +864,7 @@ def vcman(vclinklist, yourside):
     browser1.set_handle_refresh(mechanize._http.HTTPRefreshProcessor(), max_time=1)
 
     logincookie = browser3.get_cookies()
+    parmemvc = Counter()
 
     for tempcookie in logincookie:
         cookie.set_cookie(cookielib.Cookie(version = 0, name = tempcookie["name"], value = tempcookie["value"], port = "80", port_specified = False, domain = tempcookie["domain"], domain_specified = True, domain_initial_dot = False, path = tempcookie["path"], path_specified = True, secure = tempcookie["secure"], expires = tempcookie["expiry"], discard = False, comment = None, comment_url = None, rest = None, rfc2109 = False))
@@ -923,15 +926,14 @@ def vcman(vclinklist, yourside):
             links1 = []
             text1 = []
 
-            for link in browser1.links():
-                url2 = urlparse.urljoin(link.base_url, link.url)
-                text1.append(link.text)
-
-                links1.append("http://" + (urlparse.urlparse(url2).hostname or "") + (urlparse.urlparse(url2).path or ""))
-
-            for link,text in zip(links1,text1):
-                with open("temp/temp.txt", "a") as placeholder2:
-                    placeholder2.write(re.sub(r"^http?:\/\/.*[\r\n]*", "", link.replace("http://www.chess.com/members/view/", " "), flags=re.MULTILINE))
+            for link in browser1.links(url_regex="chess.com/members/view/"):
+                ltext = link.text
+                if ltext != "View Profile":
+                    user = ltext.replace("[IMG]", "")
+                    if user in parmemvc:
+                        parmemvc[user] += 1
+                    else:
+                        parmemvc[user] = 1
 
             soup = BeautifulSoup(response)
             p2 = str(soup.find_all(class_ = "next-on"))
@@ -947,17 +949,19 @@ def vcman(vclinklist, yourside):
                         break
                     time.sleep(2)
                     print "\nchecking " + pointer + " page " + str(nextbtn)
-                    vcelem = browser3.find_elements_by_partial_link_text('')
+                    vcelem = browser3.find_elements_by_partial_link_text("")
                     for curvcparmem in vcelem:
                         memsellink = curvcparmem.get_attribute("href") or ""
 
                         if "http://www.chess.com/members/view/" in memsellink:
-                            with open("temp/temp.txt", "a") as placeholder2:
-                                placeholder2.write(re.sub(r"^http?:\/\/.*[\r\n]*", "", memsellink.replace("http://www.chess.com/members/view/", " "), flags=re.MULTILINE))
-
+                            user = re.sub(r"^http?:\/\/.*[\r\n]*", "", memsellink.replace("http://www.chess.com/members/view/", " "))
+                            if user in parmemvc:
+                                parmemvc[user] += 1
+                            else:
+                                parmemvc[user] = 1
                     nextbtn += 1
-
     browser3.quit()
+    return parmemvc
 
 def memberprocesser(target):
     minrat = raw_input("\n\nMin rating allowed. leave empty to skip: ")
@@ -1004,7 +1008,7 @@ def memberprocesser(target):
     browser.set_handle_robots(False)
     browser.set_handle_refresh(mechanize._http.HTTPRefreshProcessor(), max_time=1)
 
-    target = target.replace(" ", "").split(",")
+    target = str(target).replace(" ", "").replace("(", "").replace(")", "").replace("]", "").replace("[", "").replace("'", "").split(",")
     passmem = list()
     for targetx in target:
         print "checking " + targetx
@@ -1109,6 +1113,8 @@ def timeoutchecker(soup):
         if "Timeouts:" in str(placeholder):
             timeout = int(placeholder.text.replace("Timeouts:", "").strip().replace("% (last 90 days)", ""))
             break
+        else:
+            timeout = 0
     return timeout
 
 def ratingchecker(soup):
@@ -1299,18 +1305,15 @@ def spider_ml(target, logincookie):
             ltext = link.text
             if ltext != "View Profile":
                 usrlist.append(ltext.replace("[IMG]", ""))
-    return usrlist
+    return list(set(usrlist))
 
 pathway = "y"
 while pathway in (["y"]):
-
-    with open("temp/temp.txt", "w") as placeholder2:
-        print "chess.com RK Resource 001\nversion 0.8.7\ndeveloped by Robin Karlsson\ncontact email: 'r.robin.karlsson@gmail.com'\ncontact chess.com profile: 'http://www.chess.com/members/view/RobinKarlsson'\n"
-    with open("temp/temp2.txt", "w") as placeholder2:
-        print "What would you like to do?\n\n 1. Create a list of members from a group.\n 2. Check a team match for members banned from matches by the Dominion.\n 3. Send invites for a group.\n 4. Check a groups finished votechess matches and count number of posts per member\n 5. Check a groups team matches and count the number of times each member has participated.\n 6. Check a list of members for those with a rating above and/or below a specific value, last online & member since a specific date and a timeout ratio below a specific value.\n 7. Presentation of a csv-file from option 6.\n 8. Remove doublets and filter out members who are in specific groups from a preexisting textfile.\n 9. Look for members who has left your team\n 10. Count number of group notes per member\n 11. Collect birthdays for a list of members\n 12. Send personal messages to members"
+    print "chess.com RK Resource 001\nversion 0.8.7\ndeveloped by Robin Karlsson\ncontact email: 'r.robin.karlsson@gmail.com'\ncontact chess.com profile: 'http://www.chess.com/members/view/RobinKarlsson'\n"
+    print "What would you like to do?\n\n 1. Create a list of members from a group.\n 2. Check a team match for members banned from matches by the Dominion.\n 3. Send invites for a group.\n 4. Check a groups finished votechess matches and count number of posts per member\n 5. Check a groups team matches and count the number of times each member has participated.\n 6. Check a list of members for those with a rating above and/or below a specific value, last online & member since a specific date and a timeout ratio below a specific value.\n 7. Presentation of a csv-file from option 6.\n 8. Remove doublets and filter out members who are in specific groups from a preexisting textfile.\n 9. Look for members who has left your team\n 10. Count number of group notes per member\n 11. Collect birthdays for a list of members\n 12. Send personal messages to members"
 
     flow = ""
-    while flow not in (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]):
+    while flow not in (["1", "2", "3", "5", "6", "7", "8", "9", "10", "11", "12"]):
         flow = raw_input("\nEnter your choice here: ")
 
     if flow == "1":
@@ -1371,13 +1374,7 @@ while pathway in (["y"]):
         yourside = raw_input("Name of group to check: ")
 
         vclinklist = getvclinks(yourside)
-        vcman(vclinklist, yourside)
-
-        parmemvc = Counter()
-
-        for placeholder2 in open ("temp/temp.txt", "r"):
-          for membervc in placeholder2.split ():
-            parmemvc[membervc] += 0.5
+        parmemvc = vcman(vclinklist, yourside)
 
         for key, value in sorted(parmemvc.items(), key = itemgetter(1), reverse = True):
             print "\n" + key + " has made " + str(int(value)) + " posts"
@@ -1529,11 +1526,15 @@ while pathway in (["y"]):
 
             col_width = max(len(element) for row in memlist for element in row) + 2
             print "\n\n" + "".join(element.ljust(col_width) for element in (memlist[0][0], memlist[0][1] + " old", memlist[0][1] + " new", "difference")) + "\n"
+            fmemlist = list()
             for tup in memlist2:
                 if tup not in memlist:
                     for tup2 in memlist:
                         if tup[tup.index(tup[0])] in tup2 and max(float(tup[1]), float(tup2[1])) != 0.0:
-                            print "".join(element.ljust(col_width) for element in (tup[0], str(min(float(tup[1]), float(tup2[1]))).replace(".0", ""), str(max(float(tup[1]), float(tup2[1]))).replace(".0", ""), str(abs(float(tup[1]) - float(tup2[1]))).replace(".0", "")))
+                            fmemlist.append((tup[0], str(min(float(tup[1]), float(tup2[1]))).replace(".0", ""), str(max(float(tup[1]), float(tup2[1]))).replace(".0", ""), str(abs(float(tup[1]) - float(tup2[1]))).replace(".0", "")))
+            fmemlist = sorted(fmemlist, reverse = True, key=lambda tup: tup[-1])
+            for cpointer in fmemlist:
+                print "".join(element.ljust(col_width) for element in cpointer)
 
     elif flow == "8":
         print "\n\n\nRemoves doublets and unwanted elements from your list (ie those who are either already members or banned/unwanted)\n\nFiles in directory:\n"
@@ -1574,8 +1575,6 @@ while pathway in (["y"]):
             choiceorg = ([choiceorg])
 
         for choice in choiceorg:
-            with open("temp/temp.txt", "w") as placeholder2:
-                "eraser"
             memlist = list()
             target = list()
             counter = 1
@@ -1889,7 +1888,7 @@ while pathway in (["y"]):
             elif choice == "13":
                 if os.stat("mem/CarpeDiemmem").st_size > 0:
                     for placeholder in open("mem/CarpeDiemmem", "rb"):
-                        cdmem = com3("keyCD", placeholder, 256, []).replace("\n", "").split(", ")
+                        cdmem = list(set(com3("keyCD", placeholder, 256, []).replace("\n", "").split(", ")))
                 else:
                     cdmem = list()
 
@@ -1982,6 +1981,3 @@ while pathway in (["y"]):
     pathway = ""
     while pathway not in (["y", "n"]):
         pathway = raw_input("\n\n\nRun again? (y/n) ")
-
-os.remove("temp/temp.txt")
-os.remove("temp/temp2.txt")
