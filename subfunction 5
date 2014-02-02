@@ -307,8 +307,7 @@ def timeoutchecker(soup):
     for placeholder in soup.find_all(class_ = "even"):
         if "Timeouts:" in str(placeholder):
             timeout = int(placeholder.text.replace("Timeouts:", "").strip().replace("% (last 90 days)", ""))
-            break
-    return timeout
+            return timeout
 
 def ratingchecker(soup):
     ratinglist = list()
@@ -357,62 +356,105 @@ pathway = "y"
 while pathway in (["y"]):
     flow = ""
 
-    while flow not in (["6"]):
+    while flow not in (["5"]):
         flow = raw_input("\nEnter your choice here: ")
             
-    if flow == "6":
+    elif flow == "5":
+        pathtm = ""
+        while pathtm not in (["1", "2"]):
+            pathtm = raw_input(" 1. Check all tm's for a group\n 2. Check a single tm\nYour choice: ")
         targetnameorg = raw_input("\n\n\nName of the group you wish to check: ")
         targetname = re.sub(r"[^a-z A-Z 0-9]","", targetnameorg)
         targetname = targetname.replace(" ", "-").lower()
 
-        pagelist = gettmlinks(targetname)
+        if pathtm == "1":
+            targetnameorgf = targetnameorg
+            pagelist = gettmlinks(targetname)
+        elif pathtm == "2":
+            pathtm = ""
+            while pathtm not in (["1", "2"]):
+                pathtm = raw_input("\n\n 1. Check the tm for results\n 2. Check match for members with a timeout-ratio above a specific value\nYour choice: ")
+            pagelist = raw_input("team match id: ")
+            targetnameorgf = "team match: " + pagelist + " ... "
+            pagelist = (["http://www.chess.com/groups/team_match?id=" + pagelist])
+
         tmpar, tmtimeout, winssdic, losedic = tmparchecker(pagelist, targetname)
 
-        tmparcount = Counter(tmpar)
-        tmtimeoutcount = Counter(tmtimeout)
-        joined = {}
-        membernamelist = list()
+        if pathtm == "1":
+            tmparcount = Counter(tmpar)
+            tmtimeoutcount = Counter(tmtimeout)
+            joined = {}
+            membernamelist = list()
 
-        outputfile = open(targetnameorg + ".csv", "wb")
-        csvwriter = csv.writer(outputfile, delimiter = " ", quoting=csv.QUOTE_MINIMAL)
-        
-        choicetm = raw_input("\n\nWould you wish to\n\n 1. Print the collected infomation\n\n 2. Remove those who hasn't been online in a while or have an overall high timeout ratio and print\n\nChooce your path wisely, young padawan: ")
+            outputfile = open(targetnameorgf + " " + strftime("%Y-%m-%d", gmtime()) + ".csv", "wb")
+            csvwriter = csv.writer(outputfile, delimiter = " ", quoting=csv.QUOTE_MINIMAL)
 
-        for pointer in set(tmparcount.keys())|set(winssdic.keys())|set(losedic.keys())|set(tmtimeoutcount.keys()):
-            
-            joined[pointer] = (float(tmparcount.get(pointer, 0))/10 + (float(tmparcount.get(pointer, 0))*2 - float(winssdic.get(pointer, 0)) - float(losedic.get(pointer, 0)))*5/4 + float(winssdic.get(pointer, 0)) - float(losedic.get(pointer, 0)) - tmtimeoutcount.get(pointer, 0)*3, tmparcount.get(pointer, 0), winssdic.get(pointer, 0), losedic.get(pointer, 0), tmtimeoutcount.get(pointer, 0))
+            for pointer in set(tmparcount.keys())|set(winssdic.keys())|set(losedic.keys())|set(tmtimeoutcount.keys()):
+                joined[pointer] = (float(tmparcount.get(pointer, 0))/10 + (float(tmparcount.get(pointer, 0))*2 - float(winssdic.get(pointer, 0)) - float(losedic.get(pointer, 0)))*5/4 + float(winssdic.get(pointer, 0)) - float(losedic.get(pointer, 0)) - tmtimeoutcount.get(pointer, 0)*3, tmparcount.get(pointer, 0), winssdic.get(pointer, 0), losedic.get(pointer, 0), tmtimeoutcount.get(pointer, 0))
 
-        if choicetm == "1":
             csvwriter.writerow(("Member name", "tm's participated in", "points won", "points lost", "ongoing games", "timeouts"))
-            
+
             for key, value in sorted(joined.items(), key = itemgetter(1), reverse = True):
-
-                print "\n" + key + " has played in " + str(value[1]) + " team matches, and timed out in " + str(value[4]) + " games\npoints won: " + str(value[2]).replace(".0", "") + ", points lost: " + str(value[3]).replace(".0", "") + ", ongoing games: " + str(value[1]*2 - value[2] - value[3]).replace(".0", "")
                 csvwriter.writerow((key, value[1], value[2], value[3], value[1]*2 - value[2] - value[3], value[4]))
 
-            choicetm = raw_input("continue to remove those who dosn't fill your requirements? (y/n) ")
+            choicetm = ""
+            while choicetm not in (["y", "n"]):
+                choicetm = raw_input("continue to remove those who dosn't fill your requirements? (y/n) ")
+
             if choicetm == "y":
-                choicetm = "2"
-        
-        if choicetm == "2":
-            membernamelist = list()
-            for key in joined:
-                membernamelist.append(key)
+                membernamelist = list()
+                for key in joined:
+                    membernamelist.append(key)
 
-            passmembers = memberprocesser(membernamelist)
-            joined2 = dict()
-            membernamelist = list()
-            for key in joined:
-                if key in passmembers:
-                    joined2[key] = joined[key]
-                    
-            csvwriter.writerow(("Member name (those who fill your requirements)", "tm's participated in", "points won", "points lost", "ongoing games", "timeouts"))
-            
-            for key, value in sorted(joined2.items(), key = itemgetter(1), reverse = True):
+                passmembers = memberprocesser(membernamelist)
+                joined2 = dict()
+                membernamelist = list()
+                for key in joined:
+                    if key in passmembers:
+                        joined2[key] = joined[key]
 
-                print "\n" + key + " has played in " + str(value[1]) + " team matches, and timed out in " + str(value[4]) + " games\npoints won: " + str(value[2]).replace(".0", "") + ", points lost: " + str(value[3]).replace(".0", "") + ", ongoing games: " + str(value[1]*2 - value[2] - value[3]).replace(".0", "")
-                csvwriter.writerow((key, value[1], value[2], value[3], value[1]*2 - value[2] - value[3], value[4]))
+                csvwriter.writerow(("Member name (those who fill your requirements)", "tm's participated in", "points won", "points lost", "ongoing games", "timeouts"))
 
-        outputfile.close()
+                for key, value in sorted(joined2.items(), key = itemgetter(1), reverse = True):
+
+                    csvwriter.writerow((key, value[1], value[2], value[3], value[1]*2 - value[2] - value[3], value[4]))
+            outputfile.close()
+
+        elif pathtm == "2":
+            maxtmrat = int(raw_input("\n\nGet members with a timeout-ratio above: ").replace("%", ""))
+            browser = mechanize.Browser()
+            browser.set_handle_equiv(True)
+            browser.set_handle_redirect(True)
+            browser.set_handle_gzip(True)
+            browser.set_handle_referer(True)
+            browser.set_handle_robots(False)
+            browser.set_handle_refresh(mechanize._http.HTTPRefreshProcessor(), max_time=1)
+            deadbeatlist = list()
+            for member in tmpar:
+                print "checking " + member
+                response = browser.open("http://www.chess.com/members/view/" + member)
+                if "://www.chess.com/members/view/" not in browser.geturl():
+                    continue
+                soup = BeautifulSoup(response)
+                if timeoutchecker(soup) > maxtmrat:
+                    deadbeatlist.append(member)
+            print "\n\n\nThe following members has a timeoutratio above " + str(maxtmrat) + "%: " + str(deadbeatlist).replace("'", "").replace("[", "").replace("]", "")
+
+    elif flow == "6":
+        membernamelist = raw_input("\n\nList of members to check: ")
+
+        passmembers = memberprocesser(membernamelist)
+
+        choice6 = ""
+        while choice6 not in (["1", "2"]):
+            choice6 = raw_input("\n\nDo you wish to\n 1. Print the names of those who fill your criterias onscreen\n 2. Save them to a file\n\nEnter choice here: ")
+
+        if choice6 == "1":
+            print "\n\n" + str(passmembers).replace("'", "").replace("[", "").replace("]", "")
+
+        if choice6 == "2":
+            memfile1 = raw_input("\nName of the file to which your list will be saved: ")
+            with open(memfile1, "a") as placeholder2:
+                placeholder2.write(str(passmembers).replace("'", "").replace("[", "").replace("]", ""))
         
   pathway = raw_input("Run again? (y/n) ")
