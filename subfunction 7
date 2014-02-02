@@ -81,12 +81,9 @@ def csvsoworker(memlist):
         
 pathway = "y"
 while pathway in (["y"]):
-    flow = ""
+    flow = "7"
 
-    while flow not in (["8"]):
-        flow = raw_input("\nEnter your choice here: ")
-
-    if flow == "8":
+    if flow == "7":
         memlist = list()
         clist = list()
         flist = list()
