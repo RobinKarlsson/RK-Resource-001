@@ -354,12 +354,9 @@ def birthlister(soup):
 
 pathway = "y"
 while pathway in (["y"]):
-    flow = ""
-
-    while flow not in (["5"]):
-        flow = raw_input("\nEnter your choice here: ")
+    flow = "5"
             
-    elif flow == "5":
+    if flow == "5":
         pathtm = ""
         while pathtm not in (["1", "2"]):
             pathtm = raw_input(" 1. Check all tm's for a group\n 2. Check a single tm\nYour choice: ")
@@ -439,22 +436,5 @@ while pathway in (["y"]):
                 if timeoutchecker(soup) > maxtmrat:
                     deadbeatlist.append(member)
             print "\n\n\nThe following members has a timeoutratio above " + str(maxtmrat) + "%: " + str(deadbeatlist).replace("'", "").replace("[", "").replace("]", "")
-
-    elif flow == "6":
-        membernamelist = raw_input("\n\nList of members to check: ")
-
-        passmembers = memberprocesser(membernamelist)
-
-        choice6 = ""
-        while choice6 not in (["1", "2"]):
-            choice6 = raw_input("\n\nDo you wish to\n 1. Print the names of those who fill your criterias onscreen\n 2. Save them to a file\n\nEnter choice here: ")
-
-        if choice6 == "1":
-            print "\n\n" + str(passmembers).replace("'", "").replace("[", "").replace("]", "")
-
-        if choice6 == "2":
-            memfile1 = raw_input("\nName of the file to which your list will be saved: ")
-            with open(memfile1, "a") as placeholder2:
-                placeholder2.write(str(passmembers).replace("'", "").replace("[", "").replace("]", ""))
         
   pathway = raw_input("Run again? (y/n) ")
