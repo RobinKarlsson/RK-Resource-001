@@ -9,9 +9,14 @@ contact chess.com profile: "http://www.chess.com/members/view/RobinKarlsson"
 
 version 0.8.7
 
+===============
 
+Requirements
 
+- Python 2.7
+- Libraries: Mechanize, BeautifulSoup, Selenium
 
+===============
 
 
 options:
