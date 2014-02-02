@@ -253,7 +253,18 @@ def pmdriver(target, choice):
     browser1.set_handle_refresh(mechanize._http.HTTPRefreshProcessor(), max_time=1)
     print "\n\n"
 
+    counter = 1
     for membername2 in memtpm:
+        counter += 1
+        if counter > 100:
+            browser0.quit()
+            browser0 = webdriver.Firefox()
+            browser0.get("https://www.chess.com/login")
+            WebDriverWait(browser0, 10).until(EC.presence_of_element_located((By.ID, "btnLogin")))
+            browser0.find_element_by_name("c1").send_keys(Username)
+            browser0.find_element_by_name("loginpassword").send_keys(Password)
+            browser0.find_element_by_id("btnLogin").click()
+            counter = 1
         print "sending pm to " + membername2
         membername = "http://www.chess.com/members/view/" + membername2
         response = browser1.open(membername)
@@ -307,6 +318,7 @@ def pmdriver(target, choice):
         time.sleep(1)
 
         browser0.find_element_by_id("c16").click()
+        #raw_input(payload)
         time.sleep(5)
 
 def tmparchecker(pagelist, targetname):
@@ -555,7 +567,7 @@ def inviter(choicelist, invitenum):
         for choice5 in choicelist:
             counter += 1
             counted = "y"
-            if counter > 120:
+            if counter > 100:
                 browser2.quit()
                 browser2 = webdriver.Firefox()
                 browser2.get("https://www.chess.com/login")
@@ -630,7 +642,7 @@ def inviter(choicelist, invitenum):
                     counted = ""
                 else:
                     counter += 1
-                if counter > 120:
+                if counter > 100:
                     browser2.quit()
                     browser2 = webdriver.Firefox()
                     browser2.get("https://www.chess.com/login")
@@ -1565,12 +1577,12 @@ while pathway in (["y"]):
     elif flow == "9":
         choiceorg = ""
         while choiceorg not in (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "42"]):
-            choiceorg = raw_input("\nWhich group do you wish to check?\n 1. Star Trek: The Dominion\n 2. The Breen Confederacy\n 3. The Cardassian Empire\n 4. Death Star III\n 5. Karemma Ministry of Trade\n 6. Space 1999\n 7. Space 2099\n 8. Andromeda\n 9. legio XIII gemina\n 10. The Majestical Utopia\n 11. Space Angels\n 12. Chess!\n 13. Carpe Diem\n\n 42. Check all groups\n\nYour choice: ")
+            choiceorg = raw_input("\nWhich group do you wish to check?\n 1. Star Trek: The Dominion\n 2. The Breen Confederacy\n 3. The Cardassian Empire\n 4. Death Star III\n 5. Karemma Ministry of Trade\n 6. Space 1999\n 7. Space 2099\n 8. Andromeda\n 9. legio XIII gemina\n 10. The Majestical Utopia\n 11. Space Angels\n 12. Chess!\n 13. Carpe Diem\n\n 42. Check groups 1-10\n\nYour choice: ")
         print "\n\nWe will start by extracting the latest memberslist for your group\n"
         logincookie = login()
 
         if choiceorg == "42":
-            choiceorg = (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13"])
+            choiceorg = (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"])
         else:
             choiceorg = ([choiceorg])
 
