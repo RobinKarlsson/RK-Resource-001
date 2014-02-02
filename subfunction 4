@@ -178,11 +178,9 @@ def vcman(vclinklist, yourside):
 
 pathway = "y"
 while pathway in (["y"]):
-    flow = ""
+    flow = "4"
 
-    while flow not in (["5"]):
-        flow = raw_input("\nEnter your choice here: ")
-
+    if flow == "4"
         vclinklist = getvclinks(yourside)
         vcman(vclinklist, yourside)
 
