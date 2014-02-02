@@ -15,6 +15,7 @@ Requirements
 
 - Python 2.7
 - Libraries: Mechanize, BeautifulSoup, Selenium
+- Mozilla Firefox
 
 ===============
 
