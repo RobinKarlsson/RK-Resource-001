@@ -321,6 +321,32 @@ def pmdriver(target, choice):
         #raw_input(payload)
         time.sleep(5)
 
+def nineworker(infile, inid, logincookie, memlist, key):
+    target = list()
+    if os.stat("mem/" + infile).st_size > 0:
+        for placeholder in open("mem/" + infile, "rb"):
+            memlistorg = list(set(com3(key, placeholder, 256, []).replace("\n", "").split(", ")))
+    else:
+        memlistorg = list()
+
+    counter = 1
+    while counter <= 100:
+        target.append("http://www.chess.com/groups/managemembers?id=" + inid + "&page=" + str(counter))
+        counter += 1
+
+    un = spider_checker(target, logincookie)
+
+    for member in memlistorg:
+        if member not in un:
+            memlist.append(member)
+
+    if len(memlist) != 0:
+        memlist = notclosedcheck(memlist)
+
+    with open("mem/" + infile, "w") as placeholder:
+        placeholder.write(com2(key, str(un).replace("'", "").replace("[", "").replace("]", ""), 256, []))
+    return memlist
+
 def tmparchecker(pagelist, targetname):
     tmpar = list()
     timeoutlist = list()
@@ -1124,10 +1150,7 @@ def timeoutchecker(soup):
     for placeholder in soup.find_all(class_ = "even"):
         if "Timeouts:" in str(placeholder):
             timeout = int(placeholder.text.replace("Timeouts:", "").strip().replace("% (last 90 days)", ""))
-            break
-        else:
-            timeout = 0
-    return timeout
+            return timeout
 
 def ratingchecker(soup):
     ratinglist = list()
@@ -1402,52 +1425,75 @@ while pathway in (["y"]):
         if pathtm == "1":
             targetnameorgf = targetnameorg
             pagelist = gettmlinks(targetname)
-        if pathtm == "2":
+        elif pathtm == "2":
+            pathtm = ""
+            while pathtm not in (["1", "2"]):
+                pathtm = raw_input("\n\n 1. Check the tm for results\n 2. Check match for members with a timeout-ratio above a specific value\nYour choice: ")
             pagelist = raw_input("team match id: ")
             targetnameorgf = "team match: " + pagelist + " ... "
             pagelist = (["http://www.chess.com/groups/team_match?id=" + pagelist])
 
         tmpar, tmtimeout, winssdic, losedic = tmparchecker(pagelist, targetname)
 
-        tmparcount = Counter(tmpar)
-        tmtimeoutcount = Counter(tmtimeout)
-        joined = {}
-        membernamelist = list()
-
-        outputfile = open(targetnameorgf + " " + strftime("%Y-%m-%d", gmtime()) + ".csv", "wb")
-        csvwriter = csv.writer(outputfile, delimiter = " ", quoting=csv.QUOTE_MINIMAL)
-
-        for pointer in set(tmparcount.keys())|set(winssdic.keys())|set(losedic.keys())|set(tmtimeoutcount.keys()):
-            joined[pointer] = (float(tmparcount.get(pointer, 0))/10 + (float(tmparcount.get(pointer, 0))*2 - float(winssdic.get(pointer, 0)) - float(losedic.get(pointer, 0)))*5/4 + float(winssdic.get(pointer, 0)) - float(losedic.get(pointer, 0)) - tmtimeoutcount.get(pointer, 0)*3, tmparcount.get(pointer, 0), winssdic.get(pointer, 0), losedic.get(pointer, 0), tmtimeoutcount.get(pointer, 0))
-
-        csvwriter.writerow(("Member name", "tm's participated in", "points won", "points lost", "ongoing games", "timeouts"))
-
-        for key, value in sorted(joined.items(), key = itemgetter(1), reverse = True):
-            csvwriter.writerow((key, value[1], value[2], value[3], value[1]*2 - value[2] - value[3], value[4]))
-
-        choicetm = ""
-        while choicetm not in (["y", "n"]):
-            choicetm = raw_input("continue to remove those who dosn't fill your requirements? (y/n) ")
-
-        if choicetm == "y":
+        if pathtm == "1":
+            tmparcount = Counter(tmpar)
+            tmtimeoutcount = Counter(tmtimeout)
+            joined = {}
             membernamelist = list()
-            for key in joined:
-                membernamelist.append(key)
 
-            passmembers = memberprocesser(membernamelist)
-            joined2 = dict()
-            membernamelist = list()
-            for key in joined:
-                if key in passmembers:
-                    joined2[key] = joined[key]
+            outputfile = open(targetnameorgf + " " + strftime("%Y-%m-%d", gmtime()) + ".csv", "wb")
+            csvwriter = csv.writer(outputfile, delimiter = " ", quoting=csv.QUOTE_MINIMAL)
 
-            csvwriter.writerow(("Member name (those who fill your requirements)", "tm's participated in", "points won", "points lost", "ongoing games", "timeouts"))
+            for pointer in set(tmparcount.keys())|set(winssdic.keys())|set(losedic.keys())|set(tmtimeoutcount.keys()):
+                joined[pointer] = (float(tmparcount.get(pointer, 0))/10 + (float(tmparcount.get(pointer, 0))*2 - float(winssdic.get(pointer, 0)) - float(losedic.get(pointer, 0)))*5/4 + float(winssdic.get(pointer, 0)) - float(losedic.get(pointer, 0)) - tmtimeoutcount.get(pointer, 0)*3, tmparcount.get(pointer, 0), winssdic.get(pointer, 0), losedic.get(pointer, 0), tmtimeoutcount.get(pointer, 0))
 
-            for key, value in sorted(joined2.items(), key = itemgetter(1), reverse = True):
+            csvwriter.writerow(("Member name", "tm's participated in", "points won", "points lost", "ongoing games", "timeouts"))
 
+            for key, value in sorted(joined.items(), key = itemgetter(1), reverse = True):
                 csvwriter.writerow((key, value[1], value[2], value[3], value[1]*2 - value[2] - value[3], value[4]))
 
-        outputfile.close()
+            choicetm = ""
+            while choicetm not in (["y", "n"]):
+                choicetm = raw_input("continue to remove those who dosn't fill your requirements? (y/n) ")
+
+            if choicetm == "y":
+                membernamelist = list()
+                for key in joined:
+                    membernamelist.append(key)
+
+                passmembers = memberprocesser(membernamelist)
+                joined2 = dict()
+                membernamelist = list()
+                for key in joined:
+                    if key in passmembers:
+                        joined2[key] = joined[key]
+
+                csvwriter.writerow(("Member name (those who fill your requirements)", "tm's participated in", "points won", "points lost", "ongoing games", "timeouts"))
+
+                for key, value in sorted(joined2.items(), key = itemgetter(1), reverse = True):
+
+                    csvwriter.writerow((key, value[1], value[2], value[3], value[1]*2 - value[2] - value[3], value[4]))
+            outputfile.close()
+
+        elif pathtm == "2":
+            maxtmrat = int(raw_input("\n\nGet members with a timeout-ratio above: ").replace("%", ""))
+            browser = mechanize.Browser()
+            browser.set_handle_equiv(True)
+            browser.set_handle_redirect(True)
+            browser.set_handle_gzip(True)
+            browser.set_handle_referer(True)
+            browser.set_handle_robots(False)
+            browser.set_handle_refresh(mechanize._http.HTTPRefreshProcessor(), max_time=1)
+            deadbeatlist = list()
+            for member in tmpar:
+                print "checking " + member
+                response = browser.open("http://www.chess.com/members/view/" + member)
+                if "://www.chess.com/members/view/" not in browser.geturl():
+                    continue
+                soup = BeautifulSoup(response)
+                if timeoutchecker(soup) > maxtmrat:
+                    deadbeatlist.append(member)
+            print "\n\n\nThe following members has a timeoutratio above " + str(maxtmrat) + "%: " + str(deadbeatlist).replace("'", "").replace("[", "").replace("]", "")
 
     elif flow == "6":
         membernamelist = raw_input("\n\nList of members to check: ")
@@ -1588,340 +1634,58 @@ while pathway in (["y"]):
 
         for choice in choiceorg:
             memlist = list()
-            target = list()
-            counter = 1
 
             if choice == "1":
+                memlist = nineworker("dommem", "15896", logincookie, memlist, "keydom")
                 group = "the Dominion"
-                while counter <= 100:
-                    target.append('http://www.chess.com/groups/managemembers?id=15896&page=' + str(counter))
-                    counter += 1
-
-                un1 = spider_checker(target, logincookie)
-                if len(un1) == 0:
-                    continue
-
-                for member in dommem:
-                    if member not in un1 and member not in domban and member not in tmban:
-                        memlist.append(member)
-
-                if len(memlist) != 0:
-                    memlist = notclosedcheck(memlist)
-
-                with open("mem/dommem", "w") as placeholder:
-                    placeholder.write(com2("keydom", str(un1).replace("'", "").replace("[", "").replace("]", ""), 256, []))
 
             elif choice == "2":
-                if os.stat("mem/breenmem").st_size > 0:
-                    for placeholder in open("mem/breenmem", "rb"):
-                        breenmem = com3("keybreen", placeholder, 256, []).replace("\n", "").split(", ")
-                else:
-                    breenmem = list()
-
+                memlist = nineworker("breenmem", "21974", logincookie, memlist, "keybreen")
                 group = "the Breen Confederacy"
-                while counter <= 100:
-                    target.append('http://www.chess.com/groups/managemembers?id=21974&page=' + str(counter))
-                    counter += 1
-
-                un2 = spider_checker(target, logincookie)
-                if len(un2) == 0:
-                    continue
-
-                for member in breenmem:
-                    if member not in un2 and member not in domban and member not in tmban:
-                        memlist.append(member)
-
-                if len(memlist) != 0:
-                    memlist = notclosedcheck(memlist)
-
-                with open("mem/breenmem", "w") as placeholder:
-                    placeholder.write(com2("keybreen", str(un2).replace("'", "").replace("[", "").replace("]", ""), 256, []))
 
             elif choice == "3":
-                if os.stat("mem/carmem").st_size > 0:
-                    for placeholder in open("mem/carmem", "rb"):
-                        cardassiamem = com3("keycarda", placeholder, 256, []).replace("\n", "").split(", ")
-                else:
-                    cardassiamem = list()
-
+                memlist = nineworker("carmem", "20126", logincookie, memlist, "keycarda")
                 group = "the Cardassian Empire"
-                while counter <= 100:
-                    target.append('http://www.chess.com/groups/managemembers?id=20126&page=' + str(counter))
-                    counter += 1
-
-                un3 = spider_checker(target, logincookie)
-                if len(un3) == 0:
-                    continue
-
-                for member in cardassiamem:
-                    if member not in un3 and member not in domban and member not in tmban:
-                        memlist.append(member)
-
-                if len(memlist) != 0:
-                    memlist = notclosedcheck(memlist)
-
-                with open("mem/carmem", "w") as placeholder:
-                    placeholder.write(com2("keycarda", str(un3).replace("'", "").replace("[", "").replace("]", ""), 256, []))
 
             elif choice == "4":
-                if os.stat("mem/deathmem").st_size > 0:
-                    for placeholder in open("mem/deathmem", "rb"):
-                        deathmem = com3("keydeath", placeholder, 256, []).replace("\n", "").split(", ")
-                else:
-                    deathmem = list()
-
+                memlist = nineworker("deathmem", "17618", logincookie, memlist, "keydeath")
                 group = "Death Star III"
-                while counter <= 100:
-                    target.append('http://www.chess.com/groups/managemembers?id=17618&page=' + str(counter))
-                    counter += 1
-
-                un4 = spider_checker(target, logincookie)
-                if len(un4) == 0:
-                    continue
-
-                for member in deathmem:
-                    if member not in un4 and member not in domban and member not in tmban:
-                        memlist.append(member)
-
-                if len(memlist) != 0:
-                    memlist = notclosedcheck(memlist)
-
-                with open("mem/deathmem", "w") as placeholder:
-                    placeholder.write(com2("keydeath", str(un4).replace("'", "").replace("[", "").replace("]", ""), 256, []))
 
             elif choice == "5":
-                if os.stat("mem/karemma").st_size > 0:
-                    for placeholder in open("mem/karemma", "rb"):
-                        karemem = com3("keykar", placeholder, 256, []).replace("\n", "").split(", ")
-                else:
-                    karemem = list()
-
+                memlist = nineworker("karemma", "26088", logincookie, memlist, "keykar")
                 group = "Karemma Ministry of Trade"
-                while counter <= 100:
-                    target.append('http://www.chess.com/groups/managemembers?id=26088&page=' + str(counter))
-                    counter += 1
-
-                un5 = spider_checker(target, logincookie)
-                if len(un5) == 0:
-                    continue
-
-                for member in karemem:
-                    if member not in un5 and member not in domban and member not in tmban:
-                        memlist.append(member)
-
-                if len(memlist) != 0:
-                    memlist = notclosedcheck(memlist)
-
-                with open("mem/karemma", "w") as placeholder:
-                    placeholder.write(com2("keykar", str(un5).replace("'", "").replace("[", "").replace("]", ""), 256, []))
 
             elif choice == "6":
-                if os.stat("mem/1999").st_size > 0:
-                    for placeholder in open("mem/1999", "rb"):
-                        nininin = com3("key1999", placeholder, 256, []).replace("\n", "").split(", ")
-                else:
-                    nininin = list()
-
+                memlist = nineworker("1999", "26614", logincookie, memlist, "key1999")
                 group = "Space 1999"
-                while counter <= 100:
-                    target.append('http://www.chess.com/groups/managemembers?id=26614&page=' + str(counter))
-                    counter += 1
-
-                un6 = spider_checker(target, logincookie)
-                if len(un6) == 0:
-                    continue
-
-                for member in nininin:
-                    if member not in un6 and member not in domban and member not in tmban:
-                        memlist.append(member)
-
-                if len(memlist) != 0:
-                    memlist = notclosedcheck(memlist)
-
-                with open("mem/1999", "w") as placeholder:
-                    placeholder.write(com2("key1999", str(un6).replace("'", "").replace("[", "").replace("]", ""), 256, []))
 
             elif choice == "7":
-                if os.stat("mem/2099").st_size > 0:
-                    for placeholder in open("mem/2099", "rb"):
-                        twninin = com3("key2099", placeholder, 256, []).replace("\n", "").split(", ")
-                else:
-                    twninin = list()
-
+                memlist = nineworker("2099", "26624", logincookie, memlist, "key2099")
                 group = "Space 2099"
-                while counter <= 100:
-                    target.append('http://www.chess.com/groups/managemembers?id=26624&page=' + str(counter))
-                    counter += 1
-
-                un7 = spider_checker(target, logincookie)
-                if len(un7) == 0:
-                    continue
-
-                for member in twninin:
-                    if member not in un7 and member not in domban and member not in tmban:
-                        memlist.append(member)
-
-                if len(memlist) != 0:
-                    memlist = notclosedcheck(memlist)
-
-                with open("mem/2099", "w") as placeholder:
-                    placeholder.write(com2("key2099", str(un7).replace("'", "").replace("[", "").replace("]", ""), 256, []))
 
             elif choice == "8":
-                if os.stat("mem/andromeda").st_size > 0:
-                    for placeholder in open("mem/andromeda", "rb"):
-                        andromeda = com3("keyandromeda", placeholder, 256, []).replace("\n", "").split(", ")
-                else:
-                    andromeda = list()
-
+                memlist = nineworker("andromeda", "21262", logincookie, memlist, "keyandromeda")
                 group = "Andromeda"
-                while counter <= 100:
-                    target.append('http://www.chess.com/groups/managemembers?id=21262&page=' + str(counter))
-                    counter += 1
-
-                un8 = spider_checker(target, logincookie)
-                if len(un8) == 0:
-                    continue
-
-                for member in andromeda:
-                    if member not in un8 and member not in domban and member not in tmban:
-                        memlist.append(member)
-
-                if len(memlist) != 0:
-                    memlist = notclosedcheck(memlist)
-
-                with open("mem/andromeda", "w") as placeholder:
-                    placeholder.write(com2("keyandromeda", str(un8).replace("'", "").replace("[", "").replace("]", ""), 256, []))
 
             elif choice == "9":
-                if os.stat("mem/legio").st_size > 0:
-                    for placeholder in open("mem/legio", "rb"):
-                        legio = com3("keylegio", placeholder, 256, []).replace("\n", "").split(", ")
-                else:
-                    legio = list()
-
+                memlist = nineworker("legio", "22596", logincookie, memlist, "keylegio")
                 group = "Legio XIII Gemina"
-                while counter <= 100:
-                    target.append('http://www.chess.com/groups/managemembers?id=22596&page=' + str(counter))
-                    counter += 1
-
-                un9 = spider_checker(target, logincookie)
-                if len(un9) == 0:
-                    continue
-
-                for member in legio:
-                    if member not in un9 and member not in domban and member not in tmban:
-                        memlist.append(member)
-
-                if len(memlist) != 0:
-                    memlist = notclosedcheck(memlist)
-
-                with open("mem/legio", "w") as placeholder:
-                    placeholder.write(com2("keylegio", str(un9).replace("'", "").replace("[", "").replace("]", ""), 256, []))
 
             elif choice == "10":
-                if os.stat("mem/utopia").st_size > 0:
-                    for placeholder in open("mem/utopia", "rb"):
-                        utopia = com3("keyutopia", placeholder, 256, []).replace("\n", "").split(", ")
-                else:
-                    utopia = list()
-
+                memlist = nineworker("utopia", "23674", logincookie, memlist, "keyutopia")
                 group = "Majestical Utopia"
-                while counter <= 100:
-                    target.append('http://www.chess.com/groups/managemembers?id=23674&page=' + str(counter))
-                    counter += 1
-
-                un10 = spider_checker(target, logincookie)
-                if len(un10) == 0:
-                    continue
-
-                for member in utopia:
-                    if member not in un10 and member not in domban and member not in tmban:
-                        memlist.append(member)
-
-                if len(memlist) != 0:
-                    memlist = notclosedcheck(memlist)
-
-                with open("mem/utopia", "w") as placeholder:
-                    placeholder.write(com2("keyutopia", str(un10).replace("'", "").replace("[", "").replace("]", ""), 256, []))
 
             elif choice == "11":
-                if os.stat("mem/angelmem").st_size > 0:
-                    for placeholder in open("mem/angelmem", "rb"):
-                        angelmem = com3("keyangel", placeholder, 256, []).replace("\n", "").split(", ")
-                else:
-                    angelmem = list()
-
+                memlist = nineworker("angelmem", "18512", logincookie, memlist, "keyangel")
                 group = "Space Angels"
-                while counter <= 100:
-                    target.append('http://www.chess.com/groups/managemembers?id=18512&page=' + str(counter))
-                    counter += 1
-
-                un11 = spider_checker(target, logincookie)
-                if len(un11) == 0:
-                    continue
-
-                for member in angelmem:
-                    if member not in un11 and member not in domban and member not in tmban:
-                        memlist.append(member)
-
-                if len(memlist) != 0:
-                    memlist = notclosedcheck(memlist)
-
-                with open("mem/angelmem", "w") as placeholder:
-                    placeholder.write(com2("keyangel", str(un11).replace("'", "").replace("[", "").replace("]", ""), 256, []))
 
             elif choice == "12":
-                if os.stat("mem/chessmem").st_size > 0:
-                    for placeholder in open("mem/chessmem", "rb"):
-                        chmem = com3("keyChess", placeholder, 256, []).replace("\n", "").split(", ")
-                else:
-                    chmem = list()
-
+                memlist = nineworker("chessmem", "18810", logincookie, memlist, "keyChess")
                 group = "Chess!"
-                while counter <= 100:
-                    target.append('http://www.chess.com/groups/managemembers?id=18810&page=' + str(counter))
-                    counter += 1
-
-                un12 = spider_checker(target, logincookie)
-                if len(un12) == 0:
-                    continue
-
-                for member in chmem:
-                    if member not in un12 and member not in domban and member not in tmban:
-                        memlist.append(member)
-
-                if len(memlist) != 0:
-                    memlist = notclosedcheck(memlist)
-
-                with open("mem/chessmem", "w") as placeholder:
-                    placeholder.write(com2("keyChess", str(un12).replace("'", "").replace("[", "").replace("]", ""), 256, []))
 
             elif choice == "13":
-                if os.stat("mem/CarpeDiemmem").st_size > 0:
-                    for placeholder in open("mem/CarpeDiemmem", "rb"):
-                        cdmem = list(set(com3("keyCD", placeholder, 256, []).replace("\n", "").split(", ")))
-                else:
-                    cdmem = list()
-
+                memlist = nineworker("CarpeDiemmem", "14704", logincookie, memlist, "keyCD")
                 group = "Carpe Diem"
-                while counter <= 100:
-                    target.append('http://www.chess.com/groups/managemembers?id=14704&page=' + str(counter))
-                    counter += 1
-
-                un13 = spider_checker(target, logincookie)
-                if len(un13) == 0:
-                    continue
-
-                for member in cdmem:
-                    if member not in un13 and member not in domban and member not in tmban:
-                        memlist.append(member)
-
-                if len(memlist) != 0:
-                    memlist = notclosedcheck(memlist)
-
-                with open("mem/CarpeDiemmem", "w") as placeholder:
-                    placeholder.write(com2("keyCD", str(un13).replace("'", "").replace("[", "").replace("]", ""), 256, []))
 
             print "\n\nMembers who are no longer in " + group + ": " + str(memlist).replace("'", "").replace("[", "").replace("]", "")
 
