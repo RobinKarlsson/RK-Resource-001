@@ -28,12 +28,6 @@ Extract the memberslist of one or more groups
 
  
 
-2.
-
-Check a single team match for members who are currently banned from tm's by the dominion and subgroups
-
- 
-
 3.
 
 Send invites for a group
@@ -62,7 +56,7 @@ takes a comma seperated list of members and sort out those who doesn't fill a fe
 
 7.
 
-Presentation of a csv-file from option 6. Offers to sort the team match information gathered based on the members value to the team, member name, tm's played in, points won, points lost, ongoing games or number of timeouts.
+Presentation of a csv-file from option 5. Offers to sort the team match information gathered based on the members value to the team, member name, tm's played in, points won, points lost, ongoing games or number of timeouts.
 
 It will also let you create a new list with specific information from the csv-file (for example if you just want a list of each members name and number of timeouts, sorted by number of timeouts)
 
