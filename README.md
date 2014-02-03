@@ -36,9 +36,7 @@ Check a single team match for members who are currently banned from tm's by the 
 
 3.
 
-Send invites for a group, or iterate over the list of supported groups in an endless loop.
-
-Supported groups: Star Trek: The Dominion, Karemma Ministry of Trade, The Breen Confederacy, The Cardassian Empire, Death Star III, Legio XIII Gemina, Andromeda, Space 1999, Space 2099
+Send invites for a group
 
  
 
@@ -81,8 +79,6 @@ Removes doublets, remove members unwanted by the dominion and has the option to 
 9.
 
 Looks for members who has recenty left your group.
-
-Supported groups: Star Trek: The Dominion, The Cardassian Empire, The Breen Confederacy and Death Star III, Karemma Ministry of Trade, Space 1999, Space 2099, Andromeda, legio XIII gemina, The Majestical Utopia, Space Angels
 
  
 
