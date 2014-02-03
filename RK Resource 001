@@ -201,21 +201,44 @@ def getvclinks(yourside):
     linklist = list(OrderedDict.fromkeys(linklist))
     return linklist
 
-def pmreplacer(text, name, country, timeoutratio):
-    return text.replace("/name", name).replace("/nation", country).replace("/timeoutratio", timeoutratio).replace("/newline", "\n")
+def pmreplacer(text, name, country):
+    return text.replace("/name", name).replace("/nation", country).replace("/newline", "\n")
 
 def pmdriver(target, choice):
-    print "\n\n\nYour message will be in the format:\nmain text\nimage\nsecondary text\n\n\nsupported commands, will be replaced with each members respective info\n /name - members name or username (if name is unavailable)\n /nation - members nation of origin\n /timeoutratio - members timeoutratio\n /newline - pagebreak\n\n\n"
+    print "\n\n\n\nsupported commands, will be replaced with each members respective info\n /name - members name or username (if name is unavailable)\n /nation - members nation of origin\n /newline - pagebreak\n\n\n"
     subjectorg = raw_input("subject line: ")
-    payloadorg = raw_input("main text: ")
-    payloadimg = raw_input("url of image you want to use: ")
-    payload2org = raw_input("secondary text: ")
+    msglist = list()
+    choicepm = "y"
+    while choicepm == "y":
+        while choicepm not in(["1", "2"]):
+            choicepm = raw_input("\n\nAdd a snippet containing\n 1. Text\n 2. Image\nYour choice: ")
+        if choicepm == "1":
+            text = raw_input("Enter the text: ")
+        elif choicepm == "2":
+            text = raw_input("Enter url of the image: ")
+        msglist.append((choicepm, text))
+
+        while choicepm not in (["y", "n"]):
+            choicepm = raw_input("add another snippet? (y/n) ")
+
     nnation = raw_input("If member nation is International, use this instead: ")
+
+    browserchoice = ""
+    while browserchoice not in (["1", "2", "3", "4"]):
+        browserchoice = raw_input("chooce which browser you want to use\n 1. Firefox\n 2. Chrome\n 3. PhantomJS\n 4. Internet Explorer\nYour choice: ")
 
     Username = raw_input("\n\n\nUsername: ")
     Password = raw_input("Password: ")
 
-    browser0 = webdriver.Firefox()
+    if browserchoice == "1":
+        browser0 = webdriver.Firefox()
+    elif browserchoice == "2":
+        browser0 = webdriver.Chrome()
+    elif browserchoice == "3":
+        browser0 = webdriver.PhantomJS()
+    elif browserchoice == "4":
+        browser0 = webdriver.Ie()
+
     browser0.get("https://www.chess.com/login")
 
     browser0.find_element_by_name("c1").send_keys(Username)
@@ -258,7 +281,14 @@ def pmdriver(target, choice):
         counter += 1
         if counter > 100:
             browser0.quit()
-            browser0 = webdriver.Firefox()
+            if browserchoice == "1":
+                browser0 = webdriver.Firefox()
+            elif browserchoice == "2":
+                browser0 = webdriver.Chrome()
+            elif browserchoice == "3":
+                browser0 = webdriver.PhantomJS()
+            elif browserchoice == "4":
+                browser0 = webdriver.Ie()
             browser0.get("https://www.chess.com/login")
             WebDriverWait(browser0, 10).until(EC.presence_of_element_located((By.ID, "btnLogin")))
             browser0.find_element_by_name("c1").send_keys(Username)
@@ -270,7 +300,6 @@ def pmdriver(target, choice):
         response = browser1.open(membername)
         soup = BeautifulSoup(response)
 
-        timeoutratio = str(timeoutchecker(soup))
         for placeholder in soup.find_all(class_ = "flag"):
             country = placeholder["title"]
         if country == "International":
@@ -283,9 +312,7 @@ def pmdriver(target, choice):
         if name == " ":
             name = membername2
 
-        subject = pmreplacer(subjectorg, name.strip(), country.strip(), timeoutratio)
-        payload = pmreplacer(payloadorg, name.strip(), country.strip(), timeoutratio) + "\n"
-        payload2 = "\n" + pmreplacer(payload2org, name.strip(), country.strip(), timeoutratio)
+        subject = pmreplacer(subjectorg, name.strip(), country.strip())
 
         for link in soup.find_all("a", href=True):
             if link.text == "Send a Message":
@@ -300,26 +327,25 @@ def pmdriver(target, choice):
 
         browser0.switch_to_frame("tinymcewindow_ifr")
         browser0.find_element_by_id("tinymce").clear()
-        browser0.find_element_by_id("tinymce").send_keys(payload)
         browser0.switch_to_default_content()
 
-        browser0.find_element_by_id("tinymcewindow_imageuploader").click()
-        time.sleep(1)
-
-        browser0.switch_to_window(browser0.window_handles[1])
-        WebDriverWait(browser0, 10).until(EC.presence_of_element_located((By.ID, "photourl")))
-        browser0.find_element_by_id("photourl").send_keys(payloadimg)
-        browser0.find_element_by_id("insert").click()
-        browser0.switch_to_window(browser0.window_handles[0])
-
-        browser0.switch_to_frame("tinymcewindow_ifr")
-        browser0.find_element_by_id("tinymce").send_keys(payload2)
-        browser0.switch_to_default_content()
-        time.sleep(1)
+        for content in msglist:
+            if content[0] == "1":
+                browser0.switch_to_frame("tinymcewindow_ifr")
+                browser0.find_element_by_id("tinymce").send_keys(pmreplacer(content[1], name.strip(), country.strip()))
+                browser0.switch_to_default_content()
+            elif content[0] == "2":
+                browser0.find_element_by_id("tinymcewindow_imageuploader").click()
+                time.sleep(1)
+                browser0.switch_to_window(browser0.window_handles[1])
+                WebDriverWait(browser0, 10).until(EC.presence_of_element_located((By.ID, "photourl")))
+                browser0.find_element_by_id("photourl").send_keys(content[1])
+                browser0.find_element_by_id("insert").click()
+                browser0.switch_to_window(browser0.window_handles[0])
+                time.sleep(1)
 
         browser0.find_element_by_id("c16").click()
-        #raw_input(payload)
-        time.sleep(5)
+        time.sleep(4)
 
 def nineworker(infile, inid, logincookie, memlist, key):
     target = list()
@@ -531,21 +557,46 @@ def ageproc(target):
     return flist
 
 def inviter(choicelist, invitenum):
-    Username = raw_input("Username: ")
+    if choicelist[0] == "168":
+        invgroup = ""
+        groupinv = raw_input("\nid of the group you want to send invites for: ")
+        groupinv = "http://www.chess.com/groups/invite_members?id=" + groupinv
+        infile = raw_input("name of the file containing your invites list: ")
+        infile = "Invite Lists/" + infile
+        alrfile = "Invite Lists/" + infile + " already invited"
+        print "\n\n\n\nsupported commands, will be replaced with each members respective info\n /name - members name or username (if name is unavailable)\n /nation - members nation of origin\n /newline - pagebreak\n\n\n"
+        msglist = list()
+        choice = "y"
+        while choice == "y":
+            while choice not in(["1", "2", "3"]):
+                choice = raw_input("\n\nAdd a snippet containing\n 1. Text\n 2. Image\n 3. Video\nYour choice: ")
+            if choice == "1":
+                text = raw_input("Enter the text: ")
+            elif choice == "2":
+                text = raw_input("Enter url of the image: ")
+            elif choice == "3":
+                text = raw_input("Enter url of the video: ")
+            msglist.append((choice, text))
+
+            while choice not in (["y", "n"]):
+                choice = raw_input("add another snippet? (y/n) ")
+        countryalt = raw_input("If member nation is International, use this instead: ")
+
+    browserchoice = ""
+    while browserchoice not in (["1", "2", "3", "4"]):
+        browserchoice = raw_input("chooce which browser you want to use\n 1. Firefox\n 2. Chrome\n 3. PhantomJS\n 4. Internet Explorer\nYour choice: ")
+
+    Username = raw_input("\n\n\nUsername: ")
     Password = raw_input("Password: ")
 
-    browser2 = webdriver.Firefox()
-
-    #try:
-     #   browser2 = webdriver.PhantomJS()
-    #except:
-     #   try:
-      #      browser2 = webdriver.Firefox()
-       # except:
-        #    try:
-         #       browser2 = webdriver.Chrome()
-          #  except:
-           #     sys.exit()
+    if browserchoice == "1":
+        browser2 = webdriver.Firefox()
+    elif browserchoice == "2":
+        browser2 = webdriver.Chrome()
+    elif browserchoice == "3":
+        browser2 = webdriver.PhantomJS()
+    elif browserchoice == "4":
+        browser2 = webdriver.Ie()
 
     browser2.get("https://www.chess.com/login")
 
@@ -595,7 +646,14 @@ def inviter(choicelist, invitenum):
             counted = "y"
             if counter > 100:
                 browser2.quit()
-                browser2 = webdriver.Firefox()
+                if browserchoice == "1":
+                    browser2 = webdriver.Firefox()
+                elif browserchoice == "2":
+                    browser2 = webdriver.Chrome()
+                elif browserchoice == "3":
+                    browser2 = webdriver.PhantomJS()
+                elif browserchoice == "4":
+                    browser2 = webdriver.Ie()
                 browser2.get("https://www.chess.com/login")
                 WebDriverWait(browser2, 10).until(EC.presence_of_element_located((By.ID, "btnLogin")))
                 browser2.find_element_by_name("c1").send_keys(Username)
@@ -607,47 +665,80 @@ def inviter(choicelist, invitenum):
             memint = list()
 
             if choice5 == "1":
-                invgroup = "The Dominion"
+                invgroup = "to The Dominion"
+                groupinv = "http://www.chess.com/groups/invite_members?id=15896"
                 infile = "Invite Lists/Star Trek: The Dominion"
                 alrfile = "Invite Lists/Star Trek: The Dominion already invited"
+                msglist = (("2", "http://4.bp.blogspot.com/_KcFkeN0I6po/SxKzhR0mUCI/AAAAAAAAEbE/jcE4_kPJu6Q/s1600/7of9.jpg"), ("1", "/newline/newlinePuzzles, Riddles, Chess!!!/newline/newlineThe largest Star Trek themed group on chess.com wants you, /name, for the grand Dominions /nation contingent/newline/newlineWith over 700 members we run vote chess, team matches, doubles chess and an in-house members league. Join now, and together we will impose order on this galaxy!!!/newline/newline"), ("2", "http://d1lalstwiwz2br.cloudfront.net/images_users/tiny_mce/RobinKarlsson/phpiGxzYM.jpeg"), ("1", "/newline/newlineBenjamin Sisko was a chemist's son/newlinebut Sisko is no more./newlineWhat Sisko thought was H2O/newlinewas H2SO4/newline/newline"), ("3", "https://www.youtube.com/watch?v=JKPISUSOjiw"))
+
             elif choice5 == "2":
-                invgroup = "The Karemma"
+                invgroup = "to The Karemma"
+                groupinv = "http://www.chess.com/groups/invite_members?id=26088"
                 infile = "Invite Lists/Karemma Commerse Ministry"
                 alrfile = "Invite Lists/Karemma Commerse Ministry already invited"
+                msglist = (("1", "Hello /name. Welcome to the Karemma Commerce Ministry, the most influential trading organization of the gamma quadrant./newline"), ("2", "http://static1.wikia.nocookie.net/__cb20050911110619/memoryalpha/en/images/a/ab/Karemma_starship.jpg"), ("1", "/newlineThe Karemma are the merchants of the Dominion, responsible for the absolute majority of transportation and mercantile establishments throughout the gamma quadrant. And as the organization that negotiates trade agreements for this proud and powerful race, the Karemma Commerse Ministry power are rivaled only by the Founders/newline/newlineSo join us, and together we will see profits rise above our wildest expectations/newline"), ("3", "http://www.youtube.com/watch?v=FvGZzzNLnBY"))
+
             elif choice5 == "3":
-                invgroup = "The Breen Confederacy"
+                invgroup = "to The Breen Confederacy"
+                groupinv = "http://www.chess.com/groups/invite_members?id=21974"
                 infile = "Invite Lists/The Breen Confederacy"
                 alrfile = "Invite Lists/The Breen Confederacy already invited"
+                msglist = (("1", "Welcome, /name, to the grand Breen Confederacy's /nation contingent. An elite group aligned with the Dominion, specialising in votechess and thematic matches./newline/newline"), ("2", "http://images1.wikia.nocookie.net/__cb20061013002747/stexpanded/images/e/e4/BreenShip.jpg"), ("1", '/newline    "Never turn your back on a Breen"/newline/newline        -A Romulan saying/newline'), ("3", "http://www.youtube.com/watch?v=j2rH2Uh2MWs"))
+
             elif choice5 == "4":
-                invgroup = "The Cardassian Empire"
+                invgroup = "to The Cardassian Empire"
                 infile = "Invite Lists/The Cardassian Empire"
                 alrfile = "Invite Lists/The Cardassian Empire already invited"
+                groupinv = "http://www.chess.com/groups/invite_members?id=20126"
+                msglist = (("1", "Welcome, /name, to the Cardassian Empire, the strongest power in the Alpha Quadrant/newline/newline"), ("2", "http://static1.wikia.nocookie.net/__cb20061230121459/memoryalpha/en/images/2/24/Cardassia.jpg"), ("1", "/newline/newlineWelcome to our Capital world, Cardassia Prime, headed by our esteemed leader Gul Dukat. Our military might as well as inteliigence is SUPREME!/newline/newlineSo come and join us, and relish in our phenomenal victories!/newline/newline"), ("3", "http://www.youtube.com/watch?v=GiyXGQk_pc0"))
+
             elif choice5 == "5":
-                invgroup = "Death Star III"
+                invgroup = "to Death Star III"
                 infile = "Invite Lists/Death Star III"
                 alrfile = "Invite Lists/Death Star III already invited"
+                groupinv = "http://www.chess.com/groups/invite_members?id=17618"
+                msglist = (("1", "Hello /name. Welcome to the Death Star, a Dynamically Dangerous Spacestation and Superweapon capable of Destroying an Entire Planet with its Powerful Superlaser../newline/newline"), ("2", "http://loyalkng.com/wp-content/uploads/2009/05/deathstarfiring2.jpg"), ("1", "/newlineThe Death Star has a crew of 265,675, as well as 52,276 gunners, 607,360 troops, 30,984 stormtroopers, and 180,216 pilots Its hangars contain assault shuttles, blastboats, Strike cruisers, land vehicles, support ships, and 7,293 TIE Fighters. It is protected by 10,000 turbolaser batteries, 2,600 Ion Cannons, and 768 Tractor Beam projectors./newline/newlineWelcome To Our Leader, Darth Vader :) Join us and together we will rule this galaxy!!!!/newline/newline"), ("3", "http://www.youtube.com/watch?v=pJ27mQgWpis"))
+
             elif choice5 == "6":
-                "empty"
+                "none"
+
             elif choice5 == "7":
-                invgroup = "Legio XIII Gemina"
+                invgroup = "to Legio XIII Gemina"
                 infile = "Invite Lists/Legio XIII Gemina"
                 alrfile = "Invite Lists/Legio XIII Gemina already invited"
+                groupinv = "http://www.chess.com/groups/invite_members?id=22596"
+                countryalt = "the outskirts of our Roman empire"
+                msglist = (("1", "Augustus needs you, triarii /name, for the reconstituted legio XIII gemina. As a veteran of the disbanded 13th legion you have proven your worth in battle, and once more your skills are needed in defence against the barbarian hordes roaming /nation/newlineThis is your true destiny, will you answer the call of Rome and once more march toward victories that shall be legend!! Forever etching the name /name in history/newline/newline"), ("2", "http://3219a2.medialib.glogster.com/jessicaann77/media/bd/bdab41001c3686ad707a2050c9a41ba876e06939/xslegionrecruiting.jpg"), ("1", "/newline/newlinein 41 BC emperor Augustus reconstituted the thirteenth legion (dispanded 45 BC, following the final battle of Munda) to deal with the rebellion of Sextus Pompeius in Sicily./newlineThe legion thus acquired the cognomen Gemina (twin), after being reinforced with veteran legionnaries from other legions following the war against Mark Antony and the battle of Actium/newline"), ("3", "http://www.youtube.com/watch?v=kFmDt_E3WbU"))
+
             elif choice5 == "8":
-                invgroup = "Andromeda"
+                invgroup = "to Andromeda"
                 infile = "Invite Lists/Andromeda"
                 alrfile = "Invite Lists/Andromeda already invited"
+                groupinv = "http://www.chess.com/groups/invite_members?id=21262"
+                countryalt = "international water"
+                msglist = (("1", "Welcome to the Systems Commonwealth flagship, the Andromeda Ascendant, high guard recruit /name. As a human hailing from the geographical block that constituted /nation in the 21st century you have been selected for, if you choose to accept, special service onboard this Glorious Heritage-class heavy cruiser. As a crewmember of the Andromeda you will be taking part in rescue missions, map distant starsystems and conduct first contact missions with alien civilizations uneducated in the fine art of chess./newline/newline"), ("2", "http://www.sciforums.com/attachment.php?attachmentid=4853"), ("1", "/newline/newlineConstructed in CY 9768 Andromeda Ascendant is the tenth Glorious Heritage-class heavy cruiser, High Guard ship of the line, built by the Systems Commonwealth. And as such she is one of the bright stars of the High Guard fleet, capable of high-endurance, independent operations. Glorious Heritage-class ships are often called upon to perform disaster relief and refugee support operations due to their spacious interiors and ability to ferry large quantities of emergency supplies and additional personnel. They are also the preferred platform for first contact missions, given their formidable combat capabilities and their ability to operate without a battlegroup - often critical to assuring potential Commonwealth members that the High Guard comes in peace./newline/newline"), ("3", "http://www.youtube.com/watch?v=Y8uE-HXASuE"))
+
             elif choice5 == "9":
-                invgroup = "Family Guy"
+                invgroup = "to Family Guy"
                 infile = "Invite Lists/Family Guy"
                 alrfile = "Invite Lists/Family Guy already invited"
+                groupinv = "http://www.chess.com/groups/invite_members?id=14966"
+                countryalt = "International water"
+                msglist = (("1", "Welcome /name to the most awesome Family Guy fan club on chess.com... This is for everyone who likes family guy no matter if you're an alien or terran, from /nation or atlantis, a fan of Brian or Peter, we are all welcome./newline/newline"), ("2", "http://digitaljournal.com/img/1/4/8/8/6/8/i/5/8/6/o/family_guy.jpg"), ("1", "/newline/newlineWe are a happy bunch of people who like to come together and talk about our favorite FG episodes or jokes, recent events in the series and maybe even play a little bit of chess every now and then, to pass the time :))/newline/newline"), ("3", "http://www.youtube.com/watch?v=LhnRHOYRncc"))
+
             elif choice5 == "10":
-                invgroup = "Space 1999"
+                invgroup = "to Space 1999"
                 infile = "Invite Lists/Space 1999"
                 alrfile = "Invite Lists/Space 1999 already invited"
+                groupinv = "http://www.chess.com/groups/invite_members?id=26614"
+                msglist = (("2", "http://th07.deviantart.net/fs70/PRE/f/2011/331/8/2/moonbase_alpha_next_generation_by_heavy_fantasy-d4hg1v4.jpg"), ("1", "/newline/newlineWe want you, /name, for this rogue moons /nation settlement./newline/newline"), ("2", "http://upload.wikimedia.org/wikipedia/en/3/39/Space1999_Year1_Title.jpg"), ("1", "/newline/newlinePrimarily a scientific research station, Moonbase Alpha houses 311 personnel including scientists, astronauts, medical personnel, and security officers./newlineSpace: 1999: Nuclear waste from Earth, which was stored on the Moon's far side, explodes in a catastrophic accident on 13 September 1999, knocking the Moon out of orbit and sending it, and the 311 inhabitants of Moonbase Alpha, hurtling uncontrollably into space/newlineWATCH CLOSELY:))"), ("3", "http://www.youtube.com/watch?v=8WZW4groJro"))
+
             elif choice5 == "11":
-                invgroup = "Space 2099"
+                invgroup = "to Space 2099"
                 infile = "Invite Lists/Space 2099"
                 alrfile = "Invite Lists/Space 2099 already invited"
+                groupinv = "http://www.chess.com/groups/invite_members?id=26624"
+                msglist = (("2", "http://th07.deviantart.net/fs70/PRE/f/2011/331/8/2/moonbase_alpha_next_generation_by_heavy_fantasy-d4hg1v4.jpg"), ("1", "/newline/newlineWe want you, /name, for this rogue moons /nation settlement./newline"), ("2", "http://www.thescifiworld.net/img/interviews/space2099_08-big.jpg"), ("1", "/newlinePrimarily a scientific research station, Moonbase Alpha houses 311 personnel including scientists, astronauts, medical personnel, and security officers./newlineSpace: 1999: Nuclear waste from Earth, which was stored on the Moon's far side, explodes in a catastrophic accident on 13 September 1999, knocking the Moon out of orbit and sending it, and the 311 inhabitants of Moonbase Alpha, hurtling uncontrollably into space/newlineWATCH CLOSELY:))"), ("3", "http://www.youtube.com/watch?v=8WZW4groJro"))
 
             memtinv = remove_doublets(infile, "")
             memalrinv = remove_doublets(alrfile, "")
@@ -670,7 +761,14 @@ def inviter(choicelist, invitenum):
                     counter += 1
                 if counter > 100:
                     browser2.quit()
-                    browser2 = webdriver.Firefox()
+                    if browserchoice == "1":
+                        browser2 = webdriver.Firefox()
+                    elif browserchoice == "2":
+                        browser2 = webdriver.Chrome()
+                    elif browserchoice == "3":
+                        browser2 = webdriver.PhantomJS()
+                    elif browserchoice == "4":
+                        browser2 = webdriver.Ie()
                     browser2.get("https://www.chess.com/login")
                     WebDriverWait(browser2, 10).until(EC.presence_of_element_located((By.ID, "btnLogin")))
                     browser2.find_element_by_name("c1").send_keys(Username)
@@ -682,6 +780,8 @@ def inviter(choicelist, invitenum):
 
                 for placeholder in soup.find_all(class_ = "flag"):
                     country = placeholder["title"]
+                if country == "International":
+                    country = countryalt
 
                 for placeholder in soup.find_all("strong"):
                     if "Click here" not in str(placeholder) and "ChessTV" not in str(placeholder):
@@ -690,142 +790,41 @@ def inviter(choicelist, invitenum):
                 if name == " ":
                     name = member
 
-                if choice5 == "1": #The Dominion
-                    invimtop = "http://4.bp.blogspot.com/_KcFkeN0I6po/SxKzhR0mUCI/AAAAAAAAEbE/jcE4_kPJu6Q/s1600/7of9.jpg"
-                    groupinv = "http://www.chess.com/groups/invite_members?id=15896"
-                    payload2 = "\n\nBenjamin Sisko was a chemist's son\nbut Sisko is no more.\nWhat Sisko thought was H2O\nwas H2SO4\n\n"
-                    invimage = "http://d1lalstwiwz2br.cloudfront.net/images_users/tiny_mce/RobinKarlsson/phpiGxzYM.jpeg"
-                    invvid = "https://www.youtube.com/watch?v=JKPISUSOjiw"
-                    payload = "\n\nPuzzles, Riddles, Chess!!!\n\nThe largest Star Trek themed group on chess.com wants you, " + name + ", for the grand Dominions " + country + " contingent\n\nWith over 700 members we run vote chess, team matches, doubles chess and an in-house members league. Join now, and together we will impose order on this galaxy!!!\n\n"
-                
-                elif choice5 == "2": #Karemma Commerce Ministry
-                    groupinv = "http://www.chess.com/groups/invite_members?id=26088"
-                    payload2 = "\nThe Karemma are the merchants of the Dominion, responsible for the absolute majority of transportation and mercantile establishments throughout the gamma quadrant. And as the organization that negotiates trade agreements for this proud and powerful race, the Karemma Commerse Ministry power are rivaled only by the Founders\n\nSo join us, and together we will see profits rise above our wildest expectations\n"
-                    invimage = "http://static1.wikia.nocookie.net/__cb20050911110619/memoryalpha/en/images/a/ab/Karemma_starship.jpg"
-                    invvid = "http://www.youtube.com/watch?v=FvGZzzNLnBY"
-                    payload = "Hello " + name + ". Welcome to the Karemma Commerce Ministry, the most influential trading organization of the gamma quadrant.\n"
-
-                elif choice5 == "3": #The Breen Confederacy
-                    groupinv = "http://www.chess.com/groups/invite_members?id=21974"
-                    payload2 = '\n    "Never turn your back on a Breen"\n\n        -A Romulan saying\n'
-                    invimage = "http://images1.wikia.nocookie.net/__cb20061013002747/stexpanded/images/e/e4/BreenShip.jpg"
-                    invvid = "http://www.youtube.com/watch?v=j2rH2Uh2MWs"
-                    payload = "Welcome, " + name + ", to the grand Breen Confederacy's " + country + " contingent. An elite group aligned with the Dominion, specialising in votechess and thematic matches.\n\n"
-                
-                elif choice5 == "4": #The Cardassian Empire
-                    groupinv = "http://www.chess.com/groups/invite_members?id=20126"
-                    payload2 = "\n\nWelcome to our Capital world, Cardassia Prime, headed by our esteemed leader Gul Dukat. Our military might as well as inteliigence is SUPREME!\n\nSo come and join us, and relish in our phenomenal victories!\n\n"
-                    invimage = "http://static1.wikia.nocookie.net/__cb20061230121459/memoryalpha/en/images/2/24/Cardassia.jpg"
-                    invvid = "http://www.youtube.com/watch?v=GiyXGQk_pc0"
-                    payload = "Welcome, " + name + ", to the Cardassian Empire, the strongest power in the Alpha Quadrant\n\n"
-             
-                elif choice5 == "5": #Death Star III
-                    groupinv = "http://www.chess.com/groups/invite_members?id=17618"
-                    payload2 = "\nThe Death Star has a crew of 265,675, as well as 52,276 gunners, 607,360 troops, 30,984 stormtroopers, and 180,216 pilots Its hangars contain assault shuttles, blastboats, Strike cruisers, land vehicles, support ships, and 7,293 TIE Fighters. It is protected by 10,000 turbolaser batteries, 2,600 Ion Cannons, and 768 Tractor Beam projectors.\n\nWelcome To Our Leader, Darth Vader :) Join us and together we will rule this galaxy!!!!\n\n"
-                    invimage = "http://loyalkng.com/wp-content/uploads/2009/05/deathstarfiring2.jpg"
-                    invvid = "http://www.youtube.com/watch?v=pJ27mQgWpis"
-                    payload = "Hello " + name + ". Welcome to the Death Star, a Dynamically Dangerous Spacestation and Superweapon capable of Destroying an Entire Planet with its Powerful Superlaser..\n\n"
-                
-                elif choice5 == "6": 
-                    groupinv = "http://www.chess.com/groups/invite_members?id=18512"
-                    payload2 = ""
-                    invimage = "http://static.fjcdn.com/pictures/C3PEDO_7905dd_216367.jpg"
-                    invvid = "https://www.youtube.com/watch?v=JKPISUSOjiw"
-                    payload = "Hello " + name + " from " + country + "\nloooong message\n"
-
-                elif choice5 == "7": #Legio XIII Gemina
-                    groupinv = "http://www.chess.com/groups/invite_members?id=22596"
-                    payload2 = "\n\nin 41 BC emperor Augustus reconstituted the thirteenth legion (dispanded 45 BC, following the final battle of Munda) to deal with the rebellion of Sextus Pompeius in Sicily.\nThe legion thus acquired the cognomen Gemina (twin), after being reinforced with veteran legionnaries from other legions following the war against Mark Antony and the battle of Actium\n"
-                    invimage = "http://3219a2.medialib.glogster.com/jessicaann77/media/bd/bdab41001c3686ad707a2050c9a41ba876e06939/xslegionrecruiting.jpg"
-                    invvid = "http://www.youtube.com/watch?v=kFmDt_E3WbU"
-                    if country == "International":
-                        country = "the outskirts of our Roman empire"
-                    payload = "Augustus needs you, triarii " + name + ", for the reconstituted legio XIII gemina. As a veteran of the disbanded 13th legion you have proven your worth in battle, and once more your skills are needed in defence against the barbarian hordes roaming " + country + "\nThis is your true destiny, will you answer the call of Rome and once more march toward victories that shall be legend!! Forever etching the name " + name + " in history\n\n"
-
-                elif choice5 == "8": #Andromeda
-                    groupinv = "http://www.chess.com/groups/invite_members?id=21262"
-                    payload2 = "\n\nConstructed in CY 9768 Andromeda Ascendant is the tenth Glorious Heritage-class heavy cruiser, High Guard ship of the line, built by the Systems Commonwealth. And as such she is one of the bright stars of the High Guard fleet, capable of high-endurance, independent operations. Glorious Heritage-class ships are often called upon to perform disaster relief and refugee support operations due to their spacious interiors and ability to ferry large quantities of emergency supplies and additional personnel. They are also the preferred platform for first contact missions, given their formidable combat capabilities and their ability to operate without a battlegroup - often critical to assuring potential Commonwealth members that the High Guard comes in peace.\n\n"
-                    invimage = "http://www.sciforums.com/attachment.php?attachmentid=4853"
-                    invvid = "http://www.youtube.com/watch?v=Y8uE-HXASuE"
-                    if country == "International":
-                        country = "international water"
-                    payload = "Welcome to the Systems Commonwealth flagship, the Andromeda Ascendant, high guard recruit " + name + ". As a human hailing from the geographical block that constituted " + country + " in the 21st century you have been selected for, if you choose to accept, special service onboard this Glorious Heritage-class heavy cruiser. As a crewmember of the Andromeda you will be taking part in rescue missions, map distant starsystems and conduct first contact missions with alien civilizations uneducated in the fine art of chess.\n\n"
-
-                elif choice5 == "9": #Family Guy
-                    groupinv = "http://www.chess.com/groups/invite_members?id=14966"
-                    payload2 = "\n\nWe are a happy bunch of people who like to come together and talk about our favorite FG episodes or jokes, recent events in the series and maybe even play a little bit of chess every now and then, to pass the time :))\n\n"
-                    invimage = "http://digitaljournal.com/img/1/4/8/8/6/8/i/5/8/6/o/family_guy.jpg"
-                    invvid = "http://www.youtube.com/watch?v=LhnRHOYRncc"
-                    if country == "International":
-                        country = "International water"
-                    payload = "Welcome " + name + " to the most awesome Family Guy fan club on chess.com... This is for everyone who likes family guy no matter if you're an alien or terran, from " + country + " or atlantis, a fan of Brian or Peter, we are all welcome.\n\n"
-
-                elif choice5 == "10": #Space1999
-                    invimtop = "http://th07.deviantart.net/fs70/PRE/f/2011/331/8/2/moonbase_alpha_next_generation_by_heavy_fantasy-d4hg1v4.jpg"
-                    groupinv = "http://www.chess.com/groups/invite_members?id=26614"
-                    payload2 = "\n\nPrimarily a scientific research station, Moonbase Alpha houses 311 personnel including scientists, astronauts, medical personnel, and security officers.\nSpace: 1999: Nuclear waste from Earth, which was stored on the Moon's far side, explodes in a catastrophic accident on 13 September 1999, knocking the Moon out of orbit and sending it, and the 311 inhabitants of Moonbase Alpha, hurtling uncontrollably into space\nWATCH CLOSELY:))"
-                    invimage = "http://upload.wikimedia.org/wikipedia/en/3/39/Space1999_Year1_Title.jpg"
-                    invvid = "http://www.youtube.com/watch?v=8WZW4groJro"
-                    payload = "\n\nWe want you, " + name + ", for this rogue moons " + country + " settlement.\n\n"
-
-                elif choice5 == "11": #Space 2099
-                    invimtop = "http://th07.deviantart.net/fs70/PRE/f/2011/331/8/2/moonbase_alpha_next_generation_by_heavy_fantasy-d4hg1v4.jpg"
-                    groupinv = "http://www.chess.com/groups/invite_members?id=26624"
-                    payload2 = "\nPrimarily a scientific research station, Moonbase Alpha houses 311 personnel including scientists, astronauts, medical personnel, and security officers.\nSpace: 1999: Nuclear waste from Earth, which was stored on the Moon's far side, explodes in a catastrophic accident on 13 September 1999, knocking the Moon out of orbit and sending it, and the 311 inhabitants of Moonbase Alpha, hurtling uncontrollably into space\nWATCH CLOSELY:))"
-                    invimage = "http://www.thescifiworld.net/img/interviews/space2099_08-big.jpg"
-                    invvid = "http://www.youtube.com/watch?v=8WZW4groJro"
-                    payload = "\n\nWe want you, " + name + ", for this rogue moons " + country + " settlement.\n"
-
                 browser2.get(groupinv)
 
                 try:
-                    WebDriverWait(browser2, 10).until(EC.presence_of_element_located((By.ID, "c15")))
+                    WebDriverWait(browser2, 5).until(EC.presence_of_element_located((By.ID, "c15")))
                     browser2.find_element_by_name("c15").send_keys(member)
                 except:
                     break
 
-                print "\nInviting " + member + " to " + invgroup
+                print "\nInviting " + member + " " + invgroup
                 memint.append(member)
 
                 browser2.switch_to_frame("tinymcewindow_ifr")
                 browser2.find_element_by_id("tinymce").clear()
-
-                if choice5 in (["1", "10", "11"]):
-                    browser2.switch_to_default_content()
-                    browser2.find_element_by_id("tinymcewindow_imageuploader").click()
-                    time.sleep(1)
-                
-                    browser2.switch_to_window(browser2.window_handles[1])
-                    WebDriverWait(browser2, 10).until(EC.presence_of_element_located((By.ID, "photourl")))
-                    browser2.find_element_by_id("photourl").send_keys(invimtop)
-                    browser2.find_element_by_id("insert").click()
-                    browser2.switch_to_window(browser2.window_handles[0])
-                
-                    browser2.switch_to_frame("tinymcewindow_ifr")
-
-                browser2.find_element_by_id("tinymce").send_keys(payload.replace("  ", " ").replace(" .", ".").replace(" ,", ","))
-                browser2.switch_to_default_content()
-  
-                browser2.find_element_by_id("tinymcewindow_imageuploader").click()
-                time.sleep(1)
-
-                browser2.switch_to_window(browser2.window_handles[1])
-                WebDriverWait(browser2, 10).until(EC.presence_of_element_located((By.ID, "photourl")))
-                browser2.find_element_by_id("photourl").send_keys(invimage)
-                browser2.find_element_by_id("insert").click()
-                browser2.switch_to_window(browser2.window_handles[0])
-
-                browser2.switch_to_frame("tinymcewindow_ifr")
-                browser2.find_element_by_id("tinymce").send_keys(payload2)
                 browser2.switch_to_default_content()
 
-                browser2.find_element_by_id("tinymcewindow_mce_media").click()
-
-                alert = browser2.switch_to_alert()
-                alert.send_keys(invvid)
-                alert.accept()
-                time.sleep(1)
-
+                for content in msglist:
+                    if content[0] == "1":
+                        browser2.switch_to_frame("tinymcewindow_ifr")
+                        browser2.find_element_by_id("tinymce").send_keys(pmreplacer(content[1], name.strip(), country.strip()))
+                        browser2.switch_to_default_content()
+                    elif content[0] == "2":
+                        browser2.find_element_by_id("tinymcewindow_imageuploader").click()
+                        time.sleep(1)
+                        browser2.switch_to_window(browser2.window_handles[1])
+                        WebDriverWait(browser2, 10).until(EC.presence_of_element_located((By.ID, "photourl")))
+                        browser2.find_element_by_id("photourl").send_keys(content[1])
+                        browser2.find_element_by_id("insert").click()
+                        browser2.switch_to_window(browser2.window_handles[0])
+                        time.sleep(1)
+                    elif content[0] == "3":
+                        browser2.find_element_by_id("tinymcewindow_mce_media").click()
+                        alert = browser2.switch_to_alert()
+                        alert.send_keys(content[1])
+                        alert.accept()
+                        time.sleep(1)
                 browser2.find_element_by_id("c18").click()
 
             updinvlist = set(memtinv).difference(set(memint))
@@ -1357,7 +1356,6 @@ while pathway in (["y"]):
         target = step3456("", (["n"]))
 
         logincookie = login()
-
         un1 = set(spider_ml(target, logincookie))
 
         remmem = ""
@@ -1368,7 +1366,6 @@ while pathway in (["y"]):
             un1 = memremoverf(un1)
 
         un1 = un1.difference(domban)
-        #un1 = un1.difference(tmban)
         un1 = misc1(un1)
 
         choice6 = ""
@@ -1389,25 +1386,19 @@ while pathway in (["y"]):
         target = ([raw_input("\nLink to the tm: ")])
 
         logincookie = login()
-
         un2 = set(spider_checker(target, logincookie))
-
         un2 = un2.intersection(tmban)
         un2 = misc1(un2)
         print "\n\nThe following members banned from team matches was found in this match: " + un2 + "\n\n\nThank you for using the chess.com checker. We wish you a continued pleasant day and hope the script worked to your satisfaction.\n"
 
     elif flow == "3":
         choice5 = ""
-        while choice5 not in (["1", "2", "3", "4", "5", "7", "8", "9", "10", "11", "42", "84"]):
-            choice5 = raw_input("\n\nWhich group would you like to send invites for?\n\n    Dominion affiliated groups:\n 1. Star Trek: The Dominion\n 2. Karemma Commerce Ministry\n 3. The Breen Confederacy\n 4. The Cardassian Empire\n 5. Death Star III\n\n    Non Dominion groups:\n \n 7. Legio XIII Gemina\n 8. Andromeda\n 9. Family Guy\n 10. Space 1999\n 11. Space 2099\n\n 42. endless loop that goes through all the groups, indefinitely\n 84. Create you own custom infinite loop from the supported groups\n\nEnter choice here: ")
-
-        #invitenum = int(raw_input("How many do you wish to invite? (reommended number for best effect is between 90 and 120) "))
-        invitenum = 120
-        inviter(([choice5]), invitenum)
+        while choice5 not in (["1", "2", "3", "4", "5", "7", "8", "9", "10", "11", "42", "84", "168"]):
+            choice5 = raw_input("\n\nWhich group would you like to send invites for?\n\n    Dominion affiliated groups:\n 1. Star Trek: The Dominion\n 2. Karemma Commerce Ministry\n 3. The Breen Confederacy\n 4. The Cardassian Empire\n 5. Death Star III\n\n    Non Dominion groups:\n \n 7. Legio XIII Gemina\n 8. Andromeda\n 9. Family Guy\n 10. Space 1999\n 11. Space 2099\n\n 42. endless loop that goes through all the groups, indefinitely\n 84. Create you own custom infinite loop from the supported groups\n 168. Send invites for another group\n\nEnter choice here: ")
+        inviter(([choice5]), 120)
 
     elif flow == "4":
         yourside = raw_input("Name of group to check: ")
-
         vclinklist = getvclinks(yourside)
         parmemvc = vcman(vclinklist, yourside)
 
