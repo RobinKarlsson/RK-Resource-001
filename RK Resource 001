@@ -665,6 +665,7 @@ def inviter(choicelist, invitenum):
             memint = list()
 
             if choice5 == "1":
+                countryalt = ""
                 invgroup = "to The Dominion"
                 groupinv = "http://www.chess.com/groups/invite_members?id=15896"
                 infile = "Invite Lists/Star Trek: The Dominion"
@@ -672,6 +673,7 @@ def inviter(choicelist, invitenum):
                 msglist = (("2", "http://4.bp.blogspot.com/_KcFkeN0I6po/SxKzhR0mUCI/AAAAAAAAEbE/jcE4_kPJu6Q/s1600/7of9.jpg"), ("1", "/newline/newlinePuzzles, Riddles, Chess!!!/newline/newlineThe largest Star Trek themed group on chess.com wants you, /name, for the grand Dominions /nation contingent/newline/newlineWith over 700 members we run vote chess, team matches, doubles chess and an in-house members league. Join now, and together we will impose order on this galaxy!!!/newline/newline"), ("2", "http://d1lalstwiwz2br.cloudfront.net/images_users/tiny_mce/RobinKarlsson/phpiGxzYM.jpeg"), ("1", "/newline/newlineBenjamin Sisko was a chemist's son/newlinebut Sisko is no more./newlineWhat Sisko thought was H2O/newlinewas H2SO4/newline/newline"), ("3", "https://www.youtube.com/watch?v=JKPISUSOjiw"))
 
             elif choice5 == "2":
+                countryalt = ""
                 invgroup = "to The Karemma"
                 groupinv = "http://www.chess.com/groups/invite_members?id=26088"
                 infile = "Invite Lists/Karemma Commerse Ministry"
@@ -679,6 +681,7 @@ def inviter(choicelist, invitenum):
                 msglist = (("1", "Hello /name. Welcome to the Karemma Commerce Ministry, the most influential trading organization of the gamma quadrant./newline"), ("2", "http://static1.wikia.nocookie.net/__cb20050911110619/memoryalpha/en/images/a/ab/Karemma_starship.jpg"), ("1", "/newlineThe Karemma are the merchants of the Dominion, responsible for the absolute majority of transportation and mercantile establishments throughout the gamma quadrant. And as the organization that negotiates trade agreements for this proud and powerful race, the Karemma Commerse Ministry power are rivaled only by the Founders/newline/newlineSo join us, and together we will see profits rise above our wildest expectations/newline"), ("3", "http://www.youtube.com/watch?v=FvGZzzNLnBY"))
 
             elif choice5 == "3":
+                countryalt = ""
                 invgroup = "to The Breen Confederacy"
                 groupinv = "http://www.chess.com/groups/invite_members?id=21974"
                 infile = "Invite Lists/The Breen Confederacy"
@@ -686,6 +689,7 @@ def inviter(choicelist, invitenum):
                 msglist = (("1", "Welcome, /name, to the grand Breen Confederacy's /nation contingent. An elite group aligned with the Dominion, specialising in votechess and thematic matches./newline/newline"), ("2", "http://images1.wikia.nocookie.net/__cb20061013002747/stexpanded/images/e/e4/BreenShip.jpg"), ("1", '/newline    "Never turn your back on a Breen"/newline/newline        -A Romulan saying/newline'), ("3", "http://www.youtube.com/watch?v=j2rH2Uh2MWs"))
 
             elif choice5 == "4":
+                countryalt = ""
                 invgroup = "to The Cardassian Empire"
                 infile = "Invite Lists/The Cardassian Empire"
                 alrfile = "Invite Lists/The Cardassian Empire already invited"
@@ -693,6 +697,7 @@ def inviter(choicelist, invitenum):
                 msglist = (("1", "Welcome, /name, to the Cardassian Empire, the strongest power in the Alpha Quadrant/newline/newline"), ("2", "http://static1.wikia.nocookie.net/__cb20061230121459/memoryalpha/en/images/2/24/Cardassia.jpg"), ("1", "/newline/newlineWelcome to our Capital world, Cardassia Prime, headed by our esteemed leader Gul Dukat. Our military might as well as inteliigence is SUPREME!/newline/newlineSo come and join us, and relish in our phenomenal victories!/newline/newline"), ("3", "http://www.youtube.com/watch?v=GiyXGQk_pc0"))
 
             elif choice5 == "5":
+                countryalt = ""
                 invgroup = "to Death Star III"
                 infile = "Invite Lists/Death Star III"
                 alrfile = "Invite Lists/Death Star III already invited"
@@ -727,6 +732,7 @@ def inviter(choicelist, invitenum):
                 msglist = (("1", "Welcome /name to the most awesome Family Guy fan club on chess.com... This is for everyone who likes family guy no matter if you're an alien or terran, from /nation or atlantis, a fan of Brian or Peter, we are all welcome./newline/newline"), ("2", "http://digitaljournal.com/img/1/4/8/8/6/8/i/5/8/6/o/family_guy.jpg"), ("1", "/newline/newlineWe are a happy bunch of people who like to come together and talk about our favorite FG episodes or jokes, recent events in the series and maybe even play a little bit of chess every now and then, to pass the time :))/newline/newline"), ("3", "http://www.youtube.com/watch?v=LhnRHOYRncc"))
 
             elif choice5 == "10":
+                countryalt = ""
                 invgroup = "to Space 1999"
                 infile = "Invite Lists/Space 1999"
                 alrfile = "Invite Lists/Space 1999 already invited"
@@ -734,6 +740,7 @@ def inviter(choicelist, invitenum):
                 msglist = (("2", "http://th07.deviantart.net/fs70/PRE/f/2011/331/8/2/moonbase_alpha_next_generation_by_heavy_fantasy-d4hg1v4.jpg"), ("1", "/newline/newlineWe want you, /name, for this rogue moons /nation settlement./newline/newline"), ("2", "http://upload.wikimedia.org/wikipedia/en/3/39/Space1999_Year1_Title.jpg"), ("1", "/newline/newlinePrimarily a scientific research station, Moonbase Alpha houses 311 personnel including scientists, astronauts, medical personnel, and security officers./newlineSpace: 1999: Nuclear waste from Earth, which was stored on the Moon's far side, explodes in a catastrophic accident on 13 September 1999, knocking the Moon out of orbit and sending it, and the 311 inhabitants of Moonbase Alpha, hurtling uncontrollably into space/newlineWATCH CLOSELY:))"), ("3", "http://www.youtube.com/watch?v=8WZW4groJro"))
 
             elif choice5 == "11":
+                countryalt = ""
                 invgroup = "to Space 2099"
                 infile = "Invite Lists/Space 2099"
                 alrfile = "Invite Lists/Space 2099 already invited"
