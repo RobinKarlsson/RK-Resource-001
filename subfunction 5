@@ -159,7 +159,7 @@ def tmparchecker(pagelist, targetname):
     return tmpar, timeoutlist, winssdic, losedic
 
 def memberprocesser(target):
-    minrat = raw_input("\n\nMin rating allowed. leave empty to skip: ")
+    minrat = raw_input("\n\nMin (online chess) rating allowed. leave empty to skip: ")
 
     lastloginyear = raw_input("\nLast logged in year. leave empty to skip (YYYY): ")
     if lastloginyear != "":
@@ -231,13 +231,8 @@ def memberprocesser(target):
 
         if minrat != "":
             minrat = int(minrat)
-            ratinglist = ratingchecker(soup)
-            pas = "n"
-            for rating in ratinglist:
-                if rating >= minrat:
-                    pas = "y"
-                    break
-            if pas == "n":
+            rating = onlratingchecker(soup)
+            if rating < minrat:
                 continue
 
         if maxgroup != "" or mingroup != "":
@@ -309,20 +304,12 @@ def timeoutchecker(soup):
             timeout = int(placeholder.text.replace("Timeouts:", "").strip().replace("% (last 90 days)", ""))
             return timeout
 
-def ratingchecker(soup):
-    ratinglist = list()
-    recorder = "off"
-    for placeholder in soup.find_all(class_ = "right"):
-        if "View All Stats" in placeholder:
-            recorder = "on"
-        elif "Games Archive" in placeholder:
-            break
-        elif recorder == "on":
-            try:
-                ratinglist.append(int(placeholder.text))
-            except ValueError:
-                "nada"
-    return ratinglist
+def onlratingchecker(soup):
+    onrating = 0
+    for x in soup.find_all(class_ = "clearfix stats-header"):
+        if "Online Chess" in str(x):
+            onrating = int(x.text.replace("Online Chess", "").strip())
+    return onrating
 
 def memsin(soup):
     memsinlist = list()
