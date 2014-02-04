@@ -44,13 +44,13 @@ Count number of posts per member in a groups finished votechess matches
 
 Count number of times each member has played for a group in team matches. Includes number of tm's played in, points won, points lost, timeouts and number of games yet to finish.
 
-Saves the result to a excell compatible csv-file and offers to create a second list that only contain those members who fill a few criterias regarding their rating, last online, member since and timeout-ratio
+Saves the result to a excell compatible csv-file and offers to create a second list that only contain those members who fill a few criterias using option 6
 
  
 
 6.
 
-takes a comma seperated list of members and sort out those who doesn't fill a few criterias regarding their rating, last online, member since and timeout-ratio
+takes a comma seperated list of members and sort out those who doesn't fill a few criterias regarding their min/max rating, last online, member since, older/younger than, min/max number of groups they're in, timeout-ratio, if they have a custom avatar, where they're from and gender
 
  
 
@@ -58,7 +58,7 @@ takes a comma seperated list of members and sort out those who doesn't fill a fe
 
 Presentation of a csv-file from option 5. Offers to sort the team match information gathered based on the members value to the team, member name, tm's played in, points won, points lost, ongoing games or number of timeouts.
 
-It will also let you create a new list with specific information from the csv-file (for example if you just want a list of each members name and number of timeouts, sorted by number of timeouts)
+It will also let you create a new list with specific information from the csv-file (for example if you just want a list of each members name and number of timeouts, sorted by number of timeouts) and compare two csv-files
 
  
 
