@@ -1009,7 +1009,7 @@ def vcman(vclinklist, yourside):
 
 def memberprocesser(target):
     minrat = raw_input("\n\nMin (online chess) rating allowed. leave empty to skip: ")
-    maxrat = raw_input("\n\Max (online chess) rating allowed. leave empty to skip: ")
+    maxrat = raw_input("Max (online chess) rating allowed. leave empty to skip: ")
 
     lastloginyear = raw_input("\nLast logged in year. leave empty to skip (YYYY): ")
     if lastloginyear != "":
@@ -1038,6 +1038,9 @@ def memberprocesser(target):
     timemax = raw_input("\nMax timeoutratio allowed. leave empty to skip: ")
     maxgroup = raw_input("\nMax number of groups member may be in. leave empty to skip: ")
     mingroup = raw_input("Min number of groups member may be in. leave empty to skip: ")
+    avatarch = ""
+    while avatarch not in (["y", "n"]):
+        avatarch = raw_input("\nSort out those who don't have a custom avatar? (y/n) ")
 
     heritage = raw_input("\nMember should be from. leave empty to skip: ")
 
@@ -1100,6 +1103,10 @@ def memberprocesser(target):
                 if groupcount < int(mingroup):
                     continue
 
+        if avatarch == "y":
+            if AvatarCheck(soup) == False:
+                continue
+
         if youngeryear != "" or olderyear != "":
             birthdate = birthlister(soup)
             if birthdate == "":
@@ -1153,6 +1160,11 @@ def namechecker(soup):
         if "Click here" not in strplaceholder and "ChessTV" not in strplaceholder:
             return str(placeholder.text)
 
+def AvatarCheck(soup):
+    if "noavatar" in str(soup.find_all(class_ = "avatar-container bottom-8")):
+        return False
+    return True
+
 def timeoutchecker(soup):
     for placeholder in soup.find_all(class_ = "even"):
         if "Timeouts:" in str(placeholder):
@@ -1163,7 +1175,10 @@ def onlratingchecker(soup):
     onrating = 0
     for x in soup.find_all(class_ = "clearfix stats-header"):
         if "Online Chess" in str(x):
-            onrating = int(x.text.replace("Online Chess", "").strip())
+            try:
+                onrating = int(x.text.replace("Online Chess", "").strip())
+            except ValueError:
+                "nothing"
     return onrating
 
 def ratingchecker(soup):
