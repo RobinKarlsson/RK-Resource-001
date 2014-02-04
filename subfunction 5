@@ -160,6 +160,7 @@ def tmparchecker(pagelist, targetname):
 
 def memberprocesser(target):
     minrat = raw_input("\n\nMin (online chess) rating allowed. leave empty to skip: ")
+    maxrat = raw_input("\n\Max (online chess) rating allowed. leave empty to skip: ")
 
     lastloginyear = raw_input("\nLast logged in year. leave empty to skip (YYYY): ")
     if lastloginyear != "":
@@ -229,11 +230,16 @@ def memberprocesser(target):
             if datetime(memsi[0], memsi[1], memsi[2]) > datetime(membersinceyear, membersincemonth, membersinceday):
                 continue
 
-        if minrat != "":
-            minrat = int(minrat)
+        if minrat != "" or maxrat != "":
             rating = onlratingchecker(soup)
-            if rating < minrat:
-                continue
+            if minrat != "":
+                minrat = int(minrat)
+                if rating < minrat:
+                    continue
+            if maxrat != "":
+                maxrat = int(maxrat)
+                if rating > maxrat:
+                    continue
 
         if maxgroup != "" or mingroup != "":
             groupcount = groupmemlister(soup)
