@@ -1008,7 +1008,7 @@ def vcman(vclinklist, yourside):
     return parmemvc
 
 def memberprocesser(target):
-    minrat = raw_input("\n\nMin rating allowed. leave empty to skip: ")
+    minrat = raw_input("\n\nMin (online chess) rating allowed. leave empty to skip: ")
 
     lastloginyear = raw_input("\nLast logged in year. leave empty to skip (YYYY): ")
     if lastloginyear != "":
@@ -1080,13 +1080,8 @@ def memberprocesser(target):
 
         if minrat != "":
             minrat = int(minrat)
-            ratinglist = ratingchecker(soup)
-            pas = "n"
-            for rating in ratinglist:
-                if rating >= minrat:
-                    pas = "y"
-                    break
-            if pas == "n":
+            rating = onlratingchecker(soup)
+            if rating < minrat:
                 continue
 
         if maxgroup != "" or mingroup != "":
@@ -1157,6 +1152,13 @@ def timeoutchecker(soup):
         if "Timeouts:" in str(placeholder):
             timeout = int(placeholder.text.replace("Timeouts:", "").strip().replace("% (last 90 days)", ""))
             return timeout
+
+def onlratingchecker(soup):
+    onrating = 0
+    for x in soup.find_all(class_ = "clearfix stats-header"):
+        if "Online Chess" in str(x):
+            onrating = int(x.text.replace("Online Chess", "").strip())
+    return onrating
 
 def ratingchecker(soup):
     ratinglist = list()
