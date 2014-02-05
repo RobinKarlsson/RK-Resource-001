@@ -50,7 +50,7 @@ Saves the result to a excell compatible csv-file and offers to create a second l
 
 6.
 
-takes a comma seperated list of members and sort out those who doesn't fill a few criterias regarding their min/max rating, last online, member since, older/younger than, min/max number of groups they're in, timeout-ratio, if they have a custom avatar, where they're from and gender
+takes a comma seperated list of members and sort out those who doesn't fill a few criterias regarding their min/max rating, last online, member since, older/younger than, min/max number of groups they're in, timeout-ratio, time/move, if they have a custom avatar, where they're from and gender
 
  
 
