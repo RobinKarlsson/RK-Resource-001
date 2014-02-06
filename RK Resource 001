@@ -550,7 +550,7 @@ def ageproc(target):
         if birthdate == "":
             continue
         while "" in birthdate:
-            birthdate.remove('')
+            birthdate.remove("")
 
         birthdate = map(int, birthdate)
         flist.append(birthdate + tlst)
@@ -922,8 +922,12 @@ def vcman(vclinklist, yourside):
 
         response = browser1.open(vcmatch)
         soup = BeautifulSoup(response)
-        boardpos = str(re.findall("boardFlip: (?:[a-zA-Z]|(?:%[a-fA-F]))+", str(soup.find_all(class_ = "chess_viewer")))[0]).replace("boardFlip: ", "")
 
+        if '      initialSetup: "",' not in str(soup):
+            print "\n\n\nskipped " + vcmatch + "\n\n\n"
+            continue
+
+        boardpos = str(re.findall("boardFlip: (?:[a-zA-Z]|(?:%[a-fA-F]))+", str(soup.find_all(class_ = "chess_viewer")))[0]).replace("boardFlip: ", "")
         yourpos = soup.find_all(class_ = "playername")
         yourpos = (str(yourpos[0]).replace('<span class="playername">', "").replace("</span>", ""), str(yourpos[1]).replace('<span class="playername">', "").replace("</span>", ""))
 
@@ -973,7 +977,9 @@ def vcman(vclinklist, yourside):
             for link in browser1.links(url_regex="chess.com/members/view/"):
                 ltext = link.text
                 if ltext != "View Profile":
-                    user = ltext.replace("[IMG]", "")
+                    user = ltext.replace("[IMG]", "").strip()
+                    if user == "":
+                        continue
                     if user in parmemvc:
                         parmemvc[user] += 1
                     else:
@@ -985,7 +991,7 @@ def vcman(vclinklist, yourside):
             if "next-on" in p2:
                 browser3.get(pointer)
                 nextbtn = 2
-                while not nextbtn == 0:
+                while 0 == 0:
 
                     try:
                         browser3.find_element_by_css_selector('li.next-on>a').click()
@@ -998,11 +1004,13 @@ def vcman(vclinklist, yourside):
                         memsellink = curvcparmem.get_attribute("href") or ""
 
                         if "http://www.chess.com/members/view/" in memsellink:
-                            user = re.sub(r"^http?:\/\/.*[\r\n]*", "", memsellink.replace("http://www.chess.com/members/view/", " "))
+                            user = re.sub(r"^http?:\/\/.*[\r\n]*", "", memsellink.replace("http://www.chess.com/members/view/", " ")).strip()
+                            if user == "":
+                                continue
                             if user in parmemvc:
-                                parmemvc[user] += 1
+                                parmemvc[user] += 0.5
                             else:
-                                parmemvc[user] = 1
+                                parmemvc[user] = 0.5
                     nextbtn += 1
     browser3.quit()
     return parmemvc
@@ -1038,6 +1046,14 @@ def memberprocesser(target):
     timemax = raw_input("\nMax timeoutratio allowed. leave empty to skip: ")
     maxgroup = raw_input("\nMax number of groups member may be in. leave empty to skip: ")
     mingroup = raw_input("Min number of groups member may be in. leave empty to skip: ")
+
+    timovchoicemin = raw_input("\nTime/move higher than (format: days - hours - minutes, leave empty to skip) ")
+    timovchoicemax = raw_input("Time/move lower than (format: days - hours - minutes, leave empty to skip) ")
+    if timovchoicemax != "":
+        timovchoicemax = [int(elem) for elem in timovchoicemax.split("-")]
+    if timovchoicemin != "":
+        timovchoicemin = [int(elem) for elem in timovchoicemin.split("-")]
+
     avatarch = ""
     while avatarch not in (["y", "n"]):
         avatarch = raw_input("\nSort out those who don't have a custom avatar? (y/n) ")
@@ -1076,6 +1092,25 @@ def memberprocesser(target):
         if timemax != "":
             if timeoutchecker(soup) > int(timemax):
                 continue
+
+        if timovchoicemax != "" or timovchoicemin != "":
+            timemove = TimeMoveChecker(soup)
+
+            if timovchoicemax != "":
+                if timemove[0] > timovchoicemax[0]:
+                    continue
+                if timemove[1] > timovchoicemax[1] and timemove[0] >= timovchoicemax[0]:
+                    continue
+                if timemove[2] > timovchoicemax[2] and timemove[1] >= timovchoicemax[1] and timemove[0] >= timovchoicemax[0]:
+                    continue
+
+            if timovchoicemin != "":
+                if timemove[0] < timovchoicemin[0]:
+                    continue
+                if timemove[1] < timovchoicemin[1] and timemove[0] <= timovchoicemin[0]:
+                    continue
+                if timemove[2] < timovchoicemin[2] and timemove[1] <= timovchoicemin[1] and timemove[0] <= timovchoicemin[0]:
+                    continue
 
         if membersinceyear != "":
             memsi = memsinlist[0]
@@ -1170,6 +1205,26 @@ def timeoutchecker(soup):
         if "Timeouts:" in str(placeholder):
             timeout = int(placeholder.text.replace("Timeouts:", "").strip().replace("% (last 90 days)", ""))
             return timeout
+
+def TimeMoveChecker(soup):
+    timemove = (["", "", ""])
+    for x in soup.find_all(class_ = "odd"):
+        if "Time/Move:" in str(x):
+            timemov = x.text.replace("Time/Move:", "").strip().split(" ")
+            timemov = [i+j for i,j in zip(timemov[::2],timemov[1::2])]
+            for xx in timemov:
+                if "days" in xx:
+                    timemove[0] = int(xx.replace("days", ""))
+                if "hr" in xx:
+                    timemove[1] = int(xx.replace("hr", ""))
+                if "fewmin" in xx:
+                    timemove[2] = xx.replace("fewmin", "")
+                elif "min" in xx:
+                    timemove[2] = int(xx.replace("min", ""))
+            break
+    while "" in timemove:
+        timemove[timemove.index("")] = 0
+    return timemove
 
 def onlratingchecker(soup):
     onrating = 0
@@ -1374,10 +1429,10 @@ def spider_ml(target, logincookie):
 pathway = "y"
 while pathway in (["y"]):
     print "chess.com RK Resource 001\nversion 0.8.7\ndeveloped by Robin Karlsson\ncontact email: 'r.robin.karlsson@gmail.com'\ncontact chess.com profile: 'http://www.chess.com/members/view/RobinKarlsson'\n"
-    print "What would you like to do?\n\n 1. Create a list of members from a group.\n 3. Send invites for a group.\n 4. Check a groups finished votechess matches and count number of posts per member\n 5. Check a groups team matches and count the number of times each member has participated.\n 6. Check a list of members for those with a rating above and/or below a specific value, last online & member since a specific date and a timeout ratio below a specific value.\n 7. Presentation of a csv-file from option 6.\n 8. Remove doublets and filter out members who are in specific groups from a preexisting textfile.\n 9. Look for members who has left your team\n 10. Count number of group notes per member\n 11. Collect birthdays for a list of members\n 12. Send personal messages to members"
+    print "What would you like to do?\n\n 1. Create a list of members from a group.\n 3. Send invites for a group.\n 4. Check a groups finished votechess matches and count number of posts per member\n 5. Check a groups team matches and count the number of times each member has participated.\n 6. Check a list of members for those with a rating above and/or below a specific value, last online & member since a specific date and a timeout ratio below a specific value.\n 7. Presentation of a csv-file from option 5.\n 8. Remove doublets and filter out members who are in specific groups from a preexisting textfile.\n 9. Look for members who has left your team\n 10. Count number of group notes per member\n 11. Collect birthdays for a list of members\n 12. Send personal messages to members"
 
     flow = ""
-    while flow not in (["1", "3", "5", "6", "7", "8", "9", "10", "11", "12"]):
+    while flow not in (["1", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]):
         flow = raw_input("\nEnter your choice here: ")
 
     if flow == "1":
@@ -1635,13 +1690,13 @@ while pathway in (["y"]):
 
     elif flow == "9":
         choiceorg = ""
-        while choiceorg not in (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "42"]):
-            choiceorg = raw_input("\nWhich group do you wish to check?\n 1. Star Trek: The Dominion\n 2. The Breen Confederacy\n 3. The Cardassian Empire\n 4. Death Star III\n 5. Karemma Ministry of Trade\n 6. Space 1999\n 7. Space 2099\n 8. Andromeda\n 9. legio XIII gemina\n 10. The Majestical Utopia\n 11. Space Angels\n 12. Chess!\n 13. Carpe Diem\n\n 42. Check groups 1-10\n\nYour choice: ")
+        while choiceorg not in (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "42"]):
+            choiceorg = raw_input("\nWhich group do you wish to check?\n 1. Star Trek: The Dominion\n 2. The Breen Confederacy\n 3. The Cardassian Empire\n 4. Death Star III\n 5. Karemma Ministry of Trade\n 6. Space 1999\n 7. Space 2099\n 8. Andromeda\n 9. legio XIII gemina\n 10. The Majestical Utopia\n 11. Space Angels\n 12. Chess!\n 13. Carpe Diem\n 14. CSR\n 15. Family Guy\n\n 42. Check groups 1-10, 14-15\n\nYour choice: ")
         print "\n\nWe will start by extracting the latest memberslist for your group\n"
         logincookie = login()
 
         if choiceorg == "42":
-            choiceorg = (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"])
+            choiceorg = (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "14", "15"])
         else:
             choiceorg = ([choiceorg])
 
@@ -1699,6 +1754,14 @@ while pathway in (["y"]):
             elif choice == "13":
                 memlist = nineworker("CarpeDiemmem", "14704", logincookie, memlist, "keyCD")
                 group = "Carpe Diem"
+
+            elif choice == "14":
+                memlist = nineworker("CSR", "18514", logincookie, memlist, "keyCSR")
+                group = "Chess Star Resort"
+
+            elif choice == "15":
+                memlist = nineworker("Family Guy", "14966", logincookie, memlist, "keyFG")
+                group = "Family Guy"
 
             print "\n\nMembers who are no longer in " + group + ": " + str(memlist).replace("'", "").replace("[", "").replace("]", "")
 
