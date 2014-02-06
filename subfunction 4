@@ -77,10 +77,10 @@ def vcman(vclinklist, yourside):
     browser1.set_handle_refresh(mechanize._http.HTTPRefreshProcessor(), max_time=1)
 
     logincookie = browser3.get_cookies()
-    
+    parmemvc = Counter()
+
     for tempcookie in logincookie:
         cookie.set_cookie(cookielib.Cookie(version = 0, name = tempcookie["name"], value = tempcookie["value"], port = "80", port_specified = False, domain = tempcookie["domain"], domain_specified = True, domain_initial_dot = False, path = tempcookie["path"], path_specified = True, secure = tempcookie["secure"], expires = tempcookie["expiry"], discard = False, comment = None, comment_url = None, rest = None, rfc2109 = False))
-
 
     for vcmatch in vclinklist:
         movelist = list()
@@ -91,8 +91,12 @@ def vcman(vclinklist, yourside):
 
         response = browser1.open(vcmatch)
         soup = BeautifulSoup(response)
-        boardpos = str(re.findall("boardFlip: (?:[a-zA-Z]|(?:%[a-fA-F]))+", str(soup.find_all(class_ = "chess_viewer")))[0]).replace("boardFlip: ", "")
 
+        if '      initialSetup: "",' not in str(soup):
+            print "\n\n\nskipped " + vcmatch + "\n\n\n"
+            continue
+
+        boardpos = str(re.findall("boardFlip: (?:[a-zA-Z]|(?:%[a-fA-F]))+", str(soup.find_all(class_ = "chess_viewer")))[0]).replace("boardFlip: ", "")
         yourpos = soup.find_all(class_ = "playername")
         yourpos = (str(yourpos[0]).replace('<span class="playername">', "").replace("</span>", ""), str(yourpos[1]).replace('<span class="playername">', "").replace("</span>", ""))
 
@@ -139,41 +143,46 @@ def vcman(vclinklist, yourside):
             links1 = []
             text1 = []
 
-            for link in browser1.links():
-                url2 = urlparse.urljoin(link.base_url, link.url)
-                text1.append(link.text)
+            for link in browser1.links(url_regex="chess.com/members/view/"):
+                ltext = link.text
+                if ltext != "View Profile":
+                    user = ltext.replace("[IMG]", "").strip()
+                    if user == "":
+                        continue
+                    if user in parmemvc:
+                        parmemvc[user] += 1
+                    else:
+                        parmemvc[user] = 1
 
-                links1.append("http://" + (urlparse.urlparse(url2).hostname or "") + (urlparse.urlparse(url2).path or ""))
-        
-            for link,text in zip(links1,text1):
-                with open("temp/temp.txt", "a") as placeholder2:
-                    placeholder2.write(re.sub(r"^http?:\/\/.*[\r\n]*", "", link.replace("http://www.chess.com/members/view/", " "), flags=re.MULTILINE))
-            
             soup = BeautifulSoup(response)
             p2 = str(soup.find_all(class_ = "next-on"))
-            
+
             if "next-on" in p2:
                 browser3.get(pointer)
                 nextbtn = 2
-                while not nextbtn == 0:
-                
+                while 0 == 0:
+
                     try:
                         browser3.find_element_by_css_selector('li.next-on>a').click()
                     except:
                         break
                     time.sleep(2)
-                    print "\nextracting names from " + pointer + " page " + str(nextbtn)
-                    vcelem = browser3.find_elements_by_partial_link_text('')
+                    print "\nchecking " + pointer + " page " + str(nextbtn)
+                    vcelem = browser3.find_elements_by_partial_link_text("")
                     for curvcparmem in vcelem:
                         memsellink = curvcparmem.get_attribute("href") or ""
 
                         if "http://www.chess.com/members/view/" in memsellink:
-                            with open("temp/temp.txt", "a") as placeholder2:
-                                placeholder2.write(re.sub(r"^http?:\/\/.*[\r\n]*", "", memsellink.replace("http://www.chess.com/members/view/", " "), flags=re.MULTILINE))
-
+                            user = re.sub(r"^http?:\/\/.*[\r\n]*", "", memsellink.replace("http://www.chess.com/members/view/", " ")).strip()
+                            if user == "":
+                                continue
+                            if user in parmemvc:
+                                parmemvc[user] += 0.5
+                            else:
+                                parmemvc[user] = 0.5
                     nextbtn += 1
-        
     browser3.quit()
+    return parmemvc
 
 
 pathway = "y"
@@ -181,14 +190,9 @@ while pathway in (["y"]):
     flow = "4"
 
     if flow == "4"
+        yourside = raw_input("Name of group to check: ")
         vclinklist = getvclinks(yourside)
-        vcman(vclinklist, yourside)
-
-        parmemvc = Counter()
-
-        for placeholder2 in open ("temp/temp.txt", "r"):
-          for membervc in placeholder2.split ():
-            parmemvc[membervc] += 0.5
+        parmemvc = vcman(vclinklist, yourside)
 
         for key, value in sorted(parmemvc.items(), key = itemgetter(1), reverse = True):
             print "\n" + key + " has made " + str(int(value)) + " posts"
