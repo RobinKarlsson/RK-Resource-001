@@ -159,6 +159,8 @@ def tmparchecker(pagelist, targetname):
     return tmpar, timeoutlist, winssdic, losedic
 
 def memberprocesser(target):
+    while "" in target:
+        target.remove("")
     minrat = raw_input("\n\nMin (online chess) rating allowed. leave empty to skip: ")
     maxrat = raw_input("Max (online chess) rating allowed. leave empty to skip: ")
 
