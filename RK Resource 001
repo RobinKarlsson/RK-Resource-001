@@ -205,6 +205,8 @@ def pmreplacer(text, name, country):
     return text.replace("/name", name).replace("/nation", country).replace("/newline", "\n")
 
 def pmdriver(target, choice):
+    while "" in target:
+        target.remove("")
     print "\n\n\n\nsupported commands, will be replaced with each members respective info\n /name - members name or username (if name is unavailable)\n /nation - members nation of origin\n /newline - pagebreak\n\n\n"
     subjectorg = raw_input("subject line: ")
     msglist = list()
@@ -529,6 +531,8 @@ def spider_checker(target, logincookie):
     return list(set(usrlist))
 
 def ageproc(target):
+    while "" in target:
+        target.remove("")
     browser = mechanize.Browser()
     browser.set_handle_equiv(True)
     browser.set_handle_redirect(True)
@@ -557,6 +561,7 @@ def ageproc(target):
     return flist
 
 def inviter(choicelist, invitenum):
+    country = ""
     if choicelist[0] == "168":
         invgroup = ""
         groupinv = raw_input("\nid of the group you want to send invites for: ")
@@ -644,7 +649,7 @@ def inviter(choicelist, invitenum):
         for choice5 in choicelist:
             counter += 1
             counted = "y"
-            if counter > 100:
+            if counter > 70:
                 browser2.quit()
                 if browserchoice == "1":
                     browser2 = webdriver.Firefox()
@@ -766,7 +771,7 @@ def inviter(choicelist, invitenum):
                     counted = ""
                 else:
                     counter += 1
-                if counter > 100:
+                if counter > 70:
                     browser2.quit()
                     if browserchoice == "1":
                         browser2 = webdriver.Firefox()
@@ -1016,6 +1021,8 @@ def vcman(vclinklist, yourside):
     return parmemvc
 
 def memberprocesser(target):
+    while "" in target:
+        target.remove("")
     minrat = raw_input("\n\nMin (online chess) rating allowed. leave empty to skip: ")
     maxrat = raw_input("Max (online chess) rating allowed. leave empty to skip: ")
 
