@@ -22,8 +22,11 @@ Requirements
 Guide to set it up.
 
  1) install the required software
+ 
  2) set up the correct file architecture by downloading and extracting this file, 
+ 
  3) get the code from here, https://github.com/RobinKarlsson/RK-Resource-001/blob/master/RK%20Resource%20001, and save it to a .py file in your newly created "RK Resource 001" folder
+ 
  4) run the script
 
 ===============
