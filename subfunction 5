@@ -61,6 +61,12 @@ def gettmlinks(targetname):
     return linklist
     
 def tmparchecker(pagelist, targetname):
+    tmyear = raw_input("\nOnly check tm's that has been open for registration since year, leave empty to skip (YYYY) ")
+    if tmyear != "":
+        tmyear = int(tmyear)
+        tmmonth = int(raw_input("\nOnly check tm's that has been open for registration since month (MM) "))
+        tmday = int(raw_input("\nOnly check tm's that has been open for registration since day (DD) "))
+
     tmpar = list()
     timeoutlist = list()
     winssdic = dict()
@@ -88,6 +94,19 @@ def tmparchecker(pagelist, targetname):
             except:
                 print "something went wrong, reopening " + page
         soup = BeautifulSoup(response)
+
+        if tmyear != "":
+            regopen = soup.find_all(class_ = "simple border-top clearfix alternate")
+            for x in regopen:
+                regopen = x.text
+            regopen = regopen.strip().split("\n")
+            regopen = regopen[regopen.index("Registration Open:") + 1]
+            regopen = regopen.replace("Jan", "01").replace("Feb", "02").replace("Mar", "03").replace("Apr", "04").replace("May", "05").replace("Jun", "06").replace("Jul", "07").replace("Aug", "08").replace("Sep", "09").replace("Oct", "10").replace("Nov", "11").replace("Dec", "12").replace(",", "").split(" ")
+            regopen = ([int(regopen[2]), int(regopen[0]), int(regopen[1])])
+            print regopen
+            if datetime(regopen[0], regopen[1], regopen[2]) < datetime(tmyear, tmmonth, tmday):
+                print page + " didn't pass the timecheck"
+                continue
 
         soupgroup = str(soup.find_all(class_ = "default border-top alternate"))
         soupgroup = re.findall("/groups/home/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", soupgroup)
