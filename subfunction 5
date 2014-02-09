@@ -22,7 +22,12 @@ def gettmlinks(targetname):
     browser.set_handle_robots(False)
     browser.set_handle_refresh(mechanize._http.HTTPRefreshProcessor(), max_time=1)
 
-    response = browser.open("http://www.chess.com/groups/matches/" + targetname + "?show_all_current=1")
+    while 0 == 0:
+        try:
+            response = browser.open("http://www.chess.com/groups/matches/" + targetname + "?show_all_current=1")
+            break
+        except:
+            print "something went wrong, reopening " + "http://www.chess.com/groups/matches/" + targetname + "?show_all_current=1"
     soup = BeautifulSoup(response)
     souplinks = re.findall("/groups/team_match(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", str(soup.find_all("a")))
     for link in souplinks:
@@ -35,7 +40,12 @@ def gettmlinks(targetname):
     linkarchive = linklist.pop(-1)
     pointer = 1
     while 0 == 0:
-        response = browser.open(str(linkarchive) + "&page=" + str(pointer))
+        while 0 == 0:
+            try:
+                response = browser.open(str(linkarchive) + "&page=" + str(pointer))
+                break
+            except:
+                print "something went wrong, reopening " + str(linkarchive) + "&page=" + str(pointer)
         soup = BeautifulSoup(response)
 
         soupbrake = str(soup.find_all(class_ = "next-on"))
@@ -45,10 +55,9 @@ def gettmlinks(targetname):
 
         if soupbrake == "[]":
             break
-        
         pointer += 1
-    
-    linklist = list(OrderedDict.fromkeys(linklist))
+
+    linklist = list(set(linklist))
     return linklist
     
 def tmparchecker(pagelist, targetname):
@@ -64,14 +73,22 @@ def tmparchecker(pagelist, targetname):
     browser.set_handle_referer(True)
     browser.set_handle_robots(False)
     browser.set_handle_refresh(mechanize._http.HTTPRefreshProcessor(), max_time=1)
+    print "\n\n"
 
     for page in pagelist:
+        if "http://www.chess.com/groups/team_match?id=" not in page:
+            continue
+        print "processing: " + page
         alltmresults = list()
         counter2 = 0
-        response = browser.open(page)
-
+        while 0 == 0:
+            try:
+                response = browser.open(page)
+                break
+            except:
+                print "something went wrong, reopening " + page
         soup = BeautifulSoup(response)
-        
+
         soupgroup = str(soup.find_all(class_ = "default border-top alternate"))
         soupgroup = re.findall("/groups/home/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", soupgroup)
 
@@ -93,7 +110,7 @@ def tmparchecker(pagelist, targetname):
                     try:
                         placeholder = str(placeholder[0]).replace("http://www.chess.com/members/view/", "")
                         tmpar.append(placeholder)
-                        
+
                         if placeholder in winssdic:
                             winssdic[placeholder] += alltmresults[1 + counter2]
                         else:
@@ -103,11 +120,10 @@ def tmparchecker(pagelist, targetname):
                             losedic[placeholder] += alltmresults[2 + counter2]
                         else:
                             losedic[placeholder] = alltmresults[2 + counter2]
-                        
+
                         counter2 += 2
                     except IndexError:
                         placeholder = list()
-
 
                 for placeholder in souppar1:
                     counter = 0
@@ -119,9 +135,8 @@ def tmparchecker(pagelist, targetname):
                             timeouters1 = str(re.findall("http://www.chess.com/members/view/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", placeholder)[0]).replace("http://www.chess.com/members/view/", "")
                             timeoutlist.append(timeouters1)
                             counter += 1
-        
 
-            if targetname == str(soupgroup[1]).replace("/groups/home/", ""):
+            elif targetname == str(soupgroup[1]).replace("/groups/home/", ""):
                 for placeholder in souppar[3::4]:
                     placeholder = str(placeholder)
                     placeholder = re.findall("http://www.chess.com/members/view/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", placeholder)
@@ -138,7 +153,7 @@ def tmparchecker(pagelist, targetname):
                             losedic[placeholder] += alltmresults[1 + counter2]
                         else:
                             losedic[placeholder] = alltmresults[1 + counter2]
-                            
+
                         counter2 += 2
                     except IndexError:
                         placeholder = list()
@@ -154,13 +169,14 @@ def tmparchecker(pagelist, targetname):
                             timeoutlist.append(timeouters1)
                             counter += 1
 
+            else:
+                print "\n\nfailed to find your group in this match: " + page + "!!!\n"
+
         except IndexError:
             placeholder = list()
     return tmpar, timeoutlist, winssdic, losedic
 
 def memberprocesser(target):
-    while "" in target:
-        target.remove("")
     minrat = raw_input("\n\nMin (online chess) rating allowed. leave empty to skip: ")
     maxrat = raw_input("Max (online chess) rating allowed. leave empty to skip: ")
 
@@ -191,6 +207,14 @@ def memberprocesser(target):
     timemax = raw_input("\nMax timeoutratio allowed. leave empty to skip: ")
     maxgroup = raw_input("\nMax number of groups member may be in. leave empty to skip: ")
     mingroup = raw_input("Min number of groups member may be in. leave empty to skip: ")
+
+    timovchoicemin = raw_input("\nTime/move higher than (format: days - hours - minutes, leave empty to skip) ")
+    timovchoicemax = raw_input("Time/move lower than (format: days - hours - minutes, leave empty to skip) ")
+    if timovchoicemax != "":
+        timovchoicemax = [int(elem) for elem in timovchoicemax.split("-")]
+    if timovchoicemin != "":
+        timovchoicemin = [int(elem) for elem in timovchoicemin.split("-")]
+
     avatarch = ""
     while avatarch not in (["y", "n"]):
         avatarch = raw_input("\nSort out those who don't have a custom avatar? (y/n) ")
@@ -210,16 +234,25 @@ def memberprocesser(target):
     browser.set_handle_refresh(mechanize._http.HTTPRefreshProcessor(), max_time=1)
 
     target = str(target).replace(" ", "").replace("(", "").replace(")", "").replace("]", "").replace("[", "").replace("'", "").split(",")
+    while "" in target:
+        target.remove("")
     passmem = list()
     for targetx in target:
         print "checking " + targetx
-        response = browser.open("http://www.chess.com/members/view/" + targetx)
+        while 0 == 0:
+            try:
+                response = browser.open("http://www.chess.com/members/view/" + targetx)
+                break
+            except:
+                print "something went wrong, reopening " + targetx
         if "://www.chess.com/members/view/" not in browser.geturl():
             continue
         soup = BeautifulSoup(response)
 
         if membersinceyear != "" or lastloginyear != "":
             memsinlist = memsin(soup)
+            if memsinlist == "":
+                continue
 
             if lastloginyear != "":
                 lonln = memsinlist[1]
@@ -229,6 +262,25 @@ def memberprocesser(target):
         if timemax != "":
             if timeoutchecker(soup) > int(timemax):
                 continue
+
+        if timovchoicemax != "" or timovchoicemin != "":
+            timemove = TimeMoveChecker(soup)
+
+            if timovchoicemax != "":
+                if timemove[0] > timovchoicemax[0]:
+                    continue
+                if timemove[1] > timovchoicemax[1] and timemove[0] >= timovchoicemax[0]:
+                    continue
+                if timemove[2] > timovchoicemax[2] and timemove[1] >= timovchoicemax[1] and timemove[0] >= timovchoicemax[0]:
+                    continue
+
+            if timovchoicemin != "":
+                if timemove[0] < timovchoicemin[0]:
+                    continue
+                if timemove[1] < timovchoicemin[1] and timemove[0] <= timovchoicemin[0]:
+                    continue
+                if timemove[2] < timovchoicemin[2] and timemove[1] <= timovchoicemin[1] and timemove[0] <= timovchoicemin[0]:
+                    continue
 
         if membersinceyear != "":
             memsi = memsinlist[0]
@@ -324,6 +376,26 @@ def timeoutchecker(soup):
             timeout = int(placeholder.text.replace("Timeouts:", "").strip().replace("% (last 90 days)", ""))
             return timeout
 
+def TimeMoveChecker(soup):
+    timemove = (["", "", ""])
+    for x in soup.find_all(class_ = "odd"):
+        if "Time/Move:" in str(x):
+            timemov = x.text.replace("Time/Move:", "").strip().split(" ")
+            timemov = [i+j for i,j in zip(timemov[::2],timemov[1::2])]
+            for xx in timemov:
+                if "days" in xx:
+                    timemove[0] = int(xx.replace("days", ""))
+                if "hr" in xx:
+                    timemove[1] = int(xx.replace("hr", ""))
+                if "fewmin" in xx:
+                    timemove[2] = xx.replace("fewmin", "")
+                elif "min" in xx:
+                    timemove[2] = int(xx.replace("min", ""))
+            break
+    while "" in timemove:
+        timemove[timemove.index("")] = 0
+    return timemove
+
 def onlratingchecker(soup):
     onrating = 0
     for x in soup.find_all(class_ = "clearfix stats-header"):
@@ -332,10 +404,11 @@ def onlratingchecker(soup):
     return onrating
 
 def memsin(soup):
-    memsinlist = list()
+    memsi = ""
     for placeholder in soup.find_all(class_ = "section-content section-content-2"):
         longnumlist = placeholder.text.strip().replace("  ", "").replace(",", "").replace("Member Since:", "").replace("Profile Views:", " ").replace("Last Login:", " ").replace("\n", "").replace("Jan", "01").replace("Feb", "02").replace("Mar", "03").replace("Apr", "04").replace("May", "05").replace("Jun", "06").replace("Jul", "07").replace("Aug", "08").replace("Sep", "09").replace("Oct", "10").replace("Nov", "11").replace("Dec", "12").split(" ")
-    return [int(longnumlist[2]), int(longnumlist[0]), int(longnumlist[1])], [int(longnumlist[5]), int(longnumlist[3]), int(longnumlist[4])]
+        memsi = [int(longnumlist[2]), int(longnumlist[0]), int(longnumlist[1])], [int(longnumlist[5]), int(longnumlist[3]), int(longnumlist[4])]
+    return memsi
 
 def groupmemlister(soup):
     groupcountlist = list()
