@@ -244,7 +244,7 @@ def pmdriver(target, choice):
     if browserchoice == "1":
         browser0 = webdriver.Firefox()
     elif browserchoice == "2":
-        browser0 = webdriver.Chrome()
+        browser0 = webdriver.Chrome("chromedriver")
     elif browserchoice == "3":
         browser0 = webdriver.PhantomJS()
     elif browserchoice == "4":
@@ -617,7 +617,7 @@ def inviter(choicelist, invitenum):
         groupinv = "http://www.chess.com/groups/invite_members?id=" + groupinv
         infile = raw_input("name of the file containing your invites list: ")
         infile = "Invite Lists/" + infile
-        alrfile = "Invite Lists/" + infile + " already invited"
+        alrfile = infile + " already invited"
         print "\n\n\n\nsupported commands, will be replaced with each members respective info\n /name - members name or username (if name is unavailable)\n /nation - members nation of origin\n /newline - pagebreak\n\n\n"
         msglist = list()
         choice = "y"
@@ -679,7 +679,7 @@ def inviter(choicelist, invitenum):
     invinf = "no"
     if choicelist[0] == "42":
         invinf = "yes"
-        choicelist = (["1", "2", "3", "4", "5", "7", "8", "9", "10", "11"])
+        choicelist = (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"])
 
     elif choicelist[0] == "84":
         choicelist = list()
@@ -759,7 +759,12 @@ def inviter(choicelist, invitenum):
                 msglist = (("1", "Hello /name. Welcome to the Death Star, a Dynamically Dangerous Spacestation and Superweapon capable of Destroying an Entire Planet with its Powerful Superlaser../newline/newline"), ("2", "http://loyalkng.com/wp-content/uploads/2009/05/deathstarfiring2.jpg"), ("1", "/newlineThe Death Star has a crew of 265,675, as well as 52,276 gunners, 607,360 troops, 30,984 stormtroopers, and 180,216 pilots Its hangars contain assault shuttles, blastboats, Strike cruisers, land vehicles, support ships, and 7,293 TIE Fighters. It is protected by 10,000 turbolaser batteries, 2,600 Ion Cannons, and 768 Tractor Beam projectors./newline/newlineWelcome To Our Leader, Darth Vader :) Join us and together we will rule this galaxy!!!!/newline/newline"), ("3", "http://www.youtube.com/watch?v=pJ27mQgWpis"))
 
             elif choice5 == "6":
-                "none"
+                invgroup = "to Jungle Team"
+                infile = "Invite Lists/Jungle Team"
+                alrfile = "Invite Lists/Jungle Team already invited"
+                groupinv = "http://www.chess.com/groups/invite_members?id=17050"
+                countryalt = "the outskirts of our Roman empire"
+                msglist = (("1", "I invite you /name "), ("2", "http://d1lalstwiwz2br.cloudfront.net/images_users/tiny_mce/Teo_/phpIKXtlr.gif"), ("1", " to join the jungle team....have fun.....play teammatches and tournaments.... come and take a look/newline"), ("3", "http://www.youtube.com/watch?v=o1tj2zJ2Wvg"))
 
             elif choice5 == "7":
                 invgroup = "to Legio XIII Gemina"
@@ -800,6 +805,14 @@ def inviter(choicelist, invitenum):
                 alrfile = "Invite Lists/Space 2099 already invited"
                 groupinv = "http://www.chess.com/groups/invite_members?id=26624"
                 msglist = (("2", "http://th07.deviantart.net/fs70/PRE/f/2011/331/8/2/moonbase_alpha_next_generation_by_heavy_fantasy-d4hg1v4.jpg"), ("1", "/newline/newlineWe want you, /name, for this rogue moons /nation settlement./newline"), ("2", "http://www.thescifiworld.net/img/interviews/space2099_08-big.jpg"), ("1", "/newlinePrimarily a scientific research station, Moonbase Alpha houses 311 personnel including scientists, astronauts, medical personnel, and security officers./newlineSpace: 1999: Nuclear waste from Earth, which was stored on the Moon's far side, explodes in a catastrophic accident on 13 September 1999, knocking the Moon out of orbit and sending it, and the 311 inhabitants of Moonbase Alpha, hurtling uncontrollably into space/newlineWATCH CLOSELY:))"), ("3", "http://www.youtube.com/watch?v=8WZW4groJro"))
+
+            elif choice5 == "12":
+                countryalt = "the International kingdom of Atlantis"
+                invgroup = "to CSR"
+                infile = "Invite Lists/CSR"
+                alrfile = "Invite Lists/CSR already invited"
+                groupinv = "http://www.chess.com/groups/invite_members?id=18514"
+                msglist = (("2", "http://files.chesscomfiles.com/images_users/tiny_mce/Pepra/knightmoves.gif"), ("1", "/newline/newlineWelcome, /name, to Chess Star Resort. The one and only luxury 5 star hotel resort on chess.com/newlineJoin us, and experience all our activities firsthand... puzzles... team matches... tournaments and much much more/newline"), ("2", "http://www.washingtonpost.com/rf/image_606w/2010-2019/WashingtonPost/2013/10/18/Travel/Images/SALAMANDER20111382132477.jpg"), ("1", "/newlineCSR has since its founding just over a year ago housed some of the greatest chess players from many nations, including /nation. But without the great /name in our ranks, this hold little value/newline"), ("3", "http://www.youtube.com/watch?v=6_SqDur3IvQ"))
 
             memtinv = remove_doublets(infile, "")
             memalrinv = remove_doublets(alrfile, "")
@@ -1568,11 +1581,13 @@ while pathway in (["y"]):
                 placeholder2.write(un1)
 
     elif flow == "2":
-        "none"
+        target = raw_input("\n\nList of members: ").replace(" ", "").split(",")
+        while "" in target:
+            target.remove("")
 
     elif flow == "3":
         choice5 = ""
-        while choice5 not in (["1", "2", "3", "4", "5", "7", "8", "9", "10", "11", "42", "84", "168"]):
+        while choice5 not in (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "42", "84", "168"]):
             choice5 = raw_input("\n\nWhich group would you like to send invites for?\n\n    Dominion affiliated groups:\n 1. Star Trek: The Dominion\n 2. Karemma Commerce Ministry\n 3. The Breen Confederacy\n 4. The Cardassian Empire\n 5. Death Star III\n\n    Non Dominion groups:\n \n 7. Legio XIII Gemina\n 8. Andromeda\n 9. Family Guy\n 10. Space 1999\n 11. Space 2099\n\n 42. endless loop that goes through all the groups, indefinitely\n 84. Create you own custom infinite loop from the supported groups\n 168. Send invites for another group\n\nEnter choice here: ")
         inviter(([choice5]), 120)
 
