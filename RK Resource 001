@@ -331,7 +331,7 @@ def pmdriver(target, choice):
 
     browserchoice = ""
     while browserchoice not in (["1", "2", "3", "4"]):
-        browserchoice = raw_input("chooce which browser you want to use\n 1. Firefox\n 2. Chrome\n 3. PhantomJS\n 4. Internet Explorer\nYour choice: ")
+        browserchoice = raw_input("Which browser do you want to use\n 1. Firefox\n 2. Chrome\n 3. PhantomJS\n 4. Internet Explorer\nYour choice: ")
 
     Username = raw_input("\n\n\nUsername: ")
     Password = raw_input("Password: ")
@@ -681,7 +681,7 @@ def inviter(choicelist, invitenum):
 
     browserchoice = ""
     while browserchoice not in (["1", "2", "3", "4"]):
-        browserchoice = raw_input("chooce which browser you want to use\n 1. Firefox\n 2. Chrome\n 3. PhantomJS\n 4. Internet Explorer\nYour choice: ")
+        browserchoice = raw_input("Which browser do you want to use\n 1. Firefox\n 2. Chrome\n 3. PhantomJS\n 4. Internet Explorer\nYour choice: ")
 
     Username = raw_input("\n\n\nUsername: ")
     Password = raw_input("Password: ")
@@ -939,7 +939,7 @@ def login():
 
     browserchoice = ""
     while browserchoice not in (["1", "2", "3", "4"]):
-        browserchoice = raw_input("\n\nchooce which browser you want to use\n 1. Firefox\n 2. Chrome\n 3. PhantomJS\n 4. Internet Explorer\nYour choice: ")
+        browserchoice = raw_input("\n\nWhich browser do you want to use\n 1. Firefox\n 2. Chrome\n 3. PhantomJS\n 4. Internet Explorer\nYour choice: ")
 
     browser = pickbrowser(browserchoice)
     browser.get("https://www.chess.com/login")
