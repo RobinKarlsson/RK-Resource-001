@@ -6,7 +6,7 @@
 
 import os
 
-def csvsoworker(memlist):
+def csvsoworker(memlist, choicepath):
     col_width = max(len(element) for row in memlist for element in row) + 2
 
     choice = ""
@@ -18,9 +18,15 @@ def csvsoworker(memlist):
         choicelist = (["0"])
         while cdone != "n":
             choice = ""
-            while choice not in (["1", "2", "3", "4", "5"]) or choice in choicelist:
-                choice = raw_input("\n\nwhat would you like to include?\n 1. " + (memlist[0])[1] + "\n 2. " + (memlist[0])[2] + "\n 3. " + (memlist[0])[3] + "\n 4. " + (memlist[0])[4] + "\n 5. " + (memlist[0])[5] + "\nYour choice: ")
-            choicelist.append(choice)
+            counter = 1
+            print "\n\nwhat would you like to include?"
+            while counter < len(memlist[0]):
+                print " " + str(counter) + ". " + memlist[0][counter]
+                counter += 1
+
+            choice = raw_input("Your choice: ")
+            if choice not in choicelist:
+                choicelist.append(choice)
 
             cdone = ""
             while cdone not in (["y", "n"]):
@@ -40,9 +46,15 @@ def csvsoworker(memlist):
         ltitle = memlist2[0]
         del memlist2[0]
 
-        print "\n\nsort by\n 1. most valuable tm participant"
-        counter = 2
-        coulist = (["1"])
+        if choicepath == "1":
+            print "\n\nsort by\n 1. most valuable tm participant"
+            counter = 2
+            coulist = (["1"])
+        elif choicepath == "2":
+            print "\n\nsort by"
+            counter = 1
+            coulist = list()
+
         for pointer in ltitle:
             count2id = str(counter)
             coulist.append(count2id)
@@ -54,12 +66,23 @@ def csvsoworker(memlist):
             choice2 = raw_input("Your choice: ")
         choice2 = int(choice2)
 
-        if choice2 == 1:
-            "nothing"
-        elif choice2 == 2:
-            memlist2 = sorted(memlist2, key=lambda tup: tup[0].lower())
+        if choice2 == 1 and choicepath == "1":
+            "none"
         else:
-            memlist2 = sorted(memlist2, reverse = True, key=lambda tup: tup[choice2 - 2])
+            if choicepath == "1":
+                choice2 -= 2
+            elif choicepath == "2":
+                choice2 -= 1
+
+            for element in memlist2:
+                if type(element[choice2]) is str and element[choice2][0] == "[":
+                    element[choice2] = element[choice2].replace("[", "").replace("]", "").split(", ")
+                    element[choice2] = [int(subelem) for subelem in element[choice2]]
+
+            if type(memlist2[0][choice2]) is str:
+                memlist2 = sorted(memlist2, key=lambda tup: tup[0].lower())
+            elif type(memlist2[0][choice2]) is float or type(memlist2[0][choice2]) is list:
+                memlist2 = sorted(memlist2, reverse = True, key=lambda tup: tup[choice2])
 
         print "\n\n" + "".join(element.ljust(col_width) for element in ltitle) + "\n"
         llength = len(memlist2[0])
@@ -87,20 +110,34 @@ while pathway in (["y"]):
         memlist = list()
         clist = list()
         flist = list()
-
         counter3 = 1
+
+        choicepath = ""
+        while choicepath not in (["1", "2"]):
+            choicepath = raw_input("\nWhat would you like to process\n 1. csv file over team matches from option 5\n 2. csv file of member stats from option 2\nYour choice, monkeyboy: ")
+
         print "\n\ncsv files in directory"
         filesindic = os.listdir(".")
         for fname in filesindic:
-            if fname.endswith(".csv"):
-                flist.append(fname)
-                print " " + str(counter3) + ". " + fname
-                clist.append(str(counter3))
-                counter3 += 1
+            if choicepath == "1":
+                if fname.endswith(" tm.csv"):
+                    flist.append(fname)
+                    print " " + str(counter3) + ". " + fname
+                    clist.append(str(counter3))
+                    counter3 += 1
+            elif choicepath == "2":
+                if fname.endswith(" mem.csv"):
+                    flist.append(fname)
+                    print " " + str(counter3) + ". " + fname
+                    clist.append(str(counter3))
+                    counter3 += 1
 
-        choice = ""
-        while choice not in (["1", "2"]):
-            choice = raw_input("\noptions:\n 1. Get data from one of the csvfiles\n 2. Compare two csv-files\nYour choice: ")
+        if choicepath == "1":
+            choice = ""
+            while choice not in (["1", "2"]):
+                choice = raw_input("\noptions:\n 1. Get data from one of the csvfiles\n 2. Compare two csv-files\nYour choice: ")
+        elif choicepath == "2":
+            choice = "1"
 
         if choice == "1":
             choice1 = ""
@@ -109,28 +146,32 @@ while pathway in (["y"]):
 
             with open(flist[int(choice1) - 1], "rb") as f:
                 csvreader = csv.reader(f, delimiter = " ")
-                choice5 = ""
-                while choice5 not in (["1", "2"]):
-                    choice5 = raw_input("\n\nWhat part of the csv-file do you wish to inspect?\n 1. everyone who has ever plaid for said group\n 2. those who fill your requirements\n\nYour choice, young padawan? ")
+                if choicepath == "1":
+                    choice5 = ""
+                    while choice5 not in (["1", "2"]):
+                        choice5 = raw_input("\n\nWhat part of the csv-file do you wish to inspect?\n 1. everyone who has ever plaid for said group\n 2. those who fill your requirements\n\nYour choice, young padawan? ")
 
-                if choice5 == "1":
-                    for row in csvreader:
-                        if row[0] == "Member name (those who fill your requirements)":
-                            break
-
-                        memlist.append(row)
-
-                elif choice5 == "2":
-                    recorder = ""
-                    for row in csvreader:
-                        if row[0] == "Member name (those who fill your requirements)":
-                            recorder = "yy"
-                            row[0] = "Member name"
-                
-                        if recorder == "yy":
+                    if choice5 == "1":
+                        for row in csvreader:
+                            if row[0] == "Member name (those who fill your requirements)":
+                                break
                             memlist.append(row)
 
-            csvsoworker(memlist)
+                    elif choice5 == "2":
+                        recorder = ""
+                        for row in csvreader:
+                            if row[0] == "Member name (those who fill your requirements)":
+                                recorder = "yy"
+                                row[0] = "Member name"
+
+                            if recorder == "yy":
+                                memlist.append(row)
+
+                elif choicepath == "2":
+                    for row in csvreader:
+                        memlist.append(row)
+
+            csvsoworker(memlist, choicepath)
 
         elif choice == "2":
             ichoice = ""
@@ -164,4 +205,5 @@ while pathway in (["y"]):
             fmemlist = sorted(fmemlist, reverse = True, key=lambda tup: tup[-1])
             for cpointer in fmemlist:
                 print "".join(element.ljust(col_width) for element in cpointer)
+
   pathway = raw_input("Run again? (y/n) ")
