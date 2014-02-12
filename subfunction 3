@@ -14,6 +14,42 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.alert import Alert
 from bs4 import BeautifulSoup
 
+def pickbrowser(browserchoice):
+    usrplatform = getplatform()
+    if browserchoice == "1":
+        browser = webdriver.Firefox()
+
+    elif browserchoice == "2":
+        if usrplatform[1] == "Linux":
+            chromepath = os.path.abspath("Webdriver/Linux/86/chromedriver")
+            os.environ["webdriver.chrome.driver"] = chromepath
+            browser = webdriver.Chrome(chromepath)
+
+        elif usrplatform[1] == "Windows":
+            chromepath = os.path.abspath("Webdriver/Windows/86/chromedriver.exe")
+            os.environ["webdriver.chrome.driver"] = chromepath
+            browser = webdriver.Chrome(chromepath)
+
+        elif usrplatform[1] == "darwin":
+            chromepath = os.path.abspath("Webdriver/Mac/86/chromedriver")
+            os.environ["webdriver.chrome.driver"] = chromepath
+            browser = webdriver.Chrome(chromepath)
+
+    elif browserchoice == "3":
+        if usrplatform[1] == "Linux":
+            browser = webdriver.PhantomJS(os.path.abspath("Webdriver/Linux/86/phantomjs"))
+
+        elif usrplatform[1] == "Windows":
+            browser = webdriver.PhantomJS(os.path.abspath("Webdriver/Windows/86/phantomjs.exe"))
+
+        elif usrplatform[1] == "darwin":
+            browser = webdriver.PhantomJS(os.path.abspath("Webdriver/Mac/86/phantomjs"))
+
+    elif browserchoice == "4":
+        if usrplatform[1] == "Windows":
+            browser = webdriver.Ie(os.path.abspath("Webdriver/Windows/86/IEDriverServer.exe"))
+    return browser
+
 def inviter(choicelist, invitenum):
     country = ""
     if choicelist[0] == "168":
@@ -22,7 +58,7 @@ def inviter(choicelist, invitenum):
         groupinv = "http://www.chess.com/groups/invite_members?id=" + groupinv
         infile = raw_input("name of the file containing your invites list: ")
         infile = "Invite Lists/" + infile
-        alrfile = "Invite Lists/" + infile + " already invited"
+        alrfile = infile + " already invited"
         print "\n\n\n\nsupported commands, will be replaced with each members respective info\n /name - members name or username (if name is unavailable)\n /nation - members nation of origin\n /newline - pagebreak\n\n\n"
         msglist = list()
         choice = "y"
@@ -48,14 +84,7 @@ def inviter(choicelist, invitenum):
     Username = raw_input("\n\n\nUsername: ")
     Password = raw_input("Password: ")
 
-    if browserchoice == "1":
-        browser2 = webdriver.Firefox()
-    elif browserchoice == "2":
-        browser2 = webdriver.Chrome()
-    elif browserchoice == "3":
-        browser2 = webdriver.PhantomJS()
-    elif browserchoice == "4":
-        browser2 = webdriver.Ie()
+    browser2 = pickbrowser(browserchoice)
 
     browser2.get("https://www.chess.com/login")
 
@@ -67,24 +96,12 @@ def inviter(choicelist, invitenum):
     browser2.find_element_by_id("btnLogin").click()
 
     logincookie = browser2.get_cookies()
-    browser1 = mechanize.Browser()
-    cookie = cookielib.LWPCookieJar()
-    browser1.set_cookiejar(cookie)
-
-    for tempcookie in logincookie:
-        cookie.set_cookie(cookielib.Cookie(version = 0, name = tempcookie["name"], value = tempcookie["value"], port = '80', port_specified = False, domain = tempcookie["domain"], domain_specified = True, domain_initial_dot = False, path = tempcookie["path"], path_specified = True, secure = tempcookie["secure"], expires = tempcookie["expiry"], discard = False, comment = None, comment_url = None, rest = None, rfc2109 = False))
-
-    browser1.set_handle_equiv(True)
-    browser1.set_handle_redirect(True)
-    browser1.set_handle_gzip(True)
-    browser1.set_handle_referer(True)
-    browser1.set_handle_robots(False)
-    browser1.set_handle_refresh(mechanize._http.HTTPRefreshProcessor(), max_time=1)
+    browser1 = mecbrowser(logincookie)
 
     invinf = "no"
     if choicelist[0] == "42":
         invinf = "yes"
-        choicelist = (["1", "2", "3", "4", "5", "7", "8", "9", "10", "11"])
+        choicelist = (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"])
 
     elif choicelist[0] == "84":
         choicelist = list()
@@ -105,14 +122,7 @@ def inviter(choicelist, invitenum):
             counted = "y"
             if counter > 70:
                 browser2.quit()
-                if browserchoice == "1":
-                    browser2 = webdriver.Firefox()
-                elif browserchoice == "2":
-                    browser2 = webdriver.Chrome()
-                elif browserchoice == "3":
-                    browser2 = webdriver.PhantomJS()
-                elif browserchoice == "4":
-                    browser2 = webdriver.Ie()
+                browser2 = pickbrowser(browserchoice)
                 browser2.get("https://www.chess.com/login")
                 WebDriverWait(browser2, 10).until(EC.presence_of_element_located((By.ID, "btnLogin")))
                 browser2.find_element_by_name("c1").send_keys(Username)
@@ -164,7 +174,12 @@ def inviter(choicelist, invitenum):
                 msglist = (("1", "Hello /name. Welcome to the Death Star, a Dynamically Dangerous Spacestation and Superweapon capable of Destroying an Entire Planet with its Powerful Superlaser../newline/newline"), ("2", "http://loyalkng.com/wp-content/uploads/2009/05/deathstarfiring2.jpg"), ("1", "/newlineThe Death Star has a crew of 265,675, as well as 52,276 gunners, 607,360 troops, 30,984 stormtroopers, and 180,216 pilots Its hangars contain assault shuttles, blastboats, Strike cruisers, land vehicles, support ships, and 7,293 TIE Fighters. It is protected by 10,000 turbolaser batteries, 2,600 Ion Cannons, and 768 Tractor Beam projectors./newline/newlineWelcome To Our Leader, Darth Vader :) Join us and together we will rule this galaxy!!!!/newline/newline"), ("3", "http://www.youtube.com/watch?v=pJ27mQgWpis"))
 
             elif choice5 == "6":
-                "none"
+                invgroup = "to Jungle Team"
+                infile = "Invite Lists/Jungle Team"
+                alrfile = "Invite Lists/Jungle Team already invited"
+                groupinv = "http://www.chess.com/groups/invite_members?id=17050"
+                countryalt = "the outskirts of our Roman empire"
+                msglist = (("1", "I invite you /name "), ("2", "http://d1lalstwiwz2br.cloudfront.net/images_users/tiny_mce/Teo_/phpIKXtlr.gif"), ("1", " to join the jungle team....have fun.....play teammatches and tournaments.... come and take a look/newline"), ("3", "http://www.youtube.com/watch?v=o1tj2zJ2Wvg"))
 
             elif choice5 == "7":
                 invgroup = "to Legio XIII Gemina"
@@ -206,6 +221,14 @@ def inviter(choicelist, invitenum):
                 groupinv = "http://www.chess.com/groups/invite_members?id=26624"
                 msglist = (("2", "http://th07.deviantart.net/fs70/PRE/f/2011/331/8/2/moonbase_alpha_next_generation_by_heavy_fantasy-d4hg1v4.jpg"), ("1", "/newline/newlineWe want you, /name, for this rogue moons /nation settlement./newline"), ("2", "http://www.thescifiworld.net/img/interviews/space2099_08-big.jpg"), ("1", "/newlinePrimarily a scientific research station, Moonbase Alpha houses 311 personnel including scientists, astronauts, medical personnel, and security officers./newlineSpace: 1999: Nuclear waste from Earth, which was stored on the Moon's far side, explodes in a catastrophic accident on 13 September 1999, knocking the Moon out of orbit and sending it, and the 311 inhabitants of Moonbase Alpha, hurtling uncontrollably into space/newlineWATCH CLOSELY:))"), ("3", "http://www.youtube.com/watch?v=8WZW4groJro"))
 
+            elif choice5 == "12":
+                countryalt = "the International kingdom of Atlantis"
+                invgroup = "to CSR"
+                infile = "Invite Lists/CSR"
+                alrfile = "Invite Lists/CSR already invited"
+                groupinv = "http://www.chess.com/groups/invite_members?id=18514"
+                msglist = (("2", "http://files.chesscomfiles.com/images_users/tiny_mce/Pepra/knightmoves.gif"), ("1", "/newline/newlineWelcome, /name, to Chess Star Resort. The one and only luxury 5 star hotel resort on chess.com/newlineJoin us, and experience all our activities firsthand... puzzles... team matches... tournaments and much much more/newline"), ("2", "http://www.washingtonpost.com/rf/image_606w/2010-2019/WashingtonPost/2013/10/18/Travel/Images/SALAMANDER20111382132477.jpg"), ("1", "/newlineCSR has since its founding just over a year ago housed some of the greatest chess players from many nations, including /nation. But without the great /name in our ranks, this hold little value/newline"), ("3", "http://www.youtube.com/watch?v=6_SqDur3IvQ"))
+
             memtinv = remove_doublets(infile, "")
             memalrinv = remove_doublets(alrfile, "")
             memtinv = [x for x in memtinv if x not in memalrinv]
@@ -227,14 +250,7 @@ def inviter(choicelist, invitenum):
                     counter += 1
                 if counter > 70:
                     browser2.quit()
-                    if browserchoice == "1":
-                        browser2 = webdriver.Firefox()
-                    elif browserchoice == "2":
-                        browser2 = webdriver.Chrome()
-                    elif browserchoice == "3":
-                        browser2 = webdriver.PhantomJS()
-                    elif browserchoice == "4":
-                        browser2 = webdriver.Ie()
+                    browser2 = pickbrowser(browserchoice)
                     browser2.get("https://www.chess.com/login")
                     WebDriverWait(browser2, 10).until(EC.presence_of_element_located((By.ID, "btnLogin")))
                     browser2.find_element_by_name("c1").send_keys(Username)
