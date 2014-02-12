@@ -7,7 +7,7 @@ contact email: "r.robin.karlsson@gmail.com"
 
 contact chess.com profile: "http://www.chess.com/members/view/RobinKarlsson"
 
-version 0.8.7
+version 0.8.8
 
 ===============
 
@@ -15,7 +15,6 @@ Requirements
 
 - Python 2.7
 - Libraries: Mechanize, BeautifulSoup, Selenium
-- Mozilla Firefox
 
 ===============
 
@@ -38,6 +37,10 @@ options:
 
 Extract the memberslist of one or more groups
 
+
+2.
+
+Build an excell compatible csv file with data on a list of members
  
 
 3.
@@ -54,9 +57,7 @@ Count number of posts per member in a groups finished votechess matches
 
 5.
 
-Count number of times each member has played for a group in team matches. Includes number of tm's played in, points won, points lost, timeouts and number of games yet to finish.
-
-Saves the result to a excell compatible csv-file and offers to create a second list that only contain those members who fill a few criterias using option 6
+Build an excell compatible csv file with data on how members of a group has performed in team matches
 
  
 
