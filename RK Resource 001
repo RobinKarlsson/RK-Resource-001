@@ -937,7 +937,11 @@ def login():
     if Username == "" or Password == "":
         return ""
 
-    browser = pickbrowser("3")
+    browserchoice = ""
+    while browserchoice not in (["1", "2", "3", "4"]):
+        browserchoice = raw_input("\n\nchooce which browser you want to use\n 1. Firefox\n 2. Chrome\n 3. PhantomJS\n 4. Internet Explorer\nYour choice: ")
+
+    browser = pickbrowser(browserchoice)
     browser.get("https://www.chess.com/login")
 
     browser.find_element_by_name("c1").send_keys(Username)
