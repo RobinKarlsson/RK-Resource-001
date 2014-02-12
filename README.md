@@ -18,9 +18,9 @@ Requirements
 
 ===============
 
-Guide to set it up.
+Instructions
 
- 1) install the required software
+ 1) install the required software, the libraries can either be installed to your system or tarballed
  
  2) set up the correct file architecture by downloading and extracting this file, https://drive.google.com/file/d/0B1k9dLEBCofEeWpOOHJJV1dlTEk
  
