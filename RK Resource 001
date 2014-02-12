@@ -2,7 +2,7 @@
 # developed by Robin Karlsson
 # contact email: "r.robin.karlsson@gmail.com"
 # contact chess.com profile: "http://www.chess.com/members/view/RobinKarlsson"
-# version 0.8.7
+# version 0.8.8 alpha
 
 import mechanize
 import os
@@ -15,6 +15,7 @@ import base64
 import stat
 import re
 import time
+import platform as _platform
 from time import strftime, gmtime
 from datetime import datetime
 from selenium import webdriver
@@ -28,6 +29,91 @@ from operator import itemgetter
 from collections import OrderedDict
 from collections import Counter
 from string import punctuation
+
+def getmeminfo(target, filename):
+    browser = mecbrowser("")
+
+    memlist = list()
+    outputfile = open(filename + " " + strftime("%Y-%m-%d", gmtime()) + " mem.csv", "wb")
+    csvwriter = csv.writer(outputfile, delimiter = " ", quoting=csv.QUOTE_MINIMAL)
+    csvwriter.writerow(("Username", "Real name", "Online rating", "Timeout-ratio", "Last online", "Member since", "Time/move", "Groups", "Nation", "Custom avatar"))
+
+    for mem in target:
+        print "Processing " + mem
+        while 0 == 0:
+            try:
+                response = browser.open("http://www.chess.com/members/view/" + mem)
+                break
+            except:
+                print "something went wrong, reopening " + mem
+        if "://www.chess.com/members/view/" not in browser.geturl():
+            continue
+
+        soup = BeautifulSoup(response)
+
+        timemove = TimeMoveChecker(soup)
+        memsinlastonl = memsin(soup)
+
+        csvwriter.writerow((mem, namechecker(soup), onlratingchecker(soup), timeoutchecker(soup), memsinlastonl[1], memsinlastonl[0], timemove, groupmemlister(soup), nationlister(soup), AvatarCheck(soup)))
+
+def getplatform():
+    return _platform.platform(), _platform.system(), _platform.release()
+
+def mecbrowser(logincookie):
+    browser = mechanize.Browser()
+    cookie = cookielib.LWPCookieJar()
+    browser.set_cookiejar(cookie)
+
+    if logincookie != "":
+        for tempcookie in logincookie:
+            try:
+                cookie.set_cookie(cookielib.Cookie(version = 0, name = tempcookie["name"], value = tempcookie["value"], port = '80', port_specified = False, domain = tempcookie["domain"], domain_specified = True, domain_initial_dot = False, path = tempcookie["path"], path_specified = True, secure = tempcookie["secure"], expires = tempcookie["expiry"], discard = False, comment = None, comment_url = None, rest = None, rfc2109 = False))
+            except KeyError:
+                continue
+
+    browser.set_handle_equiv(True)
+    browser.set_handle_redirect(True)
+    browser.set_handle_gzip(True)
+    browser.set_handle_referer(True)
+    browser.set_handle_robots(False)
+    browser.set_handle_refresh(mechanize._http.HTTPRefreshProcessor(), max_time=1)
+    return browser
+
+def pickbrowser(browserchoice):
+    usrplatform = getplatform()
+    if browserchoice == "1":
+        browser = webdriver.Firefox()
+
+    elif browserchoice == "2":
+        if usrplatform[1] == "Linux":
+            chromepath = os.path.abspath("Webdriver/Linux/86/chromedriver")
+            os.environ["webdriver.chrome.driver"] = chromepath
+            browser = webdriver.Chrome(chromepath)
+
+        elif usrplatform[1] == "Windows":
+            chromepath = os.path.abspath("Webdriver/Windows/86/chromedriver.exe")
+            os.environ["webdriver.chrome.driver"] = chromepath
+            browser = webdriver.Chrome(chromepath)
+
+        elif usrplatform[1] == "darwin":
+            chromepath = os.path.abspath("Webdriver/Mac/86/chromedriver")
+            os.environ["webdriver.chrome.driver"] = chromepath
+            browser = webdriver.Chrome(chromepath)
+
+    elif browserchoice == "3":
+        if usrplatform[1] == "Linux":
+            browser = webdriver.PhantomJS(os.path.abspath("Webdriver/Linux/86/phantomjs"))
+
+        elif usrplatform[1] == "Windows":
+            browser = webdriver.PhantomJS(os.path.abspath("Webdriver/Windows/86/phantomjs.exe"))
+
+        elif usrplatform[1] == "darwin":
+            browser = webdriver.PhantomJS(os.path.abspath("Webdriver/Mac/86/phantomjs"))
+
+    elif browserchoice == "4":
+        if usrplatform[1] == "Windows":
+            browser = webdriver.Ie(os.path.abspath("Webdriver/Windows/86/IEDriverServer.exe"))
+    return browser
 
 def com2(xxxxxxxxxxxxxx, xxxxxxxxxxxxx, xxxxxxxxxxxxxxxx, xxxxxxxxxxxxxxxxxxx):
     for xxxxxxxxxxxxxxxxx in xrange(len(xxxxxxxxxxxxx)):
@@ -51,14 +137,7 @@ domban = set(['okinawaoly', 'rubenhasratyan', 'kohai', 'swarmflow', 'Backer1', '
 
 def gettmlinks(targetname):
     linklist = list()
-    browser = mechanize.Browser()
-
-    browser.set_handle_equiv(True)
-    browser.set_handle_redirect(True)
-    browser.set_handle_gzip(True)
-    browser.set_handle_referer(True)
-    browser.set_handle_robots(False)
-    browser.set_handle_refresh(mechanize._http.HTTPRefreshProcessor(), max_time=1)
+    browser = mecbrowser("")
 
     while 0 == 0:
         try:
@@ -99,7 +178,7 @@ def gettmlinks(targetname):
     return linklist
 
 def birthdsorter(birthdaylist):
-    choice = ""
+    choice = "1"
     while choice not in (["1"]):
         choice = raw_input("\n\nOptions:\n 1. print the collected information sorted by birthdays\nYour choice: ")
 
@@ -108,7 +187,7 @@ def birthdsorter(birthdaylist):
         for element in birthdaylist:
             print str(element[1]) + "/" + str(element[0]) + " - " + element[3] + ", born " + str(element[2])
 
-def csvsoworker(memlist):
+def csvsoworker(memlist, choicepath):
     col_width = max(len(element) for row in memlist for element in row) + 2
 
     choice = ""
@@ -120,9 +199,15 @@ def csvsoworker(memlist):
         choicelist = (["0"])
         while cdone != "n":
             choice = ""
-            while choice not in (["1", "2", "3", "4", "5"]) or choice in choicelist:
-                choice = raw_input("\n\nwhat would you like to include?\n 1. " + (memlist[0])[1] + "\n 2. " + (memlist[0])[2] + "\n 3. " + (memlist[0])[3] + "\n 4. " + (memlist[0])[4] + "\n 5. " + (memlist[0])[5] + "\nYour choice: ")
-            choicelist.append(choice)
+            counter = 1
+            print "\n\nwhat would you like to include?"
+            while counter < len(memlist[0]):
+                print " " + str(counter) + ". " + memlist[0][counter]
+                counter += 1
+
+            choice = raw_input("Your choice: ")
+            if choice not in choicelist:
+                choicelist.append(choice)
 
             cdone = ""
             while cdone not in (["y", "n"]):
@@ -142,9 +227,15 @@ def csvsoworker(memlist):
         ltitle = memlist2[0]
         del memlist2[0]
 
-        print "\n\nsort by\n 1. most valuable tm participant"
-        counter = 2
-        coulist = (["1"])
+        if choicepath == "1":
+            print "\n\nsort by\n 1. most valuable tm participant"
+            counter = 2
+            coulist = (["1"])
+        elif choicepath == "2":
+            print "\n\nsort by"
+            counter = 1
+            coulist = list()
+
         for pointer in ltitle:
             count2id = str(counter)
             coulist.append(count2id)
@@ -156,12 +247,23 @@ def csvsoworker(memlist):
             choice2 = raw_input("Your choice: ")
         choice2 = int(choice2)
 
-        if choice2 == 1:
-            "nothing"
-        elif choice2 == 2:
-            memlist2 = sorted(memlist2, key=lambda tup: tup[0].lower())
+        if choice2 == 1 and choicepath == "1":
+            "none"
         else:
-            memlist2 = sorted(memlist2, reverse = True, key=lambda tup: tup[choice2 - 2])
+            if choicepath == "1":
+                choice2 -= 2
+            elif choicepath == "2":
+                choice2 -= 1
+
+            for element in memlist2:
+                if type(element[choice2]) is str and element[choice2][0] == "[":
+                    element[choice2] = element[choice2].replace("[", "").replace("]", "").split(", ")
+                    element[choice2] = [int(subelem) for subelem in element[choice2]]
+
+            if type(memlist2[0][choice2]) is str:
+                memlist2 = sorted(memlist2, key=lambda tup: tup[0].lower())
+            elif type(memlist2[0][choice2]) is float or type(memlist2[0][choice2]) is list:
+                memlist2 = sorted(memlist2, reverse = True, key=lambda tup: tup[choice2])
 
         print "\n\n" + "".join(element.ljust(col_width) for element in ltitle) + "\n"
         llength = len(memlist2[0])
@@ -185,14 +287,7 @@ def getvclinks(yourside):
     linklist = list()
     yourside = re.sub(r"[^a-z A-Z 0-9]","", yourside)
     yourside = yourside.replace(" ", "-").lower()
-    browser = mechanize.Browser()
-
-    browser.set_handle_equiv(True)
-    browser.set_handle_redirect(True)
-    browser.set_handle_gzip(True)
-    browser.set_handle_referer(True)
-    browser.set_handle_robots(False)
-    browser.set_handle_refresh(mechanize._http.HTTPRefreshProcessor(), max_time=1)
+    browser = mecbrowser("")
 
     pagenum = 1
     while pagenum <= 100:
@@ -241,14 +336,7 @@ def pmdriver(target, choice):
     Username = raw_input("\n\n\nUsername: ")
     Password = raw_input("Password: ")
 
-    if browserchoice == "1":
-        browser0 = webdriver.Firefox()
-    elif browserchoice == "2":
-        browser0 = webdriver.Chrome("chromedriver")
-    elif browserchoice == "3":
-        browser0 = webdriver.PhantomJS()
-    elif browserchoice == "4":
-        browser0 = webdriver.Ie()
+    browser0 = pickbrowser(browserchoice)
 
     browser0.get("https://www.chess.com/login")
 
@@ -272,19 +360,7 @@ def pmdriver(target, choice):
     if choice2 == "y":
         memtpm = memberprocesser(memtpm)
 
-    browser1 = mechanize.Browser()
-    cookie = cookielib.LWPCookieJar()
-    browser1.set_cookiejar(cookie)
-
-    for tempcookie in logincookie:
-        cookie.set_cookie(cookielib.Cookie(version = 0, name = tempcookie["name"], value = tempcookie["value"], port = '80', port_specified = False, domain = tempcookie["domain"], domain_specified = True, domain_initial_dot = False, path = tempcookie["path"], path_specified = True, secure = tempcookie["secure"], expires = tempcookie["expiry"], discard = False, comment = None, comment_url = None, rest = None, rfc2109 = False))
-
-    browser1.set_handle_equiv(True)
-    browser1.set_handle_redirect(True)
-    browser1.set_handle_gzip(True)
-    browser1.set_handle_referer(True)
-    browser1.set_handle_robots(False)
-    browser1.set_handle_refresh(mechanize._http.HTTPRefreshProcessor(), max_time=1)
+    browser1 = mecbrowser(logincookie)
     print "\n\n"
 
     counter = 1
@@ -292,14 +368,7 @@ def pmdriver(target, choice):
         counter += 1
         if counter > 100:
             browser0.quit()
-            if browserchoice == "1":
-                browser0 = webdriver.Firefox()
-            elif browserchoice == "2":
-                browser0 = webdriver.Chrome()
-            elif browserchoice == "3":
-                browser0 = webdriver.PhantomJS()
-            elif browserchoice == "4":
-                browser0 = webdriver.Ie()
+            browser0 = pickbrowser(browserchoice)
             browser0.get("https://www.chess.com/login")
             WebDriverWait(browser0, 10).until(EC.presence_of_element_located((By.ID, "btnLogin")))
             browser0.find_element_by_name("c1").send_keys(Username)
@@ -400,14 +469,7 @@ def tmparchecker(pagelist, targetname):
     timeoutlist = list()
     winssdic = dict()
     losedic = dict()
-    browser = mechanize.Browser()
-
-    browser.set_handle_equiv(True)
-    browser.set_handle_redirect(True)
-    browser.set_handle_gzip(True)
-    browser.set_handle_referer(True)
-    browser.set_handle_robots(False)
-    browser.set_handle_refresh(mechanize._http.HTTPRefreshProcessor(), max_time=1)
+    browser = mecbrowser("")
     print "\n\n"
 
     for page in pagelist:
@@ -535,20 +597,7 @@ def step42(choice1, set1):
     return targetlist
 
 def spider_checker(target, logincookie):
-    browser = mechanize.Browser()
-    cookie = cookielib.LWPCookieJar()
-    browser.set_cookiejar(cookie)
-
-    if logincookie != "":
-        for tempcookie in logincookie:
-            cookie.set_cookie(cookielib.Cookie(version = 0, name = tempcookie["name"], value = tempcookie["value"], port = '80', port_specified = False, domain = tempcookie["domain"], domain_specified = True, domain_initial_dot = False, path = tempcookie["path"], path_specified = True, secure = tempcookie["secure"], expires = tempcookie["expiry"], discard = False, comment = None, comment_url = None, rest = None, rfc2109 = False))
-
-    browser.set_handle_equiv(True)
-    browser.set_handle_redirect(True)
-    browser.set_handle_gzip(True)
-    browser.set_handle_referer(True)
-    browser.set_handle_robots(False)
-    browser.set_handle_refresh(mechanize._http.HTTPRefreshProcessor(), max_time=1)
+    browser = mecbrowser(logincookie)
 
     usrlist = list()
     for pointer2 in target:
@@ -576,13 +625,7 @@ def spider_checker(target, logincookie):
 def ageproc(target):
     while "" in target:
         target.remove("")
-    browser = mechanize.Browser()
-    browser.set_handle_equiv(True)
-    browser.set_handle_redirect(True)
-    browser.set_handle_gzip(True)
-    browser.set_handle_referer(True)
-    browser.set_handle_robots(False)
-    browser.set_handle_refresh(mechanize._http.HTTPRefreshProcessor(), max_time=1)
+    browser = mecbrowser("")
 
     flist = []
     for targetx in target:
@@ -643,14 +686,7 @@ def inviter(choicelist, invitenum):
     Username = raw_input("\n\n\nUsername: ")
     Password = raw_input("Password: ")
 
-    if browserchoice == "1":
-        browser2 = webdriver.Firefox()
-    elif browserchoice == "2":
-        browser2 = webdriver.Chrome()
-    elif browserchoice == "3":
-        browser2 = webdriver.PhantomJS()
-    elif browserchoice == "4":
-        browser2 = webdriver.Ie()
+    browser2 = pickbrowser(browserchoice)
 
     browser2.get("https://www.chess.com/login")
 
@@ -662,19 +698,7 @@ def inviter(choicelist, invitenum):
     browser2.find_element_by_id("btnLogin").click()
 
     logincookie = browser2.get_cookies()
-    browser1 = mechanize.Browser()
-    cookie = cookielib.LWPCookieJar()
-    browser1.set_cookiejar(cookie)
-
-    for tempcookie in logincookie:
-        cookie.set_cookie(cookielib.Cookie(version = 0, name = tempcookie["name"], value = tempcookie["value"], port = '80', port_specified = False, domain = tempcookie["domain"], domain_specified = True, domain_initial_dot = False, path = tempcookie["path"], path_specified = True, secure = tempcookie["secure"], expires = tempcookie["expiry"], discard = False, comment = None, comment_url = None, rest = None, rfc2109 = False))
-
-    browser1.set_handle_equiv(True)
-    browser1.set_handle_redirect(True)
-    browser1.set_handle_gzip(True)
-    browser1.set_handle_referer(True)
-    browser1.set_handle_robots(False)
-    browser1.set_handle_refresh(mechanize._http.HTTPRefreshProcessor(), max_time=1)
+    browser1 = mecbrowser(logincookie)
 
     invinf = "no"
     if choicelist[0] == "42":
@@ -700,14 +724,7 @@ def inviter(choicelist, invitenum):
             counted = "y"
             if counter > 70:
                 browser2.quit()
-                if browserchoice == "1":
-                    browser2 = webdriver.Firefox()
-                elif browserchoice == "2":
-                    browser2 = webdriver.Chrome()
-                elif browserchoice == "3":
-                    browser2 = webdriver.PhantomJS()
-                elif browserchoice == "4":
-                    browser2 = webdriver.Ie()
+                browser2 = pickbrowser(browserchoice)
                 browser2.get("https://www.chess.com/login")
                 WebDriverWait(browser2, 10).until(EC.presence_of_element_located((By.ID, "btnLogin")))
                 browser2.find_element_by_name("c1").send_keys(Username)
@@ -835,14 +852,7 @@ def inviter(choicelist, invitenum):
                     counter += 1
                 if counter > 70:
                     browser2.quit()
-                    if browserchoice == "1":
-                        browser2 = webdriver.Firefox()
-                    elif browserchoice == "2":
-                        browser2 = webdriver.Chrome()
-                    elif browserchoice == "3":
-                        browser2 = webdriver.PhantomJS()
-                    elif browserchoice == "4":
-                        browser2 = webdriver.Ie()
+                    browser2 = pickbrowser(browserchoice)
                     browser2.get("https://www.chess.com/login")
                     WebDriverWait(browser2, 10).until(EC.presence_of_element_located((By.ID, "btnLogin")))
                     browser2.find_element_by_name("c1").send_keys(Username)
@@ -926,20 +936,19 @@ def login():
 
     if Username == "" or Password == "":
         return ""
-    
-    browser0 = webdriver.Firefox()
-    browser0.get("https://www.chess.com/login")
-    
-    browser0.find_element_by_name("c1").send_keys(Username)
-    
-    browser0.find_element_by_name("loginpassword").send_keys(Password)
 
-    WebDriverWait(browser0, 10).until(EC.presence_of_element_located((By.ID, "btnLogin")))
-    browser0.find_element_by_id("btnLogin").click()
-    
-    logincookie = browser0.get_cookies()
-    browser0.quit()
-    
+    browser = pickbrowser("3")
+    browser.get("https://www.chess.com/login")
+
+    browser.find_element_by_name("c1").send_keys(Username)
+
+    browser.find_element_by_name("loginpassword").send_keys(Password)
+
+    WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.ID, "btnLogin")))
+    browser.find_element_by_id("btnLogin").click()
+
+    logincookie = browser.get_cookies()
+    browser.quit()
     return logincookie
 
 def misc1(sortedlines2):
@@ -968,23 +977,10 @@ def vcman(vclinklist, yourside):
     browser3.find_element_by_id("btnLogin").click()
     time.sleep(2)
 
-    browser1 = mechanize.Browser()
-    cookie = cookielib.LWPCookieJar()
-    browser1.set_cookiejar(cookie)
-
-    browser1.set_handle_equiv(True)
-    browser1.set_handle_redirect(True)
-    browser1.set_handle_gzip(True)
-    browser1.set_handle_referer(True)
-    browser1.set_handle_robots(False)
-    browser1.set_handle_refresh(mechanize._http.HTTPRefreshProcessor(), max_time=1)
-
     logincookie = browser3.get_cookies()
+    browser1 = mecbrowser(logincookie)
+
     parmemvc = Counter()
-
-    for tempcookie in logincookie:
-        cookie.set_cookie(cookielib.Cookie(version = 0, name = tempcookie["name"], value = tempcookie["value"], port = "80", port_specified = False, domain = tempcookie["domain"], domain_specified = True, domain_initial_dot = False, path = tempcookie["path"], path_specified = True, secure = tempcookie["secure"], expires = tempcookie["expiry"], discard = False, comment = None, comment_url = None, rest = None, rfc2109 = False))
-
     for vcmatch in vclinklist:
         movelist = list()
         browser3.get(vcmatch)
@@ -1141,13 +1137,7 @@ def memberprocesser(target):
     while memgender not in (["m", "f", ""]):
         memgender = raw_input("\nMember should be gender (determined by comparing member name to a list of male and female names). leave empty to skip (m/f): ")
 
-    browser = mechanize.Browser()
-    browser.set_handle_equiv(True)
-    browser.set_handle_redirect(True)
-    browser.set_handle_gzip(True)
-    browser.set_handle_referer(True)
-    browser.set_handle_robots(False)
-    browser.set_handle_refresh(mechanize._http.HTTPRefreshProcessor(), max_time=1)
+    browser = mecbrowser("")
 
     target = str(target).replace(" ", "").replace("(", "").replace(")", "").replace("]", "").replace("[", "").replace("'", "").split(",")
     while "" in target:
@@ -1487,13 +1477,7 @@ def step3456(choice1, blocker):
     return targetlist
 
 def notclosedcheck(memlist):
-    browser = mechanize.Browser()
-    browser.set_handle_equiv(True)
-    browser.set_handle_redirect(True)
-    browser.set_handle_gzip(True)
-    browser.set_handle_referer(True)
-    browser.set_handle_robots(False)
-    browser.set_handle_refresh(mechanize._http.HTTPRefreshProcessor(), max_time=1)
+    browser = mecbrowser("")
 
     memlist2 = list()
     for mem in memlist:
@@ -1510,20 +1494,7 @@ def notclosedcheck(memlist):
     return memlist2
 
 def spider_ml(target, logincookie):
-    browser = mechanize.Browser()
-    cookie = cookielib.LWPCookieJar()
-    browser.set_cookiejar(cookie)
-
-    if logincookie != "":
-        for tempcookie in logincookie:
-            cookie.set_cookie(cookielib.Cookie(version = 0, name = tempcookie["name"], value = tempcookie["value"], port = "80", port_specified = False, domain = tempcookie["domain"], domain_specified = True, domain_initial_dot = False, path = tempcookie["path"], path_specified = True, secure = tempcookie["secure"], expires = tempcookie["expiry"], discard = False, comment = None, comment_url = None, rest = None, rfc2109 = False))
-
-    browser.set_handle_equiv(True)
-    browser.set_handle_redirect(True)
-    browser.set_handle_gzip(True)
-    browser.set_handle_referer(True)
-    browser.set_handle_robots(False)
-    browser.set_handle_refresh(mechanize._http.HTTPRefreshProcessor(), max_time=1)
+    browser = mecbrowser(logincookie)
 
     print "\nworking\n"
     usrlist = list()
@@ -1543,11 +1514,11 @@ def spider_ml(target, logincookie):
 
 pathway = "y"
 while pathway in (["y"]):
-    print "chess.com RK Resource 001\nversion 0.8.7\ndeveloped by Robin Karlsson\ncontact email: 'r.robin.karlsson@gmail.com'\ncontact chess.com profile: 'http://www.chess.com/members/view/RobinKarlsson'\n"
-    print "What would you like to do?\n\n 1. Create a list of members from a group.\n 3. Send invites for a group.\n 4. Check a groups finished votechess matches and count number of posts per member\n 5. Check a groups team matches and count the number of times each member has participated.\n 6. Check a list of members for those with a rating above and/or below a specific value, last online & member since a specific date and a timeout ratio below a specific value.\n 7. Presentation of a csv-file from option 5.\n 8. Remove doublets and filter out members who are in specific groups from a preexisting textfile.\n 9. Look for members who has left your team\n 10. Count number of group notes per member\n 11. Collect birthdays for a list of members\n 12. Send personal messages to members"
+    print "chess.com RK Resource 001\nversion 0.8.8 alpha\ndeveloped by Robin Karlsson\ncontact email: 'r.robin.karlsson@gmail.com'\ncontact chess.com profile: 'http://www.chess.com/members/view/RobinKarlsson'\n"
+    print "What would you like to do?\n\n 1. Create a list of members from a group\n 2. Build an excell compatible csv file with data on a list of members\n 3. Send invites for a group\n 4. Check a groups finished votechess matches and count number of posts per member\n 5. Build an excell compatible csv file with data on how members of a group has performed in team matches\n 6. Check a list of members for those with a rating above and/or below a specific value, last online & member since a specific date and a timeout ratio below a specific value\n 7. Presentation of a csv-file from option 2 or 5\n 8. Remove doublets and filter out members who are in specific groups from a preexisting textfile\n 9. Look for members who has left your team\n 10. Count number of group notes per member\n 11. Collect birthdays for a list of members\n 12. Send personal messages to members"
 
     flow = ""
-    while flow not in (["1", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]):
+    while flow not in (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]):
         flow = raw_input("\nEnter your choice here: ")
 
     if flow == "1":
@@ -1584,6 +1555,9 @@ while pathway in (["y"]):
         target = raw_input("\n\nList of members: ").replace(" ", "").split(",")
         while "" in target:
             target.remove("")
+        filename = raw_input("Name of the file to which your data will be saved: ")
+
+        getmeminfo(target, filename)
 
     elif flow == "3":
         choice5 = ""
@@ -1626,7 +1600,7 @@ while pathway in (["y"]):
             joined = {}
             membernamelist = list()
 
-            outputfile = open(targetnameorgf + " " + strftime("%Y-%m-%d", gmtime()) + ".csv", "wb")
+            outputfile = open(targetnameorgf + " " + strftime("%Y-%m-%d", gmtime()) + " tm.csv", "wb")
             csvwriter = csv.writer(outputfile, delimiter = " ", quoting=csv.QUOTE_MINIMAL)
 
             for pointer in set(tmparcount.keys())|set(winssdic.keys())|set(losedic.keys())|set(tmtimeoutcount.keys()):
@@ -1662,13 +1636,8 @@ while pathway in (["y"]):
 
         elif pathtm == "2":
             maxtmrat = int(raw_input("\n\nGet members with a timeout-ratio above: ").replace("%", ""))
-            browser = mechanize.Browser()
-            browser.set_handle_equiv(True)
-            browser.set_handle_redirect(True)
-            browser.set_handle_gzip(True)
-            browser.set_handle_referer(True)
-            browser.set_handle_robots(False)
-            browser.set_handle_refresh(mechanize._http.HTTPRefreshProcessor(), max_time=1)
+            browser = mecbrowser("")
+
             deadbeatlist = list()
             for member in tmpar:
                 print "checking " + member
@@ -1706,20 +1675,34 @@ while pathway in (["y"]):
         memlist = list()
         clist = list()
         flist = list()
-
         counter3 = 1
+
+        choicepath = ""
+        while choicepath not in (["1", "2"]):
+            choicepath = raw_input("\nWhat would you like to process\n 1. csv file over team matches from option 5\n 2. csv file of member stats from option 2\nYour choice, monkeyboy: ")
+
         print "\n\ncsv files in directory"
         filesindic = os.listdir(".")
         for fname in filesindic:
-            if fname.endswith(".csv"):
-                flist.append(fname)
-                print " " + str(counter3) + ". " + fname
-                clist.append(str(counter3))
-                counter3 += 1
+            if choicepath == "1":
+                if fname.endswith(" tm.csv"):
+                    flist.append(fname)
+                    print " " + str(counter3) + ". " + fname
+                    clist.append(str(counter3))
+                    counter3 += 1
+            elif choicepath == "2":
+                if fname.endswith(" mem.csv"):
+                    flist.append(fname)
+                    print " " + str(counter3) + ". " + fname
+                    clist.append(str(counter3))
+                    counter3 += 1
 
-        choice = ""
-        while choice not in (["1", "2"]):
-            choice = raw_input("\noptions:\n 1. Get data from one of the csvfiles\n 2. Compare two csv-files\nYour choice: ")
+        if choicepath == "1":
+            choice = ""
+            while choice not in (["1", "2"]):
+                choice = raw_input("\noptions:\n 1. Get data from one of the csvfiles\n 2. Compare two csv-files\nYour choice: ")
+        elif choicepath == "2":
+            choice = "1"
 
         if choice == "1":
             choice1 = ""
@@ -1728,28 +1711,32 @@ while pathway in (["y"]):
 
             with open(flist[int(choice1) - 1], "rb") as f:
                 csvreader = csv.reader(f, delimiter = " ")
-                choice5 = ""
-                while choice5 not in (["1", "2"]):
-                    choice5 = raw_input("\n\nWhat part of the csv-file do you wish to inspect?\n 1. everyone who has ever plaid for said group\n 2. those who fill your requirements\n\nYour choice, young padawan? ")
+                if choicepath == "1":
+                    choice5 = ""
+                    while choice5 not in (["1", "2"]):
+                        choice5 = raw_input("\n\nWhat part of the csv-file do you wish to inspect?\n 1. everyone who has ever plaid for said group\n 2. those who fill your requirements\n\nYour choice, young padawan? ")
 
-                if choice5 == "1":
-                    for row in csvreader:
-                        if row[0] == "Member name (those who fill your requirements)":
-                            break
-
-                        memlist.append(row)
-
-                elif choice5 == "2":
-                    recorder = ""
-                    for row in csvreader:
-                        if row[0] == "Member name (those who fill your requirements)":
-                            recorder = "yy"
-                            row[0] = "Member name"
-                
-                        if recorder == "yy":
+                    if choice5 == "1":
+                        for row in csvreader:
+                            if row[0] == "Member name (those who fill your requirements)":
+                                break
                             memlist.append(row)
 
-            csvsoworker(memlist)
+                    elif choice5 == "2":
+                        recorder = ""
+                        for row in csvreader:
+                            if row[0] == "Member name (those who fill your requirements)":
+                                recorder = "yy"
+                                row[0] = "Member name"
+
+                            if recorder == "yy":
+                                memlist.append(row)
+
+                elif choicepath == "2":
+                    for row in csvreader:
+                        memlist.append(row)
+
+            csvsoworker(memlist, choicepath)
 
         elif choice == "2":
             ichoice = ""
@@ -1793,10 +1780,11 @@ while pathway in (["y"]):
                 if not fname.endswith(".csv"):
                     if not fname.endswith(".py"):
                         if not fname.endswith(".pyc"):
-                            if not fname.endswith("~"):
-                                print " " + str(counter3) + ". " + fname
-                                flist.append(fname)
-                                counter3 += 1
+                            if not fname.endswith(".log"):
+                                if not fname.endswith("~"):
+                                    print " " + str(counter3) + ". " + fname
+                                    flist.append(fname)
+                                    counter3 += 1
 
         preexlist = ""
         while preexlist not in flist:
@@ -1898,19 +1886,7 @@ while pathway in (["y"]):
         grcheck = "http://www.chess.com/groups/notes/" + grcheck + "?page="
         logincookie = login()
 
-        browser = mechanize.Browser()
-        cookie = cookielib.LWPCookieJar()
-        browser.set_cookiejar(cookie)
-
-        for tempcookie in logincookie:
-            cookie.set_cookie(cookielib.Cookie(version = 0, name = tempcookie["name"], value = tempcookie["value"], port = '80', port_specified = False, domain = tempcookie["domain"], domain_specified = True, domain_initial_dot = False, path = tempcookie["path"], path_specified = True, secure = tempcookie["secure"], expires = tempcookie["expiry"], discard = False, comment = None, comment_url = None, rest = None, rfc2109 = False))
-
-        browser.set_handle_equiv(True)
-        browser.set_handle_redirect(True)
-        browser.set_handle_gzip(True)
-        browser.set_handle_referer(True)
-        browser.set_handle_robots(False)
-        browser.set_handle_refresh(mechanize._http.HTTPRefreshProcessor(), max_time=1)
+        browser = mecbrowser(logincookie)
 
         target = list()
         counter = 1
