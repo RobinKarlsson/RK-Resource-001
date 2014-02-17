@@ -12,6 +12,7 @@ import urlparse
 import cookielib
 from collections import Counter
 from collections import OrderedDict
+import platform as _platform
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
@@ -54,6 +55,9 @@ def pickbrowser(browserchoice):
         if usrplatform[1] == "Windows":
             browser = webdriver.Ie(os.path.abspath("Webdriver/Windows/86/IEDriverServer.exe"))
     return browser
+
+def getplatform():
+    return _platform.platform(), _platform.system(), _platform.release()
 
 def selbrowch():
     browserchoice = ""
