@@ -55,6 +55,12 @@ def pickbrowser(browserchoice):
             browser = webdriver.Ie(os.path.abspath("Webdriver/Windows/86/IEDriverServer.exe"))
     return browser
 
+def selbrowch():
+    browserchoice = ""
+    while browserchoice not in (["1", "2", "3", "4"]):
+        browserchoice = raw_input("Which browser do you want to use\n 1. Firefox\n 2. Chrome\n 3. PhantomJS\n 4. Internet Explorer\nYour choice: ")
+    return browserchoice
+
 def getvclinks(yourside):
     linklist = list()
     yourside = re.sub(r"[^a-z A-Z 0-9]","", yourside)
@@ -77,19 +83,19 @@ def getvclinks(yourside):
     linklist = list(OrderedDict.fromkeys(linklist))
     return linklist
 
+def mecopner(browser, pointl):
+    while True:
+        try:
+            response = browser.open(pointl)
+            break
+        except:
+            print "something went wrong, reopening " + pointl
+    return browser, response
+
 def vcman(vclinklist, yourside):
-    Username = raw_input("Username: ")
-    Password = raw_input("Password: ")
-
-    browser3 = webdriver.Firefox()
-    browser3.get("https://www.chess.com/login")
-
-    browser3.find_element_by_name("c1").send_keys(Username)
-    browser3.find_element_by_name("loginpassword").send_keys(Password)
-
-    WebDriverWait(browser3, 10).until(EC.presence_of_element_located((By.ID, "btnLogin")))
-    browser3.find_element_by_id("btnLogin").click()
-    time.sleep(2)
+    browserchoice = selbrowch()
+    browser3 = pickbrowser(browserchoice)
+    browser3 = sellogin(raw_input("Username: "), raw_input("Password: "), browser3)
 
     logincookie = browser3.get_cookies()
     browser1 = mecbrowser(logincookie)
@@ -102,12 +108,7 @@ def vcman(vclinklist, yourside):
         browser3.find_element_by_id("c33").click()
         time.sleep(2)
 
-        while 0 == 0:
-            try:
-                response = browser1.open(vcmatch)
-                break
-            except:
-                print "something went wrong, reopening " + vcmatch
+        browser1, response = mecopner(browser1, vcmatch)
         soup = BeautifulSoup(response)
 
         if '      initialSetup: "",' not in str(soup):
@@ -153,14 +154,13 @@ def vcman(vclinklist, yourside):
                     if vcmatch + "&mv=" in currentvcmovlink:
                         movelist.append(currentvcmovlink)
                 movelist = movelist[1::2]
-    
+
         for pointer in movelist:
             print "\nchecking " + pointer
+            browser1, response = mecopner(browser1, pointer)
 
-            response = browser1.open(pointer)
             links1 = []
             text1 = []
-
             for link in browser1.links(url_regex="chess.com/members/view/"):
                 ltext = link.text
                 if ltext != "View Profile":
@@ -178,8 +178,7 @@ def vcman(vclinklist, yourside):
             if "next-on" in p2:
                 browser3.get(pointer)
                 nextbtn = 2
-                while 0 == 0:
-
+                while True:
                     try:
                         browser3.find_element_by_css_selector('li.next-on>a').click()
                     except:
