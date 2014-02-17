@@ -34,18 +34,13 @@ def getmeminfo(target, filename):
     browser = mecbrowser("")
 
     memlist = list()
-    outputfile = open(filename + " " + strftime("%Y-%m-%d", gmtime()) + " mem.csv", "wb")
+    outputfile = open(filename + " " + strftime("%Y-%m-%d", gmtime()) + ".mem.csv", "wb")
     csvwriter = csv.writer(outputfile, delimiter = " ", quoting=csv.QUOTE_MINIMAL)
-    csvwriter.writerow(("Username", "Real name", "Online rating", "Timeout-ratio", "Last online", "Member since", "Time/move", "Groups", "Nation", "Custom avatar"))
+    csvwriter.writerow(("Username", "Real name", "Online rating", "Timeout-ratio", "Last online", "Member since", "Time/move", "Groups", "Points", "Total games", "Games won", "Games lost", "Games drawn", "Win ratio", "Nation", "Custom avatar"))
 
     for mem in target:
         print "Processing " + mem
-        while 0 == 0:
-            try:
-                response = browser.open("http://www.chess.com/members/view/" + mem)
-                break
-            except:
-                print "something went wrong, reopening " + mem
+        browser, response = mecopner(browser, "http://www.chess.com/members/view/" + mem)
         if "://www.chess.com/members/view/" not in browser.geturl():
             continue
 
@@ -53,8 +48,9 @@ def getmeminfo(target, filename):
 
         timemove = TimeMoveChecker(soup)
         memsinlastonl = memsin(soup)
+        gamestat = gamestats(soup)
 
-        csvwriter.writerow((mem, namechecker(soup), onlratingchecker(soup), timeoutchecker(soup), memsinlastonl[1], memsinlastonl[0], timemove, groupmemlister(soup), nationlister(soup), AvatarCheck(soup)))
+        csvwriter.writerow((mem, namechecker(soup), onlratingchecker(soup), timeoutchecker(soup), memsinlastonl[1], memsinlastonl[0], timemove, groupmemlister(soup), ptscheck(soup), gamestat[0], gamestat[1], gamestat[2], gamestat[3], gamestat[1] / gamestat[0], nationlister(soup), AvatarCheck(soup)))
 
 def getplatform():
     return _platform.platform(), _platform.system(), _platform.release()
@@ -126,12 +122,6 @@ def com3(xxxxxxxxxxxxxx, xxxxxxxxxxxxx, xxxxxxxxxxxxxxxx, xxxxxxxxxxxxxxxxxxx):
         xxxxxxxxxxxxxxxxxxx.append(chr(abs(ord(xxxxxxxxxxxxx[xxxxxxxxxxxxxxxxx]) - ord(xxxxxxxxxxxxxx[xxxxxxxxxxxxxxxxx % len(xxxxxxxxxxxxxx)]) % xxxxxxxxxxxxxxxx)))
     return "".join(xxxxxxxxxxxxxxxxxxx)
 
-if os.stat("mem/dommem").st_size > 0:
-    for placeholder in open("mem/dommem", "rb"):
-        dommem = com3("keydom", placeholder, 256, []).replace("\n", "").split(", ")
-else:
-    dommem = list()
-
 tmban = set(['bijayees1234', 'freaky25', 'Quack-Peep', 'ADOKA', 'redneck7-1-1990', 'falkon26', 'dryan43', 'mcwelch101', 'TasmanianTiger', 'lennyjane18', 'jeremybloom', '143abhi', 'Sawblade24'])
 domban = set(['okinawaoly', 'rubenhasratyan', 'kohai', 'swarmflow', 'Backer1', 'mitchthebuyer', 'Gelnon', 'Phaethonas', 'CaptainPike', 'Stormbringer', 'Steve212000', 'doctorstorm', 'dogs10099', 'chessmaster010l'])
 
@@ -139,12 +129,7 @@ def gettmlinks(targetname):
     linklist = list()
     browser = mecbrowser("")
 
-    while 0 == 0:
-        try:
-            response = browser.open("http://www.chess.com/groups/matches/" + targetname + "?show_all_current=1")
-            break
-        except:
-            print "something went wrong, reopening " + "http://www.chess.com/groups/matches/" + targetname + "?show_all_current=1"
+    browser, response = mecopner(browser, "http://www.chess.com/groups/matches/" + targetname + "?show_all_current=1")
     soup = BeautifulSoup(response)
     souplinks = re.findall("/groups/team_match(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", str(soup.find_all("a")))
     for link in souplinks:
@@ -156,13 +141,8 @@ def gettmlinks(targetname):
 
     linkarchive = linklist.pop(-1)
     pointer = 1
-    while 0 == 0:
-        while 0 == 0:
-            try:
-                response = browser.open(str(linkarchive) + "&page=" + str(pointer))
-                break
-            except:
-                print "something went wrong, reopening " + str(linkarchive) + "&page=" + str(pointer)
+    while True:
+        browser, response = mecopner(browser, str(linkarchive) + "&page=" + str(pointer))
         soup = BeautifulSoup(response)
 
         soupbrake = str(soup.find_all(class_ = "next-on"))
@@ -291,7 +271,7 @@ def getvclinks(yourside):
 
     pagenum = 1
     while pagenum <= 100:
-        response = browser.open("http://www.chess.com/groups/votechess_diagrams/" + yourside + "/?sortby=completed&page=" + str(pagenum))
+        browser, response = mecopner(browser, "http://www.chess.com/groups/votechess_diagrams/" + yourside + "/?sortby=completed&page=" + str(pagenum))
         soup = BeautifulSoup(response)
         souplinks = re.findall("/votechess/game(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", str(soup.find_all("a")))
         for link in souplinks:
@@ -329,23 +309,13 @@ def pmdriver(target, choice):
 
     nnation = raw_input("If member nation is International, use this instead: ")
 
-    browserchoice = ""
-    while browserchoice not in (["1", "2", "3", "4"]):
-        browserchoice = raw_input("Which browser do you want to use\n 1. Firefox\n 2. Chrome\n 3. PhantomJS\n 4. Internet Explorer\nYour choice: ")
+    browserchoice = selbrowch()
 
     Username = raw_input("\n\n\nUsername: ")
     Password = raw_input("Password: ")
 
     browser0 = pickbrowser(browserchoice)
-
-    browser0.get("https://www.chess.com/login")
-
-    browser0.find_element_by_name("c1").send_keys(Username)
-
-    browser0.find_element_by_name("loginpassword").send_keys(Password)
-
-    WebDriverWait(browser0, 10).until(EC.presence_of_element_located((By.ID, "btnLogin")))
-    browser0.find_element_by_id("btnLogin").click()
+    browser0 = sellogin(Username, Password, browser0)
 
     logincookie = browser0.get_cookies()
 
@@ -358,31 +328,26 @@ def pmdriver(target, choice):
     while choice2 not in (["y", "n"]):
         choice2 = raw_input("\n\n\nSort out those who dont fill a few requirements? (y/n) ")
     if choice2 == "y":
-        memtpm = memberprocesser(memtpm)
+        minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender = memprmenu()
 
     browser1 = mecbrowser(logincookie)
     print "\n\n"
 
     counter = 1
     for membername2 in memtpm:
+        if choice2 == "y":
+            if membername2 not in memberprocesser(True, browser1, membername2, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender):
+                continue
+
         counter += 1
         if counter > 100:
             browser0.quit()
             browser0 = pickbrowser(browserchoice)
-            browser0.get("https://www.chess.com/login")
-            WebDriverWait(browser0, 10).until(EC.presence_of_element_located((By.ID, "btnLogin")))
-            browser0.find_element_by_name("c1").send_keys(Username)
-            browser0.find_element_by_name("loginpassword").send_keys(Password)
-            browser0.find_element_by_id("btnLogin").click()
+            browser0 = sellogin(Username, Password, browser0)
             counter = 1
         print "sending pm to " + membername2
         membername = "http://www.chess.com/members/view/" + membername2
-        while 0 == 0:
-            try:
-                response = browser1.open(membername)
-                break
-            except:
-                print "something went wrong, reopening " + membername
+        browser1, response = mecopner(browser1, membername)
         soup = BeautifulSoup(response)
 
         for placeholder in soup.find_all(class_ = "flag"):
@@ -390,10 +355,7 @@ def pmdriver(target, choice):
         if country == "International":
             country = nnation
 
-        for placeholder in soup.find_all("strong"):
-            if "Click here" not in str(placeholder) and "ChessTV" not in str(placeholder):
-                name = placeholder.text
-                break
+        name = namechecker(soup)
         if name == " ":
             name = membername2
 
@@ -413,32 +375,14 @@ def pmdriver(target, choice):
         browser0.switch_to_frame("tinymcewindow_ifr")
         browser0.find_element_by_id("tinymce").clear()
         browser0.switch_to_default_content()
-
-        for content in msglist:
-            if content[0] == "1":
-                browser0.switch_to_frame("tinymcewindow_ifr")
-                browser0.find_element_by_id("tinymce").send_keys(pmreplacer(content[1], name.strip(), country.strip()))
-                browser0.switch_to_default_content()
-            elif content[0] == "2":
-                browser0.find_element_by_id("tinymcewindow_imageuploader").click()
-                time.sleep(1)
-                browser0.switch_to_window(browser0.window_handles[1])
-                WebDriverWait(browser0, 10).until(EC.presence_of_element_located((By.ID, "photourl")))
-                browser0.find_element_by_id("photourl").send_keys(content[1])
-                browser0.find_element_by_id("insert").click()
-                browser0.switch_to_window(browser0.window_handles[0])
-                time.sleep(1)
+        filtmcemsg(msglist, browser0, name, country)
 
         browser0.find_element_by_id("c16").click()
         time.sleep(4)
 
 def nineworker(infile, inid, logincookie, memlist, key):
     target = list()
-    if os.stat("mem/" + infile).st_size > 0:
-        for placeholder in open("mem/" + infile, "rb"):
-            memlistorg = list(set(com3(key, placeholder, 256, []).replace("\n", "").split(", ")))
-    else:
-        memlistorg = list()
+    memlistorg = memfiop("mem/" + infile, key)
 
     counter = 1
     while counter <= 100:
@@ -478,12 +422,7 @@ def tmparchecker(pagelist, targetname):
         print "processing: " + page
         alltmresults = list()
         counter2 = 0
-        while 0 == 0:
-            try:
-                response = browser.open(page)
-                break
-            except:
-                print "something went wrong, reopening " + page
+        browser, response = mecopner(browser, page)
         soup = BeautifulSoup(response)
 
         if tmyear != "":
@@ -596,17 +535,22 @@ def step42(choice1, set1):
             choice1 = raw_input("\nDo you wish to check any additional pages? (y/n): ")
     return targetlist
 
+def mecopner(browser, pointl):
+    while True:
+        try:
+            response = browser.open(pointl)
+            break
+        except:
+            print "something went wrong, reopening " + pointl
+    return browser, response
+
 def spider_checker(target, logincookie):
     browser = mecbrowser(logincookie)
 
     usrlist = list()
     for pointer2 in target:
-        while 0 == 0:
-            try:
-                response = browser.open(pointer2)
-                break
-            except:
-                print "something went wrong, reopening " + pointer2
+        browser, response = mecopner(browser, pointer2)
+
         if "http://www.chess.com/groups/view/" in browser.geturl():
             break
 
@@ -631,12 +575,7 @@ def ageproc(target):
     for targetx in target:
         print "checking: " + targetx
         tlst = [targetx]
-        while 0 == 0:
-            try:
-                response = browser.open("http://www.chess.com/members/view/" + targetx)
-                break
-            except:
-                print "something went wrong, reopening " + targetx
+        browser, response = mecopner(browser, "http://www.chess.com/members/view/" + targetx)
 
         if "://www.chess.com/members/view/" not in browser.geturl():
             continue
@@ -651,6 +590,12 @@ def ageproc(target):
         birthdate = map(int, birthdate)
         flist.append(birthdate + tlst)
     return flist
+
+def selbrowch():
+    browserchoice = ""
+    while browserchoice not in (["1", "2", "3", "4"]):
+        browserchoice = raw_input("Which browser do you want to use\n 1. Firefox\n 2. Chrome\n 3. PhantomJS\n 4. Internet Explorer\nYour choice: ")
+    return browserchoice
 
 def inviter(choicelist, invitenum):
     country = ""
@@ -679,23 +624,13 @@ def inviter(choicelist, invitenum):
                 choice = raw_input("add another snippet? (y/n) ")
         countryalt = raw_input("If member nation is International, use this instead: ")
 
-    browserchoice = ""
-    while browserchoice not in (["1", "2", "3", "4"]):
-        browserchoice = raw_input("Which browser do you want to use\n 1. Firefox\n 2. Chrome\n 3. PhantomJS\n 4. Internet Explorer\nYour choice: ")
+    browserchoice = selbrowch()
 
     Username = raw_input("\n\n\nUsername: ")
     Password = raw_input("Password: ")
 
     browser2 = pickbrowser(browserchoice)
-
-    browser2.get("https://www.chess.com/login")
-
-    WebDriverWait(browser2, 10).until(EC.presence_of_element_located((By.ID, "btnLogin")))
-    browser2.find_element_by_name("c1").send_keys(Username)
-
-    browser2.find_element_by_name("loginpassword").send_keys(Password)
-
-    browser2.find_element_by_id("btnLogin").click()
+    browser2 = sellogin(Username, Password, browser2)
 
     logincookie = browser2.get_cookies()
     browser1 = mecbrowser(logincookie)
@@ -716,6 +651,12 @@ def inviter(choicelist, invitenum):
             choicelist.append(tempval)
             block = raw_input("Add another group? (y/n) ")
 
+    choice2 = ""
+    while choice2 not in (["y", "n"]):
+        choice2 = raw_input("\n\nOnly invite those who fill a few requirements? (y/n) ")
+    if choice2 == "y":
+        minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender = memprmenu()
+
     redo = "yes"
     counter = 1
     while redo == "yes":
@@ -725,11 +666,7 @@ def inviter(choicelist, invitenum):
             if counter > 70:
                 browser2.quit()
                 browser2 = pickbrowser(browserchoice)
-                browser2.get("https://www.chess.com/login")
-                WebDriverWait(browser2, 10).until(EC.presence_of_element_located((By.ID, "btnLogin")))
-                browser2.find_element_by_name("c1").send_keys(Username)
-                browser2.find_element_by_name("loginpassword").send_keys(Password)
-                browser2.find_element_by_id("btnLogin").click()
+                browser2 = sellogin(Username, Password, browser2)
                 counter = 1
 
             invitenum2 = invitenum
@@ -773,7 +710,7 @@ def inviter(choicelist, invitenum):
                 infile = "Invite Lists/Death Star III"
                 alrfile = "Invite Lists/Death Star III already invited"
                 groupinv = "http://www.chess.com/groups/invite_members?id=17618"
-                msglist = (("1", "Hello /name. Welcome to the Death Star, a Dynamically Dangerous Spacestation and Superweapon capable of Destroying an Entire Planet with its Powerful Superlaser../newline/newline"), ("2", "http://loyalkng.com/wp-content/uploads/2009/05/deathstarfiring2.jpg"), ("1", "/newlineThe Death Star has a crew of 265,675, as well as 52,276 gunners, 607,360 troops, 30,984 stormtroopers, and 180,216 pilots Its hangars contain assault shuttles, blastboats, Strike cruisers, land vehicles, support ships, and 7,293 TIE Fighters. It is protected by 10,000 turbolaser batteries, 2,600 Ion Cannons, and 768 Tractor Beam projectors./newline/newlineWelcome To Our Leader, Darth Vader :) Join us and together we will rule this galaxy!!!!/newline/newline"), ("3", "http://www.youtube.com/watch?v=pJ27mQgWpis"))
+                msglist = (("1", "Hello /name. Welcome to the Death Star, a Dynamically Dangerous Spacestation and Superweapon capable of Destroying an Entire Planet with its Powerful Superlaser../newline/newline"), ("2", "http://loyalkng.com/wp-content/uploads/2009/05/deathstarfiring2.jpg"), ("1", "/newlineThe Death Star has a crew of 265,675, as well as 52,276 gunners, 607,360 troops, 30,984 stormtroopers, and 180,216 pilots Its hangars contain assault shuttles, blastboats, Strike cruisers, land vehicles, support ships, and 7,293 TIE Fighters. It is protected by 10,000 turbolaser batteries, 2,600 Ion Cannons, and 768 Tractor Beam projectors./newline/newlineWelcome To Our Leader, Darth Vader :) Join us and together we will rule this galaxy!!!!/newline/newline"), ("3", "http://www.youtube.com/watch?v=4ImO0ST1WkM"))
 
             elif choice5 == "6":
                 invgroup = "to Jungle Team"
@@ -846,6 +783,9 @@ def inviter(choicelist, invitenum):
                     already_picked.append(picked)
 
             for member in already_picked:
+                if choice2 == "y":
+                    if membername2 not in memberprocesser(True, browser1, member, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender):
+                        continue
                 if counted == "y":
                     counted = ""
                 else:
@@ -853,19 +793,10 @@ def inviter(choicelist, invitenum):
                 if counter > 70:
                     browser2.quit()
                     browser2 = pickbrowser(browserchoice)
-                    browser2.get("https://www.chess.com/login")
-                    WebDriverWait(browser2, 10).until(EC.presence_of_element_located((By.ID, "btnLogin")))
-                    browser2.find_element_by_name("c1").send_keys(Username)
-                    browser2.find_element_by_name("loginpassword").send_keys(Password)
-                    browser2.find_element_by_id("btnLogin").click()
+                    browser2 = sellogin(Username, Password, browser2)
                     counter = 1
 
-                while 0 == 0:
-                    try:
-                        response = browser1.open("http://www.chess.com/members/view/" + member)
-                        break
-                    except:
-                        print "something went wrong, reopening " + member
+                browser1, response = mecopner(browser1, "http://www.chess.com/members/view/" + member)
                 soup = BeautifulSoup(response)
 
                 for placeholder in soup.find_all(class_ = "flag"):
@@ -895,26 +826,7 @@ def inviter(choicelist, invitenum):
                 browser2.find_element_by_id("tinymce").clear()
                 browser2.switch_to_default_content()
 
-                for content in msglist:
-                    if content[0] == "1":
-                        browser2.switch_to_frame("tinymcewindow_ifr")
-                        browser2.find_element_by_id("tinymce").send_keys(pmreplacer(content[1], name.strip(), country.strip()))
-                        browser2.switch_to_default_content()
-                    elif content[0] == "2":
-                        browser2.find_element_by_id("tinymcewindow_imageuploader").click()
-                        time.sleep(1)
-                        browser2.switch_to_window(browser2.window_handles[1])
-                        WebDriverWait(browser2, 10).until(EC.presence_of_element_located((By.ID, "photourl")))
-                        browser2.find_element_by_id("photourl").send_keys(content[1])
-                        browser2.find_element_by_id("insert").click()
-                        browser2.switch_to_window(browser2.window_handles[0])
-                        time.sleep(1)
-                    elif content[0] == "3":
-                        browser2.find_element_by_id("tinymcewindow_mce_media").click()
-                        alert = browser2.switch_to_alert()
-                        alert.send_keys(content[1])
-                        alert.accept()
-                        time.sleep(1)
+                filtmcemsg(msglist, browser2, name, country)
                 browser2.find_element_by_id("c18").click()
 
             updinvlist = set(memtinv).difference(set(memint))
@@ -930,6 +842,28 @@ def inviter(choicelist, invitenum):
             browser2.quit()
             redo = "no"
 
+def filtmcemsg(msglist, browser, name, country):
+    for content in msglist:
+        if content[0] == "1":
+            browser.switch_to_frame("tinymcewindow_ifr")
+            browser.find_element_by_id("tinymce").send_keys(pmreplacer(content[1], name.strip(), country.strip()))
+            browser.switch_to_default_content()
+        elif content[0] == "2":
+            browser.find_element_by_id("tinymcewindow_imageuploader").click()
+            time.sleep(1)
+            browser.switch_to_window(browser.window_handles[1])
+            WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.ID, "photourl")))
+            browser.find_element_by_id("photourl").send_keys(content[1])
+            browser.find_element_by_id("insert").click()
+            browser.switch_to_window(browser.window_handles[0])
+            time.sleep(1)
+        elif content[0] == "3":
+            browser.find_element_by_id("tinymcewindow_mce_media").click()
+            alert = browser.switch_to_alert()
+            alert.send_keys(content[1])
+            alert.accept()
+            time.sleep(1)
+
 def login():
     Username = raw_input("Username: ")
     Password = raw_input("Password: ")
@@ -937,19 +871,9 @@ def login():
     if Username == "" or Password == "":
         return ""
 
-    browserchoice = ""
-    while browserchoice not in (["1", "2", "3", "4"]):
-        browserchoice = raw_input("\n\nWhich browser do you want to use\n 1. Firefox\n 2. Chrome\n 3. PhantomJS\n 4. Internet Explorer\nYour choice: ")
-
+    browserchoice = selbrowch()
     browser = pickbrowser(browserchoice)
-    browser.get("https://www.chess.com/login")
-
-    browser.find_element_by_name("c1").send_keys(Username)
-
-    browser.find_element_by_name("loginpassword").send_keys(Password)
-
-    WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.ID, "btnLogin")))
-    browser.find_element_by_id("btnLogin").click()
+    browser = sellogin(Username, Password, browser)
 
     logincookie = browser.get_cookies()
     browser.quit()
@@ -967,19 +891,85 @@ def remove_doublets(filename, target):
     sortedlines = sortedlines.split()
     return sortedlines
 
+def memprmenu():
+    minrat = raw_input("\n\nMin (online chess) rating allowed. leave empty to skip: ")
+    maxrat = raw_input("Max (online chess) rating allowed. leave empty to skip: ")
+    mingames = raw_input("\nMin number of games played (online chess). leave empty to skip : ")
+    minwinrat = raw_input("Min win-ratio (online chess). leave empty to skip : ")
+
+    lastloginyear = raw_input("\nLast logged in year. leave empty to skip (YYYY): ")
+    if lastloginyear != "":
+        lastloginyear = int(lastloginyear)
+        lastloginmonth = int(raw_input("Last logged in month (MM): "))
+        lastloginday = int(raw_input("Last logged in day (DD): "))
+    else:
+        lastloginmonth = ""
+        lastloginday = ""
+
+    membersinceyear = raw_input("\nMember since before year. leave empty to skip (YYYY): ")
+    if membersinceyear!= "":
+        membersinceyear = int(membersinceyear)
+        membersincemonth = int(raw_input("Member since before month (MM): "))
+        membersinceday = int(raw_input("Member since before day (DD): "))
+    else:
+        membersincemonth = ""
+        membersinceday = ""
+
+    youngeryear = raw_input("\nBorn after year. leave empty to skip (YYYY): ")
+    if youngeryear!= "":
+        youngeryear = int(youngeryear)
+        youngermonth = int(raw_input("Born after month (MM): "))
+        youngerday = int(raw_input("Born after day (DD): "))
+    else:
+        youngermonth = ""
+        youngerday = ""
+
+    olderyear = raw_input("\nBorn before year. leave empty to skip (YYYY): ")
+    if olderyear!= "":
+        olderyear = int(olderyear)
+        oldermonth = int(raw_input("Born before month (MM): "))
+        olderday = int(raw_input("Born before day (DD): "))
+    else:
+        oldermonth = ""
+        olderday = ""
+
+    timemax = raw_input("\nMax timeoutratio allowed. leave empty to skip: ")
+    maxgroup = raw_input("\nMax number of groups member may be in. leave empty to skip: ")
+    mingroup = raw_input("Min number of groups member may be in. leave empty to skip: ")
+
+    timovchoicemin = raw_input("\nTime/move higher than (format: days - hours - minutes, leave empty to skip) ")
+    timovchoicemax = raw_input("Time/move lower than (format: days - hours - minutes, leave empty to skip) ")
+    if timovchoicemax != "":
+        timovchoicemax = [int(elem) for elem in timovchoicemax.split("-")]
+    if timovchoicemin != "":
+        timovchoicemin = [int(elem) for elem in timovchoicemin.split("-")]
+
+    avatarch = ""
+    while avatarch not in (["y", "n"]):
+        avatarch = raw_input("\nSort out those who don't have a custom avatar? (y/n) ")
+
+    heritage = raw_input("\nMember should be from. leave empty to skip: ")
+
+    memgender = "a"
+    while memgender not in (["m", "f", ""]):
+        memgender = raw_input("\nMember should be gender (determined by comparing member name to a list of male and female names). leave empty to skip (m/f): ")
+    return minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender
+
+def sellogin(Username, Password, browser):
+    browser.get("https://www.chess.com/login")
+    WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.ID, "btnLogin")))
+
+    browser.find_element_by_name("c1").send_keys(Username)
+    browser.find_element_by_name("loginpassword").send_keys(Password)
+
+    browser.find_element_by_id("btnLogin").click()
+    time.sleep(1)
+    return browser
+
 def vcman(vclinklist, yourside):
-    Username = raw_input("Username: ")
-    Password = raw_input("Password: ")
-
-    browser3 = webdriver.Firefox()
-    browser3.get("https://www.chess.com/login")
-
-    browser3.find_element_by_name("c1").send_keys(Username)
-    browser3.find_element_by_name("loginpassword").send_keys(Password)
-
-    WebDriverWait(browser3, 10).until(EC.presence_of_element_located((By.ID, "btnLogin")))
-    browser3.find_element_by_id("btnLogin").click()
-    time.sleep(2)
+    browserchoice = selbrowch()
+    browser3 = pickbrowser(browserchoice)
+    browser3 = sellogin(raw_input("Username: "), raw_input("Password: "), browser3)
 
     logincookie = browser3.get_cookies()
     browser1 = mecbrowser(logincookie)
@@ -992,12 +982,7 @@ def vcman(vclinklist, yourside):
         browser3.find_element_by_id("c33").click()
         time.sleep(2)
 
-        while 0 == 0:
-            try:
-                response = browser1.open(vcmatch)
-                break
-            except:
-                print "something went wrong, reopening " + vcmatch
+        browser1, response = mecopner(browser1, vcmatch)
         soup = BeautifulSoup(response)
 
         if '      initialSetup: "",' not in str(soup):
@@ -1043,14 +1028,13 @@ def vcman(vclinklist, yourside):
                     if vcmatch + "&mv=" in currentvcmovlink:
                         movelist.append(currentvcmovlink)
                 movelist = movelist[1::2]
-    
+
         for pointer in movelist:
             print "\nchecking " + pointer
+            browser1, response = mecopner(browser1, pointer)
 
-            response = browser1.open(pointer)
             links1 = []
             text1 = []
-
             for link in browser1.links(url_regex="chess.com/members/view/"):
                 ltext = link.text
                 if ltext != "View Profile":
@@ -1068,8 +1052,7 @@ def vcman(vclinklist, yourside):
             if "next-on" in p2:
                 browser3.get(pointer)
                 nextbtn = 2
-                while 0 == 0:
-
+                while True:
                     try:
                         browser3.find_element_by_css_selector('li.next-on>a').click()
                     except:
@@ -1092,69 +1075,22 @@ def vcman(vclinklist, yourside):
     browser3.quit()
     return parmemvc
 
-def memberprocesser(target):
-    minrat = raw_input("\n\nMin (online chess) rating allowed. leave empty to skip: ")
-    maxrat = raw_input("Max (online chess) rating allowed. leave empty to skip: ")
+def memfiop(fipath, kem):
+    if os.stat(fipath).st_size > 0:
+        for placeholder in open(fipath, "rb"):
+            mem = com3(kem, placeholder, 256, []).replace("\n", "").split(", ")
+        return mem
+    return list()
 
-    lastloginyear = raw_input("\nLast logged in year. leave empty to skip (YYYY): ")
-    if lastloginyear != "":
-        lastloginyear = int(lastloginyear)
-        lastloginmonth = int(raw_input("Last logged in month (MM): "))
-        lastloginday = int(raw_input("Last logged in day (DD): "))
-
-    membersinceyear = raw_input("\nMember since before year. leave empty to skip (YYYY): ")
-    if membersinceyear!= "":
-        membersinceyear = int(membersinceyear)
-        membersincemonth = int(raw_input("Member since before month (MM): "))
-        membersinceday = int(raw_input("Member since before day (DD): "))
-
-    youngeryear = raw_input("\nBorn after year. leave empty to skip (YYYY): ")
-    if youngeryear!= "":
-        youngeryear = int(youngeryear)
-        youngermonth = int(raw_input("Born after month (MM): "))
-        youngerday = int(raw_input("Born after day (DD): "))
-
-    olderyear = raw_input("\nBorn before year. leave empty to skip (YYYY): ")
-    if olderyear!= "":
-        olderyear = int(olderyear)
-        oldermonth = int(raw_input("Born before month (MM): "))
-        olderday = int(raw_input("Born before day (DD): "))
-
-    timemax = raw_input("\nMax timeoutratio allowed. leave empty to skip: ")
-    maxgroup = raw_input("\nMax number of groups member may be in. leave empty to skip: ")
-    mingroup = raw_input("Min number of groups member may be in. leave empty to skip: ")
-
-    timovchoicemin = raw_input("\nTime/move higher than (format: days - hours - minutes, leave empty to skip) ")
-    timovchoicemax = raw_input("Time/move lower than (format: days - hours - minutes, leave empty to skip) ")
-    if timovchoicemax != "":
-        timovchoicemax = [int(elem) for elem in timovchoicemax.split("-")]
-    if timovchoicemin != "":
-        timovchoicemin = [int(elem) for elem in timovchoicemin.split("-")]
-
-    avatarch = ""
-    while avatarch not in (["y", "n"]):
-        avatarch = raw_input("\nSort out those who don't have a custom avatar? (y/n) ")
-
-    heritage = raw_input("\nMember should be from. leave empty to skip: ")
-
-    memgender = "a"
-    while memgender not in (["m", "f", ""]):
-        memgender = raw_input("\nMember should be gender (determined by comparing member name to a list of male and female names). leave empty to skip (m/f): ")
-
-    browser = mecbrowser("")
-
+def memberprocesser(silent, browser, target, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender):
     target = str(target).replace(" ", "").replace("(", "").replace(")", "").replace("]", "").replace("[", "").replace("'", "").split(",")
     while "" in target:
         target.remove("")
     passmem = list()
     for targetx in target:
-        print "checking " + targetx
-        while 0 == 0:
-            try:
-                response = browser.open("http://www.chess.com/members/view/" + targetx)
-                break
-            except:
-                print "something went wrong, reopening " + targetx
+        if silent == False:
+            print "checking " + targetx
+        browser, response = mecopner(browser, "http://www.chess.com/members/view/" + targetx)
         if "://www.chess.com/members/view/" not in browser.geturl():
             continue
         soup = BeautifulSoup(response)
@@ -1190,6 +1126,16 @@ def memberprocesser(target):
                 if timemove[1] < timovchoicemin[1] and timemove[0] <= timovchoicemin[0]:
                     continue
                 if timemove[2] < timovchoicemin[2] and timemove[1] <= timovchoicemin[1] and timemove[0] <= timovchoicemin[0]:
+                    continue
+
+        if mingames != "" or minwinrat != "":
+            gamestat = gamestats(soup)
+
+            if mingames != "":
+                if gamestat[0] < int(mingames):
+                    continue
+            if minwinrat != "":
+                if gamestat[1] / gamestat[0]  < float(minwinrat):
                     continue
 
         if membersinceyear != "":
@@ -1273,12 +1219,28 @@ def namechecker(soup):
     for placeholder in soup.find_all("strong"):
         strplaceholder = str(placeholder)
         if "Click here" not in strplaceholder and "ChessTV" not in strplaceholder:
+            print placeholder.text
             return str(placeholder.text)
 
 def AvatarCheck(soup):
     if "noavatar" in str(soup.find_all(class_ = "avatar-container bottom-8")):
         return False
     return True
+
+def gamestats(soup):
+    for stats in soup.find_all(class_ = "even footer"):
+        stats = str(stats.text).replace("Total Games:", "").strip()
+        if "\n" not in stats:
+            stats = stats.replace("(", "").replace(")", "").replace("/", "").replace("W", "").replace("L", "").replace("D", "").split(" ")
+            while "" in stats:
+                stats.remove("")
+            return [float(elem) for elem in stats]
+
+def ptscheck(soup):
+    for pts in soup.find_all(class_ = "last"):
+        pts = str(pts.text)
+        if "Points" in pts:
+            return int(pts.replace("Points:", "").strip())
 
 def timeoutchecker(soup):
     for placeholder in soup.find_all(class_ = "even"):
@@ -1370,94 +1332,49 @@ def memremoverf(un1):
             un1 = un1.difference(dommem)
 
         elif pointer == "2":
-            if os.stat("mem/breenmem").st_size > 0:
-                for placeholder in open("mem/breenmem", "rb"):
-                    breenmem = com3("keybreen", placeholder, 256, []).replace("\n", "").split(", ")
-                un1 = un1.difference(breenmem)
+            un1 = un1.difference(memfiop("mem/breenmem", "keybreen"))
 
         elif pointer == "3":
-            if os.stat("mem/carmem").st_size > 0:
-                for placeholder in open("mem/carmem", "rb"):
-                    cardassiamem = com3("keycarda", placeholder, 256, []).replace("\n", "").split(", ")
-                un1 = un1.difference(cardassiamem)
+            un1 = un1.difference(memfiop("mem/carmem", "keycarda"))
 
         elif pointer == "4":
-            if os.stat("mem/deathmem").st_size > 0:
-                for placeholder in open("mem/deathmem", "rb"):
-                    deathmem = com3("keydeath", placeholder, 256, []).replace("\n", "").split(", ")
-                un1 = un1.difference(deathmem)
+            un1 = un1.difference(memfiop("mem/deathmem", "keydeath"))
 
         elif pointer == "5":
-            if os.stat("mem/karemma").st_size > 0:
-                for placeholder in open("mem/karemma", "rb"):
-                    karemem = com3("keykar", placeholder, 256, []).replace("\n", "").split(", ")
-                un1 = un1.difference(karemem)
+            un1 = un1.difference(memfiop("mem/karemma", "keykar"))
 
         elif pointer == "6":
-            if os.stat("mem/1999").st_size > 0:
-                for placeholder in open("mem/1999", "rb"):
-                    nininin = com3("key1999", placeholder, 256, []).replace("\n", "").split(", ")
-                un1 = un1.difference(nininin)
+            un1 = un1.difference(memfiop("mem/1999", "key1999"))
 
         elif pointer == "7":
-            if os.stat("mem/2099").st_size > 0:
-                for placeholder in open("mem/2099", "rb"):
-                    twninin = com3("key2099", placeholder, 256, []).replace("\n", "").split(", ")
-                un1 = un1.difference(twninin)
+            un1 = un1.difference(memfiop("mem/2099", "key2099"))
 
         elif pointer == "8":
-            if os.stat("mem/andromeda").st_size > 0:
-                for placeholder in open("mem/andromeda", "rb"):
-                    andromeda = com3("keyandromeda", placeholder, 256, []).replace("\n", "").split(", ")
-                un1 = un1.difference(andromeda)
+            un1 = un1.difference(memfiop("mem/andromeda", "keyandromeda"))
 
         elif pointer == "9":
-            if os.stat("mem/legio").st_size > 0:
-                for placeholder in open("mem/legio", "rb"):
-                    legio = com3("keylegio", placeholder, 256, []).replace("\n", "").split(", ")
-                un1 = un1.difference(legio)
+            un1 = un1.difference(memfiop("mem/legio", "keylegio"))
 
         elif pointer == "10":
-            if os.stat("mem/utopia").st_size > 0:
-                for placeholder in open("mem/utopia", "rb"):
-                    utopia = com3("keyutopia", placeholder, 256, []).replace("\n", "").split(", ")
-                un1 = un1.difference(utopia)
+            un1 = un1.difference(memfiop("mem/utopia", "keyutopia"))
 
         elif pointer == "11":
-            if os.stat("mem/angelmem").st_size > 0:
-                for placeholder in open("mem/angelmem", "rb"):
-                    angelmem = com3("keyangel", placeholder, 256, []).replace("\n", "").split(", ")
-                un1 = un1.difference(angelmem)
+            un1 = un1.difference(memfiop("mem/angelmem", "keyangel"))
 
         elif pointer == "12":
-            if os.stat("mem/chessmem").st_size > 0:
-                for placeholder in open("mem/chessmem", "rb"):
-                    chmem = com3("keyChess", placeholder, 256, []).replace("\n", "").split(", ")
-                un1 = un1.difference(chmem)
+            un1 = un1.difference(memfiop("mem/chessmem", "keyChess"))
 
         elif pointer == "13":
-            if os.stat("mem/CarpeDiemmem").st_size > 0:
-                for placeholder in open("mem/CarpeDiemmem", "rb"):
-                    cdmem = com3("keyCD", placeholder, 256, []).replace("\n", "").split(", ")
-                un1 = un1.difference(cdmem)
+            un1 = un1.difference(memfiop("mem/CarpeDiemmem", "keyCD"))
 
         elif pointer == "14":
-            if os.stat("mem/CSR").st_size > 0:
-                for placeholder in open("mem/CSR", "rb"):
-                    CSRmem = com3("keyCSR", placeholder, 256, []).replace("\n", "").split(", ")
-                un1 = un1.difference(CSRmem)
+            un1 = un1.difference(memfiop("mem/CSR", "keyCSR"))
 
         elif pointer == "15":
-            if os.stat("mem/Jungle Team").st_size > 0:
-                for placeholder in open("mem/Jungle Team", "rb"):
-                    JTmem = com3("keyJT", placeholder, 256, []).replace("\n", "").split(", ")
-                un1 = un1.difference(JTmem)
+            un1 = un1.difference(memfiop("mem/Jungle Team", "keyJT"))
 
         elif pointer == "16":
-            if os.stat("mem/Family Guy").st_size > 0:
-                for placeholder in open("mem/Family Guy", "rb"):
-                    FGmem = com3("keyFG", placeholder, 256, []).replace("\n", "").split(", ")
-                un1 = un1.difference(FGmem)
+            un1 = un1.difference(memfiop("mem/Family Guy", "keyFG"))
 
         while pointer not in (["y", "n"]):
             pointer = raw_input("Filter out members from another group? (y/n)")
@@ -1485,12 +1402,7 @@ def notclosedcheck(memlist):
 
     memlist2 = list()
     for mem in memlist:
-        while 0 == 0:
-            try:
-                response = browser.open("http://www.chess.com/members/view/" + mem)
-                break
-            except:
-                print "something went wrong, reopening " + mem
+        browser, response = mecopner(browser, "http://www.chess.com/members/view/" + mem)
         soup = str(BeautifulSoup(response))
 
         if mem in soup:
@@ -1504,12 +1416,7 @@ def spider_ml(target, logincookie):
     usrlist = list()
     for pointer in target:
         print "\nextracting names from " + pointer
-        while 0 == 0:
-            try:
-                response = browser.open(pointer)
-                break
-            except:
-                print "something went wrong, reopening " + pointer
+        browser, response = mecopner(browser, pointer)
         for link in browser.links(url_regex="chess.com/members/view/"):
             ltext = link.text
             if ltext != "View Profile":
@@ -1517,6 +1424,7 @@ def spider_ml(target, logincookie):
     return list(set(usrlist))
 
 pathway = "y"
+dommem = memfiop("mem/dommem", "keydom")
 while pathway in (["y"]):
     print "chess.com RK Resource 001\nversion 0.8.8 alpha\ndeveloped by Robin Karlsson\ncontact email: 'r.robin.karlsson@gmail.com'\ncontact chess.com profile: 'http://www.chess.com/members/view/RobinKarlsson'\n"
     print "What would you like to do?\n\n 1. Create a list of members from a group\n 2. Build an excell compatible csv file with data on a list of members\n 3. Send invites for a group\n 4. Check a groups finished votechess matches and count number of posts per member\n 5. Build an excell compatible csv file with data on how members of a group has performed in team matches\n 6. Check a list of members for those with a rating above and/or below a specific value, last online & member since a specific date and a timeout ratio below a specific value\n 7. Presentation of a csv-file from option 2 or 5\n 8. Remove doublets and filter out members who are in specific groups from a preexisting textfile\n 9. Look for members who has left your team\n 10. Count number of group notes per member\n 11. Collect birthdays for a list of members\n 12. Send personal messages to members"
@@ -1604,7 +1512,7 @@ while pathway in (["y"]):
             joined = {}
             membernamelist = list()
 
-            outputfile = open(targetnameorgf + " " + strftime("%Y-%m-%d", gmtime()) + " tm.csv", "wb")
+            outputfile = open(targetnameorgf + " " + strftime("%Y-%m-%d", gmtime()) + ".tm.csv", "wb")
             csvwriter = csv.writer(outputfile, delimiter = " ", quoting=csv.QUOTE_MINIMAL)
 
             for pointer in set(tmparcount.keys())|set(winssdic.keys())|set(losedic.keys())|set(tmtimeoutcount.keys()):
@@ -1621,10 +1529,12 @@ while pathway in (["y"]):
 
             if choicetm == "y":
                 membernamelist = list()
+                browser = mecbrowser("")
                 for key in joined:
                     membernamelist.append(key)
 
-                passmembers = memberprocesser(membernamelist)
+                minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender = memprmenu()
+                passmembers = memberprocesser(False, browser, membernamelist, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender)
                 joined2 = dict()
                 membernamelist = list()
                 for key in joined:
@@ -1645,12 +1555,7 @@ while pathway in (["y"]):
             deadbeatlist = list()
             for member in tmpar:
                 print "checking " + member
-                while 0 == 0:
-                    try:
-                        response = browser.open("http://www.chess.com/members/view/" + member)
-                        break
-                    except:
-                        print "something went wrong, reopening " + member
+                browser, response = mecopner(browser, "http://www.chess.com/members/view/" + member)
                 if "://www.chess.com/members/view/" not in browser.geturl():
                     continue
                 soup = BeautifulSoup(response)
@@ -1660,8 +1565,10 @@ while pathway in (["y"]):
 
     elif flow == "6":
         membernamelist = raw_input("\n\nList of members to check: ")
+        browser = mecbrowser("")
 
-        passmembers = memberprocesser(membernamelist)
+        minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender = memprmenu()
+        passmembers = memberprocesser(False, browser, membernamelist, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender)
 
         choice6 = ""
         while choice6 not in (["1", "2"]):
@@ -1689,13 +1596,13 @@ while pathway in (["y"]):
         filesindic = os.listdir(".")
         for fname in filesindic:
             if choicepath == "1":
-                if fname.endswith(" tm.csv"):
+                if fname.endswith(".tm.csv"):
                     flist.append(fname)
                     print " " + str(counter3) + ". " + fname
                     clist.append(str(counter3))
                     counter3 += 1
             elif choicepath == "2":
-                if fname.endswith(" mem.csv"):
+                if fname.endswith(".mem.csv"):
                     flist.append(fname)
                     print " " + str(counter3) + ". " + fname
                     clist.append(str(counter3))
@@ -1901,7 +1808,7 @@ while pathway in (["y"]):
         notedic = dict()
         for targetp in target:
             print targetp
-            response = browser.open(targetp)
+            browser, response = mecopner(browser, targetp)
             soup = BeautifulSoup(response)
 
             links1 = browser.links()
