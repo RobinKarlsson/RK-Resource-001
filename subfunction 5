@@ -11,52 +11,11 @@ from collections import OrderedDict
 from bs4 import BeautifulSoup
 from collections import Counter
 
-def pickbrowser(browserchoice):
-    usrplatform = getplatform()
-    if browserchoice == "1":
-        browser = webdriver.Firefox()
-
-    elif browserchoice == "2":
-        if usrplatform[1] == "Linux":
-            chromepath = os.path.abspath("Webdriver/Linux/86/chromedriver")
-            os.environ["webdriver.chrome.driver"] = chromepath
-            browser = webdriver.Chrome(chromepath)
-
-        elif usrplatform[1] == "Windows":
-            chromepath = os.path.abspath("Webdriver/Windows/86/chromedriver.exe")
-            os.environ["webdriver.chrome.driver"] = chromepath
-            browser = webdriver.Chrome(chromepath)
-
-        elif usrplatform[1] == "darwin":
-            chromepath = os.path.abspath("Webdriver/Mac/86/chromedriver")
-            os.environ["webdriver.chrome.driver"] = chromepath
-            browser = webdriver.Chrome(chromepath)
-
-    elif browserchoice == "3":
-        if usrplatform[1] == "Linux":
-            browser = webdriver.PhantomJS(os.path.abspath("Webdriver/Linux/86/phantomjs"))
-
-        elif usrplatform[1] == "Windows":
-            browser = webdriver.PhantomJS(os.path.abspath("Webdriver/Windows/86/phantomjs.exe"))
-
-        elif usrplatform[1] == "darwin":
-            browser = webdriver.PhantomJS(os.path.abspath("Webdriver/Mac/86/phantomjs"))
-
-    elif browserchoice == "4":
-        if usrplatform[1] == "Windows":
-            browser = webdriver.Ie(os.path.abspath("Webdriver/Windows/86/IEDriverServer.exe"))
-    return browser
-
 def gettmlinks(targetname):
     linklist = list()
     browser = mecbrowser("")
 
-    while 0 == 0:
-        try:
-            response = browser.open("http://www.chess.com/groups/matches/" + targetname + "?show_all_current=1")
-            break
-        except:
-            print "something went wrong, reopening " + "http://www.chess.com/groups/matches/" + targetname + "?show_all_current=1"
+    browser, response = mecopner(browser, "http://www.chess.com/groups/matches/" + targetname + "?show_all_current=1")
     soup = BeautifulSoup(response)
     souplinks = re.findall("/groups/team_match(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", str(soup.find_all("a")))
     for link in souplinks:
@@ -68,13 +27,8 @@ def gettmlinks(targetname):
 
     linkarchive = linklist.pop(-1)
     pointer = 1
-    while 0 == 0:
-        while 0 == 0:
-            try:
-                response = browser.open(str(linkarchive) + "&page=" + str(pointer))
-                break
-            except:
-                print "something went wrong, reopening " + str(linkarchive) + "&page=" + str(pointer)
+    while True:
+        browser, response = mecopner(browser, str(linkarchive) + "&page=" + str(pointer))
         soup = BeautifulSoup(response)
 
         soupbrake = str(soup.find_all(class_ = "next-on"))
@@ -88,7 +42,36 @@ def gettmlinks(targetname):
 
     linklist = list(set(linklist))
     return linklist
-    
+
+def mecopner(browser, pointl):
+    while True:
+        try:
+            response = browser.open(pointl)
+            break
+        except:
+            print "something went wrong, reopening " + pointl
+    return browser, response
+
+def mecbrowser(logincookie):
+    browser = mechanize.Browser()
+    cookie = cookielib.LWPCookieJar()
+    browser.set_cookiejar(cookie)
+
+    if logincookie != "":
+        for tempcookie in logincookie:
+            try:
+                cookie.set_cookie(cookielib.Cookie(version = 0, name = tempcookie["name"], value = tempcookie["value"], port = '80', port_specified = False, domain = tempcookie["domain"], domain_specified = True, domain_initial_dot = False, path = tempcookie["path"], path_specified = True, secure = tempcookie["secure"], expires = tempcookie["expiry"], discard = False, comment = None, comment_url = None, rest = None, rfc2109 = False))
+            except KeyError:
+                continue
+
+    browser.set_handle_equiv(True)
+    browser.set_handle_redirect(True)
+    browser.set_handle_gzip(True)
+    browser.set_handle_referer(True)
+    browser.set_handle_robots(False)
+    browser.set_handle_refresh(mechanize._http.HTTPRefreshProcessor(), max_time=1)
+    return browser
+
 def tmparchecker(pagelist, targetname):
     tmyear = raw_input("\nOnly check tm's that has been open for registration since year, leave empty to skip (YYYY) ")
     if tmyear != "":
@@ -109,12 +92,7 @@ def tmparchecker(pagelist, targetname):
         print "processing: " + page
         alltmresults = list()
         counter2 = 0
-        while 0 == 0:
-            try:
-                response = browser.open(page)
-                break
-            except:
-                print "something went wrong, reopening " + page
+        browser, response = mecopner(browser, page)
         soup = BeautifulSoup(response)
 
         if tmyear != "":
@@ -217,69 +195,15 @@ def tmparchecker(pagelist, targetname):
             placeholder = list()
     return tmpar, timeoutlist, winssdic, losedic
 
-def memberprocesser(target):
-    minrat = raw_input("\n\nMin (online chess) rating allowed. leave empty to skip: ")
-    maxrat = raw_input("Max (online chess) rating allowed. leave empty to skip: ")
-
-    lastloginyear = raw_input("\nLast logged in year. leave empty to skip (YYYY): ")
-    if lastloginyear != "":
-        lastloginyear = int(lastloginyear)
-        lastloginmonth = int(raw_input("Last logged in month (MM): "))
-        lastloginday = int(raw_input("Last logged in day (DD): "))
-
-    membersinceyear = raw_input("\nMember since before year. leave empty to skip (YYYY): ")
-    if membersinceyear!= "":
-        membersinceyear = int(membersinceyear)
-        membersincemonth = int(raw_input("Member since before month (MM): "))
-        membersinceday = int(raw_input("Member since before day (DD): "))
-
-    youngeryear = raw_input("\nBorn after year. leave empty to skip (YYYY): ")
-    if youngeryear!= "":
-        youngeryear = int(youngeryear)
-        youngermonth = int(raw_input("Born after month (MM): "))
-        youngerday = int(raw_input("Born after day (DD): "))
-
-    olderyear = raw_input("\nBorn before year. leave empty to skip (YYYY): ")
-    if olderyear!= "":
-        olderyear = int(olderyear)
-        oldermonth = int(raw_input("Born before month (MM): "))
-        olderday = int(raw_input("Born before day (DD): "))
-
-    timemax = raw_input("\nMax timeoutratio allowed. leave empty to skip: ")
-    maxgroup = raw_input("\nMax number of groups member may be in. leave empty to skip: ")
-    mingroup = raw_input("Min number of groups member may be in. leave empty to skip: ")
-
-    timovchoicemin = raw_input("\nTime/move higher than (format: days - hours - minutes, leave empty to skip) ")
-    timovchoicemax = raw_input("Time/move lower than (format: days - hours - minutes, leave empty to skip) ")
-    if timovchoicemax != "":
-        timovchoicemax = [int(elem) for elem in timovchoicemax.split("-")]
-    if timovchoicemin != "":
-        timovchoicemin = [int(elem) for elem in timovchoicemin.split("-")]
-
-    avatarch = ""
-    while avatarch not in (["y", "n"]):
-        avatarch = raw_input("\nSort out those who don't have a custom avatar? (y/n) ")
-
-    heritage = raw_input("\nMember should be from. leave empty to skip: ")
-
-    memgender = "a"
-    while memgender not in (["m", "f", ""]):
-        memgender = raw_input("\nMember should be gender (determined by comparing member name to a list of male and female names). leave empty to skip (m/f): ")
-
-    browser = mecbrowser("")
-
+def memberprocesser(silent, browser, target, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender):
     target = str(target).replace(" ", "").replace("(", "").replace(")", "").replace("]", "").replace("[", "").replace("'", "").split(",")
     while "" in target:
         target.remove("")
     passmem = list()
     for targetx in target:
-        print "checking " + targetx
-        while 0 == 0:
-            try:
-                response = browser.open("http://www.chess.com/members/view/" + targetx)
-                break
-            except:
-                print "something went wrong, reopening " + targetx
+        if silent == False:
+            print "checking " + targetx
+        browser, response = mecopner(browser, "http://www.chess.com/members/view/" + targetx)
         if "://www.chess.com/members/view/" not in browser.geturl():
             continue
         soup = BeautifulSoup(response)
@@ -315,6 +239,16 @@ def memberprocesser(target):
                 if timemove[1] < timovchoicemin[1] and timemove[0] <= timovchoicemin[0]:
                     continue
                 if timemove[2] < timovchoicemin[2] and timemove[1] <= timovchoicemin[1] and timemove[0] <= timovchoicemin[0]:
+                    continue
+
+        if mingames != "" or minwinrat != "":
+            gamestat = gamestats(soup)
+
+            if mingames != "":
+                if gamestat[0] < int(mingames):
+                    continue
+            if minwinrat != "":
+                if gamestat[1] / gamestat[0]  < float(minwinrat):
                     continue
 
         if membersinceyear != "":
@@ -405,6 +339,15 @@ def AvatarCheck(soup):
         return False
     return True
 
+def gamestats(soup):
+    for stats in soup.find_all(class_ = "even footer"):
+        stats = str(stats.text).replace("Total Games:", "").strip()
+        if "\n" not in stats:
+            stats = stats.replace("(", "").replace(")", "").replace("/", "").replace("W", "").replace("L", "").replace("D", "").split(" ")
+            while "" in stats:
+                stats.remove("")
+            return [float(elem) for elem in stats]
+
 def timeoutchecker(soup):
     for placeholder in soup.find_all(class_ = "even"):
         if "Timeouts:" in str(placeholder):
@@ -450,6 +393,70 @@ def groupmemlister(soup):
     for placeholder in soup.find_all(class_ = "parenthesis-link"):
         memgroups = placeholder.text
     return int(memgroups)
+
+def memprmenu():
+    minrat = raw_input("\n\nMin (online chess) rating allowed. leave empty to skip: ")
+    maxrat = raw_input("Max (online chess) rating allowed. leave empty to skip: ")
+    mingames = raw_input("\nMin number of games played (online chess). leave empty to skip : ")
+    minwinrat = raw_input("Min win-ratio (online chess). leave empty to skip : ")
+
+    lastloginyear = raw_input("\nLast logged in year. leave empty to skip (YYYY): ")
+    if lastloginyear != "":
+        lastloginyear = int(lastloginyear)
+        lastloginmonth = int(raw_input("Last logged in month (MM): "))
+        lastloginday = int(raw_input("Last logged in day (DD): "))
+    else:
+        lastloginmonth = ""
+        lastloginday = ""
+
+    membersinceyear = raw_input("\nMember since before year. leave empty to skip (YYYY): ")
+    if membersinceyear!= "":
+        membersinceyear = int(membersinceyear)
+        membersincemonth = int(raw_input("Member since before month (MM): "))
+        membersinceday = int(raw_input("Member since before day (DD): "))
+    else:
+        membersincemonth = ""
+        membersinceday = ""
+
+    youngeryear = raw_input("\nBorn after year. leave empty to skip (YYYY): ")
+    if youngeryear!= "":
+        youngeryear = int(youngeryear)
+        youngermonth = int(raw_input("Born after month (MM): "))
+        youngerday = int(raw_input("Born after day (DD): "))
+    else:
+        youngermonth = ""
+        youngerday = ""
+
+    olderyear = raw_input("\nBorn before year. leave empty to skip (YYYY): ")
+    if olderyear!= "":
+        olderyear = int(olderyear)
+        oldermonth = int(raw_input("Born before month (MM): "))
+        olderday = int(raw_input("Born before day (DD): "))
+    else:
+        oldermonth = ""
+        olderday = ""
+
+    timemax = raw_input("\nMax timeoutratio allowed. leave empty to skip: ")
+    maxgroup = raw_input("\nMax number of groups member may be in. leave empty to skip: ")
+    mingroup = raw_input("Min number of groups member may be in. leave empty to skip: ")
+
+    timovchoicemin = raw_input("\nTime/move higher than (format: days - hours - minutes, leave empty to skip) ")
+    timovchoicemax = raw_input("Time/move lower than (format: days - hours - minutes, leave empty to skip) ")
+    if timovchoicemax != "":
+        timovchoicemax = [int(elem) for elem in timovchoicemax.split("-")]
+    if timovchoicemin != "":
+        timovchoicemin = [int(elem) for elem in timovchoicemin.split("-")]
+
+    avatarch = ""
+    while avatarch not in (["y", "n"]):
+        avatarch = raw_input("\nSort out those who don't have a custom avatar? (y/n) ")
+
+    heritage = raw_input("\nMember should be from. leave empty to skip: ")
+
+    memgender = "a"
+    while memgender not in (["m", "f", ""]):
+        memgender = raw_input("\nMember should be gender (determined by comparing member name to a list of male and female names). leave empty to skip (m/f): ")
+    return minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender
 
 def nationlister(soup):
     nationlist = list()
@@ -498,7 +505,7 @@ while pathway in (["y"]):
             joined = {}
             membernamelist = list()
 
-            outputfile = open(targetnameorgf + " " + strftime("%Y-%m-%d", gmtime()) + " tm.csv", "wb")
+            outputfile = open(targetnameorgf + " " + strftime("%Y-%m-%d", gmtime()) + ".tm.csv", "wb")
             csvwriter = csv.writer(outputfile, delimiter = " ", quoting=csv.QUOTE_MINIMAL)
 
             for pointer in set(tmparcount.keys())|set(winssdic.keys())|set(losedic.keys())|set(tmtimeoutcount.keys()):
@@ -515,10 +522,12 @@ while pathway in (["y"]):
 
             if choicetm == "y":
                 membernamelist = list()
+                browser = mecbrowser("")
                 for key in joined:
                     membernamelist.append(key)
 
-                passmembers = memberprocesser(membernamelist)
+                minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender = memprmenu()
+                passmembers = memberprocesser(False, browser, membernamelist, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender)
                 joined2 = dict()
                 membernamelist = list()
                 for key in joined:
@@ -539,17 +548,12 @@ while pathway in (["y"]):
             deadbeatlist = list()
             for member in tmpar:
                 print "checking " + member
-                while 0 == 0:
-                    try:
-                        response = browser.open("http://www.chess.com/members/view/" + member)
-                        break
-                    except:
-                        print "something went wrong, reopening " + member
+                browser, response = mecopner(browser, "http://www.chess.com/members/view/" + member)
                 if "://www.chess.com/members/view/" not in browser.geturl():
                     continue
                 soup = BeautifulSoup(response)
                 if timeoutchecker(soup) > maxtmrat:
                     deadbeatlist.append(member)
             print "\n\n\nThe following members has a timeoutratio above " + str(maxtmrat) + "%: " + str(deadbeatlist).replace("'", "").replace("[", "").replace("]", "")
-            
+
   pathway = raw_input("Run again? (y/n) ")
