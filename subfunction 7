@@ -120,13 +120,13 @@ while pathway in (["y"]):
         filesindic = os.listdir(".")
         for fname in filesindic:
             if choicepath == "1":
-                if fname.endswith(" tm.csv"):
+                if fname.endswith(".tm.csv"):
                     flist.append(fname)
                     print " " + str(counter3) + ". " + fname
                     clist.append(str(counter3))
                     counter3 += 1
             elif choicepath == "2":
-                if fname.endswith(" mem.csv"):
+                if fname.endswith(".mem.csv"):
                     flist.append(fname)
                     print " " + str(counter3) + ". " + fname
                     clist.append(str(counter3))
@@ -205,5 +205,4 @@ while pathway in (["y"]):
             fmemlist = sorted(fmemlist, reverse = True, key=lambda tup: tup[-1])
             for cpointer in fmemlist:
                 print "".join(element.ljust(col_width) for element in cpointer)
-
   pathway = raw_input("Run again? (y/n) ")
