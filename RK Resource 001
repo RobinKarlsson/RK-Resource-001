@@ -30,6 +30,93 @@ from collections import OrderedDict
 from collections import Counter
 from string import punctuation
 
+def csvsoworker(memlist, choicepath):
+    col_width = max(len(element) for row in memlist for element in row) + 2
+
+    choice = ""
+    while choice not in (["1", "2"]):
+        choice = raw_input("\n\noptions\n 1. Get data from the csv-file\n 2. get all the usernames in an invites friendly format\nYour choice: ")
+
+    if choice == "1":
+        cdone = "y"
+        choicelist = (["0"])
+        while cdone != "n":
+            choice = ""
+            counter = 1
+            print "\n\nwhat would you like to include?"
+            while counter < len(memlist[0]):
+                print " " + str(counter) + ". " + memlist[0][counter]
+                counter += 1
+
+            choice = raw_input("Your choice: ")
+            if choice not in choicelist:
+                choicelist.append(choice)
+
+            cdone = ""
+            while cdone not in (["y", "n"]):
+                cdone = raw_input("include more data? (y/n) ")
+
+        memlist2 = list()
+        choicelist = sorted(choicelist)
+        for cpointer in memlist:
+            nlist = list()
+            for pospointer in choicelist:
+                try:
+                    nlist.append(float(cpointer[int(pospointer)]))
+                except ValueError:
+                    nlist.append(cpointer[int(pospointer)])
+            memlist2.append(nlist)
+
+        ltitle = memlist2[0]
+        del memlist2[0]
+
+        if choicepath == "1":
+            print "\n\nsort by\n 1. most valuable tm participant"
+            counter = 2
+            coulist = (["1"])
+        elif choicepath == "2":
+            print "\n\nsort by"
+            counter = 1
+            coulist = list()
+
+        for pointer in ltitle:
+            count2id = str(counter)
+            coulist.append(count2id)
+            print " " + count2id + ". " + pointer
+            counter += 1
+
+        choice2 = ""
+        while choice2 not in coulist:
+            choice2 = raw_input("Your choice: ")
+        choice2 = int(choice2)
+
+        if choice2 == 1 and choicepath == "1":
+            "none"
+        else:
+            if choicepath == "1":
+                choice2 -= 2
+            elif choicepath == "2":
+                choice2 -= 1
+
+            for element in memlist2:
+                if type(element[choice2]) is str and element[choice2][0] == "[":
+                    element[choice2] = element[choice2].replace("[", "").replace("]", "").split(", ")
+                    element[choice2] = [int(subelem) for subelem in element[choice2]]
+
+            if type(memlist2[0][choice2]) is str:
+                memlist2 = sorted(memlist2, key=lambda tup: tup[0].lower())
+            elif type(memlist2[0][choice2]) is float or type(memlist2[0][choice2]) is list:
+                memlist2 = sorted(memlist2, reverse = True, key=lambda tup: tup[choice2])
+
+        print "\n\n" + "".join(element.ljust(col_width) for element in ltitle) + "\n"
+        llength = len(memlist2[0])
+        for cpointer in memlist2:
+            counter = 0
+            while counter < llength:
+                cpointer[counter] = str(cpointer[counter])
+                counter += 1
+            print "".join(element.ljust(col_width) for element in cpointer)
+
 def getmeminfo(target, filename):
     browser = mecbrowser("")
 
@@ -166,93 +253,6 @@ def birthdsorter(birthdaylist):
         birthdaylist = sorted(birthdaylist)
         for element in birthdaylist:
             print str(element[1]) + "/" + str(element[0]) + " - " + element[3] + ", born " + str(element[2])
-
-def csvsoworker(memlist, choicepath):
-    col_width = max(len(element) for row in memlist for element in row) + 2
-
-    choice = ""
-    while choice not in (["1", "2"]):
-        choice = raw_input("\n\noptions\n 1. Get data from the csv-file\n 2. get all the usernames in an invites friendly format\nYour choice: ")
-
-    if choice == "1":
-        cdone = "y"
-        choicelist = (["0"])
-        while cdone != "n":
-            choice = ""
-            counter = 1
-            print "\n\nwhat would you like to include?"
-            while counter < len(memlist[0]):
-                print " " + str(counter) + ". " + memlist[0][counter]
-                counter += 1
-
-            choice = raw_input("Your choice: ")
-            if choice not in choicelist:
-                choicelist.append(choice)
-
-            cdone = ""
-            while cdone not in (["y", "n"]):
-                cdone = raw_input("include more data? (y/n) ")
-
-        memlist2 = list()
-        choicelist = sorted(choicelist)
-        for cpointer in memlist:
-            nlist = list()
-            for pospointer in choicelist:
-                try:
-                    nlist.append(float(cpointer[int(pospointer)]))
-                except ValueError:
-                    nlist.append(cpointer[int(pospointer)])
-            memlist2.append(nlist)
-
-        ltitle = memlist2[0]
-        del memlist2[0]
-
-        if choicepath == "1":
-            print "\n\nsort by\n 1. most valuable tm participant"
-            counter = 2
-            coulist = (["1"])
-        elif choicepath == "2":
-            print "\n\nsort by"
-            counter = 1
-            coulist = list()
-
-        for pointer in ltitle:
-            count2id = str(counter)
-            coulist.append(count2id)
-            print " " + count2id + ". " + pointer
-            counter += 1
-
-        choice2 = ""
-        while choice2 not in coulist:
-            choice2 = raw_input("Your choice: ")
-        choice2 = int(choice2)
-
-        if choice2 == 1 and choicepath == "1":
-            "none"
-        else:
-            if choicepath == "1":
-                choice2 -= 2
-            elif choicepath == "2":
-                choice2 -= 1
-
-            for element in memlist2:
-                if type(element[choice2]) is str and element[choice2][0] == "[":
-                    element[choice2] = element[choice2].replace("[", "").replace("]", "").split(", ")
-                    element[choice2] = [int(subelem) for subelem in element[choice2]]
-
-            if type(memlist2[0][choice2]) is str:
-                memlist2 = sorted(memlist2, key=lambda tup: tup[0].lower())
-            elif type(memlist2[0][choice2]) is float or type(memlist2[0][choice2]) is list:
-                memlist2 = sorted(memlist2, reverse = True, key=lambda tup: tup[choice2])
-
-        print "\n\n" + "".join(element.ljust(col_width) for element in ltitle) + "\n"
-        llength = len(memlist2[0])
-        for cpointer in memlist2:
-            counter = 0
-            while counter < llength:
-                cpointer[counter] = str(cpointer[counter])
-                counter += 1
-            print "".join(element.ljust(col_width) for element in cpointer)
 
     elif choice == "2":
         del memlist[0]
