@@ -30,102 +30,6 @@ from collections import OrderedDict
 from collections import Counter
 from string import punctuation
 
-def csvsoworker(memlist, choicepath):
-    col_width = max(len(element) for row in memlist for element in row) + 2
-
-    choice = ""
-    while choice not in (["1", "2"]):
-        choice = raw_input("\n\noptions\n 1. Get data from the csv-file\n 2. get all the usernames in an invites friendly format\nYour choice: ")
-
-    if choice == "1":
-        cdone = "y"
-        choicelist = (["0"])
-        while cdone != "n":
-            choice = ""
-            counter = 1
-            print "\n\nwhat would you like to include?"
-            while counter < len(memlist[0]):
-                print " " + str(counter) + ". " + memlist[0][counter]
-                counter += 1
-
-            choice = raw_input("Your choice: ")
-            if choice not in choicelist:
-                choicelist.append(choice)
-
-            cdone = ""
-            while cdone not in (["y", "n"]):
-                cdone = raw_input("include more data? (y/n) ")
-
-        memlist2 = list()
-        choicelist = sorted(choicelist)
-        for cpointer in memlist:
-            nlist = list()
-            for pospointer in choicelist:
-                try:
-                    nlist.append(float(cpointer[int(pospointer)]))
-                except ValueError:
-                    nlist.append(cpointer[int(pospointer)])
-            memlist2.append(nlist)
-
-        ltitle = memlist2[0]
-        del memlist2[0]
-
-        if choicepath == "1":
-            print "\n\nsort by\n 1. most valuable tm participant"
-            counter = 2
-            coulist = (["1"])
-        elif choicepath == "2":
-            print "\n\nsort by"
-            counter = 1
-            coulist = list()
-
-        for pointer in ltitle:
-            count2id = str(counter)
-            coulist.append(count2id)
-            print " " + count2id + ". " + pointer
-            counter += 1
-
-        choice2 = ""
-        while choice2 not in coulist:
-            choice2 = raw_input("Your choice: ")
-        choice2 = int(choice2)
-
-        if choice2 == 1 and choicepath == "1":
-            "none"
-        else:
-            if choicepath == "1":
-                choice2 -= 2
-            elif choicepath == "2":
-                choice2 -= 1
-
-            for element in memlist2:
-                if type(element[choice2]) is str and element[choice2][0] == "[":
-                    element[choice2] = element[choice2].replace("[", "").replace("]", "").split(", ")
-                    element[choice2] = [int(subelem) for subelem in element[choice2]]
-
-            if type(memlist2[0][choice2]) is str:
-                memlist2 = sorted(memlist2, key=lambda tup: tup[0].lower())
-            elif type(memlist2[0][choice2]) is float or type(memlist2[0][choice2]) is list:
-                memlist2 = sorted(memlist2, reverse = True, key=lambda tup: tup[choice2])
-
-        print "\n\n" + "".join(element.ljust(col_width) for element in ltitle) + "\n"
-        llength = len(memlist2[0])
-        for cpointer in memlist2:
-            counter = 0
-            while counter < llength:
-                cpointer[counter] = str(cpointer[counter])
-                counter += 1
-            print "".join(element.ljust(col_width) for element in cpointer)
-
-    elif choice == "2":
-        del memlist[0]
-        memlist2 = list()
-
-        for cpointer in memlist:
-            memlist2.append(cpointer[0])
-
-        print "\n\n" + str(memlist2).replace("'", "").replace("[", "").replace("]", "")
-
 def getmeminfo(target, filename):
     browser = mecbrowser("")
 
@@ -263,6 +167,102 @@ def birthdsorter(birthdaylist):
         for element in birthdaylist:
             print str(element[1]) + "/" + str(element[0]) + " - " + element[3] + ", born " + str(element[2])
 
+def csvsoworker(memlist, choicepath):
+    col_width = max(len(element) for row in memlist for element in row) + 2
+
+    choice = ""
+    while choice not in (["1", "2"]):
+        choice = raw_input("\n\noptions\n 1. Get data from the csv-file\n 2. get all the usernames in an invites friendly format\nYour choice: ")
+
+    if choice == "1":
+        cdone = "y"
+        choicelist = (["0"])
+        while cdone != "n":
+            choice = ""
+            counter = 1
+            print "\n\nwhat would you like to include?"
+            while counter < len(memlist[0]):
+                print " " + str(counter) + ". " + memlist[0][counter]
+                counter += 1
+
+            choice = raw_input("Your choice: ")
+            if choice not in choicelist:
+                choicelist.append(choice)
+
+            cdone = ""
+            while cdone not in (["y", "n"]):
+                cdone = raw_input("include more data? (y/n) ")
+
+        memlist2 = list()
+        choicelist = sorted(choicelist)
+        for cpointer in memlist:
+            nlist = list()
+            for pospointer in choicelist:
+                try:
+                    nlist.append(float(cpointer[int(pospointer)]))
+                except ValueError:
+                    nlist.append(cpointer[int(pospointer)])
+            memlist2.append(nlist)
+
+        ltitle = memlist2[0]
+        del memlist2[0]
+
+        if choicepath == "1":
+            print "\n\nsort by\n 1. most valuable tm participant"
+            counter = 2
+            coulist = (["1"])
+        elif choicepath == "2":
+            print "\n\nsort by"
+            counter = 1
+            coulist = list()
+
+        for pointer in ltitle:
+            count2id = str(counter)
+            coulist.append(count2id)
+            print " " + count2id + ". " + pointer
+            counter += 1
+
+        choice2 = ""
+        while choice2 not in coulist:
+            choice2 = raw_input("Your choice: ")
+        choice2 = int(choice2)
+
+        if choice2 == 1 and choicepath == "1":
+            "none"
+        else:
+            if choicepath == "1":
+                choice2 -= 2
+            elif choicepath == "2":
+                choice2 -= 1
+
+            for element in memlist2:
+                if type(element[choice2]) is str and element[choice2][0] == "[":
+                    element[choice2] = element[choice2].replace("[", "").replace("]", "").split(", ")
+                    element[choice2] = [int(subelem) for subelem in element[choice2]]
+
+            if type(memlist2[0][choice2]) is str:
+                memlist2 = sorted(memlist2, key=lambda tup: tup[0].lower())
+            elif type(memlist2[0][choice2]) is float or type(memlist2[0][choice2]) is list:
+                memlist2 = sorted(memlist2, reverse = True, key=lambda tup: tup[choice2])
+
+        print "\n\n" + "".join(element.ljust(col_width) for element in ltitle) + "\n"
+        llength = len(memlist2[0])
+        for cpointer in memlist2:
+            counter = 0
+            while counter < llength:
+                cpointer[counter] = str(cpointer[counter])
+                counter += 1
+            print "".join(element.ljust(col_width) for element in cpointer)
+
+    elif choice == "2":
+        del memlist[0]
+        memlist2 = list()
+
+        for cpointer in memlist:
+            memlist2.append(cpointer[0])
+
+        print "\n\n" + str(memlist2).replace("'", "").replace("[", "").replace("]", "")
+
 def getvclinks(yourside):
     linklist = list()
     yourside = re.sub(r"[^a-z A-Z 0-9]","", yourside)
@@ -320,7 +320,7 @@ def pmdriver(target, choice):
     logincookie = browser0.get_cookies()
 
     if choice == "1":
-        memtpm = spider_ml(target, logincookie)
+        memtpm = spider(target, logincookie, False)
     elif choice == "2":
         memtpm = target
 
@@ -381,6 +381,15 @@ def pmdriver(target, choice):
         browser0.find_element_by_id("c16").click()
         time.sleep(4)
 
+def mecopner(browser, pointl):
+    while True:
+        try:
+            response = browser.open(pointl)
+            break
+        except:
+            print "something went wrong, reopening " + pointl
+    return browser, response
+
 def nineworker(infile, inid, logincookie, memlist, key):
     target = list()
     memlistorg = memfiop("mem/" + infile, key)
@@ -390,7 +399,7 @@ def nineworker(infile, inid, logincookie, memlist, key):
         target.append("http://www.chess.com/groups/managemembers?id=" + inid + "&page=" + str(counter))
         counter += 1
 
-    un = spider_checker(target, logincookie)
+    un = spider([target], logincookie, True)
 
     for member in memlistorg:
         if member not in un:
@@ -526,45 +535,29 @@ def tmparchecker(pagelist, targetname):
             placeholder = list()
     return tmpar, timeoutlist, winssdic, losedic
 
-def step42(choice1, set1):
-    targetlist = list()
-    while choice1 not in set1:
-        targetlist.append(raw_input("\nPaste the url here: "))
-
-        choice1 = ""
-        while choice1 not in (["y", "n"]):
-            choice1 = raw_input("\nDo you wish to check any additional pages? (y/n): ")
-    return targetlist
-
-def mecopner(browser, pointl):
-    while True:
-        try:
-            response = browser.open(pointl)
-            break
-        except:
-            print "something went wrong, reopening " + pointl
-    return browser, response
-
-def spider_checker(target, logincookie):
+def spider(target, logincookie, silent):
     browser = mecbrowser(logincookie)
 
     usrlist = list()
-    for pointer2 in target:
-        browser, response = mecopner(browser, pointer2)
+    for tlst in target:
+        for pointer in tlst:
+            browser, response = mecopner(browser, pointer)
 
-        if "http://www.chess.com/groups/view/" in browser.geturl():
-            break
+            if "http://www.chess.com/groups/view/" in browser.geturl():
+                break
 
-        soup = BeautifulSoup(response)
-        p2 = str(soup.find_all(class_ = "next-on"))
+            soup = BeautifulSoup(response)
+            p2 = str(soup.find_all(class_ = "next-on"))
+            if silent == False:
+                print "checking " + pointer
 
-        for link in browser.links(url_regex="chess.com/members/view/"):
-            ltext = link.text
-            if ltext != "View Profile":
-                usrlist.append(ltext.replace("[IMG]", ""))
+            for link in browser.links(url_regex="chess.com/members/view/"):
+                ltext = link.text
+                if ltext != "View Profile":
+                    usrlist.append(ltext.replace("[IMG]", ""))
 
-        if "next-on" not in p2:
-            break
+            if "next-on" not in p2:
+                break
     return list(set(usrlist))
 
 def ageproc(target):
@@ -662,8 +655,8 @@ def inviter(choicelist, invitenum):
             block = raw_input("Add another group? (y/n) ")
 
     lonl = [int(elem) for elem in str(date.today() - timedelta(days = 3)).split("-")]
-    msin = [int(elem) for elem in str(date.today() - timedelta(days = 150)).split("-")]
-
+    msin = [int(elem) for elem in str(date.today() - timedelta(days = 90)).split("-")]
+    
     redo = "yes"
     counter = 1
     while redo == "yes":
@@ -699,7 +692,7 @@ def inviter(choicelist, invitenum):
                 olderday = ""
                 timemax = 10
                 maxgroup = 300
-                mingroup = 2
+                mingroup = ""
                 timovchoicemin = ""
                 timovchoicemax = ""
                 avatarch = "y"
@@ -731,7 +724,7 @@ def inviter(choicelist, invitenum):
                 olderday = ""
                 timemax = 8
                 maxgroup = 200
-                mingroup = 2
+                mingroup = ""
                 timovchoicemin = ""
                 timovchoicemax = ""
                 avatarch = ""
@@ -763,7 +756,7 @@ def inviter(choicelist, invitenum):
                 olderday = ""
                 timemax = 10
                 maxgroup = 300
-                mingroup = 2
+                mingroup = ""
                 timovchoicemin = ""
                 timovchoicemax = ""
                 avatarch = "y"
@@ -795,7 +788,7 @@ def inviter(choicelist, invitenum):
                 olderday = ""
                 timemax = 10
                 maxgroup = 300
-                mingroup = 2
+                mingroup = ""
                 timovchoicemin = ""
                 timovchoicemax = ""
                 avatarch = "y"
@@ -827,7 +820,7 @@ def inviter(choicelist, invitenum):
                 olderday = ""
                 timemax = 10
                 maxgroup = 300
-                mingroup = 2
+                mingroup = ""
                 timovchoicemin = ""
                 timovchoicemax = ""
                 avatarch = "y"
@@ -857,8 +850,8 @@ def inviter(choicelist, invitenum):
                 oldermonth = ""
                 olderday = ""
                 timemax = 10
-                maxgroup = 300
-                mingroup = 2
+                maxgroup = 100
+                mingroup = ""
                 timovchoicemin = ""
                 timovchoicemax = ""
                 avatarch = "y"
@@ -890,7 +883,7 @@ def inviter(choicelist, invitenum):
                 olderday = ""
                 timemax = 10
                 maxgroup = 300
-                mingroup = 2
+                mingroup = ""
                 timovchoicemin = ""
                 timovchoicemax = ""
                 avatarch = "y"
@@ -922,7 +915,7 @@ def inviter(choicelist, invitenum):
                 olderday = ""
                 timemax = 10
                 maxgroup = 300
-                mingroup = 2
+                mingroup = ""
                 timovchoicemin = ""
                 timovchoicemax = ""
                 avatarch = "y"
@@ -987,7 +980,7 @@ def inviter(choicelist, invitenum):
                 olderday = ""
                 timemax = 10
                 maxgroup = 300
-                mingroup = 2
+                mingroup = ""
                 timovchoicemin = ""
                 timovchoicemax = ""
                 avatarch = "y"
@@ -1019,7 +1012,7 @@ def inviter(choicelist, invitenum):
                 olderday = ""
                 timemax = 10
                 maxgroup = 300
-                mingroup = 2
+                mingroup = ""
                 timovchoicemin = ""
                 timovchoicemax = ""
                 avatarch = "y"
@@ -1050,8 +1043,8 @@ def inviter(choicelist, invitenum):
                 oldermonth = ""
                 olderday = ""
                 timemax = 10
-                maxgroup = 300
-                mingroup = 2
+                maxgroup = 100
+                mingroup = ""
                 timovchoicemin = ""
                 timovchoicemax = ""
                 avatarch = "y"
@@ -1683,16 +1676,19 @@ def memremoverf(un1):
             pointer = raw_input("Filter out members from another group? (y/n)")
     return un1
 
-def step3456(choice1, blocker):
+def tlstcreator():
     targetlist = list()
-    while choice1 not in blocker:
+    choice1 = ""
+    while choice1 not in (["n"]):
+        tlst = list()
         url1 = raw_input("\nPaste the url here: ") + "&page="
         start1 = int(raw_input("\nEnter pagenumber to start on: "))
         stop1 = int(raw_input("\nEnter pagenumber to end on: "))
 
         while start1 <= stop1:
-            targetlist.append(url1 + str(start1))
+            tlst.append(url1 + str(start1))
             start1 += 1
+        targetlist.append(tlst)
 
         choice1 = ""
         while choice1 not in (["y", "n"]):
@@ -1712,20 +1708,6 @@ def notclosedcheck(memlist):
             memlist2.append(mem)
     return memlist2
 
-def spider_ml(target, logincookie):
-    browser = mecbrowser(logincookie)
-
-    print "\nworking\n"
-    usrlist = list()
-    for pointer in target:
-        print "\nextracting names from " + pointer
-        browser, response = mecopner(browser, pointer)
-        for link in browser.links(url_regex="chess.com/members/view/"):
-            ltext = link.text
-            if ltext != "View Profile":
-                usrlist.append(ltext.replace("[IMG]", ""))
-    return list(set(usrlist))
-
 pathway = "y"
 dommem = memfiop("mem/dommem", "keydom")
 while pathway in (["y"]):
@@ -1739,10 +1721,10 @@ while pathway in (["y"]):
     if flow == "1":
         print "\n\n\nchess.com members list extractor\n"
         print "Locate the members list url of the group you wish to target.\n\n  example: http://www.chess.com/groups/membersearch?allnew=1&id=8893\n\nCopy the url.\n"
-        target = step3456("", (["n"]))
+        target = tlstcreator()
 
         logincookie = login()
-        un1 = set(spider_ml(target, logincookie))
+        un1 = set(spider(target, logincookie, False))
 
         remmem = ""
         while remmem not in (["y", "n"]):
@@ -2141,7 +2123,7 @@ while pathway in (["y"]):
         while choice not in (["1", "2"]):
             choice = raw_input("\n\noptions:\n 1. send a pm to all members from a set of pages\n 2. manually enter the usernames of those you wish to pm\nYour choice, young padawan: ")
         if choice == "1":
-            target = step3456("", (["n"]))
+            target = tlstcreator()
         elif choice == "2":
             target = raw_input("\n\nlist of members to pm: ").replace(" ", "").split(",")
         pmdriver(target, choice)
