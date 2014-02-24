@@ -117,6 +117,15 @@ def csvsoworker(memlist, choicepath):
                 counter += 1
             print "".join(element.ljust(col_width) for element in cpointer)
 
+    elif choice == "2":
+        del memlist[0]
+        memlist2 = list()
+
+        for cpointer in memlist:
+            memlist2.append(cpointer[0])
+
+        print "\n\n" + streplacer(str(memlist2), (["'", ""], ["[", ""], ["]", ""]))
+
 def getmeminfo(target, filename):
     browser = mecbrowser("")
 
@@ -254,15 +263,6 @@ def birthdsorter(birthdaylist):
         for element in birthdaylist:
             print str(element[1]) + "/" + str(element[0]) + " - " + element[3] + ", born " + str(element[2])
 
-    elif choice == "2":
-        del memlist[0]
-        memlist2 = list()
-
-        for cpointer in memlist:
-            memlist2.append(cpointer[0])
-
-        print "\n\n" + str(memlist2).replace("'", "").replace("[", "").replace("]", "")
-
 def getvclinks(yourside):
     linklist = list()
     yourside = re.sub(r"[^a-z A-Z 0-9]","", yourside)
@@ -285,8 +285,27 @@ def getvclinks(yourside):
     linklist = list(OrderedDict.fromkeys(linklist))
     return linklist
 
-def pmreplacer(text, name, country):
-    return text.replace("/name", name).replace("/nation", country).replace("/newline", "\n")
+def streplacer(text, rplst):
+    for rptup in rplst:
+        text = text.replace(rptup[0], rptup[1])
+    return text
+
+def fnamenot(nlst):
+    flist = list()
+    ctr = 1
+    for fname in os.listdir("."):
+        if os.path.isfile(fname):
+            cont = True
+
+            for nfname in nlst:
+                if fname.endswith(nfname):
+                    cont = False
+
+            if cont != False:
+                print " " + str(ctr) + ". " + fname
+                flist.append(fname)
+                ctr += 1
+    return flist
 
 def pmdriver(target, choice):
     while "" in target:
@@ -360,7 +379,7 @@ def pmdriver(target, choice):
         if name == " ":
             name = membername2
 
-        subject = pmreplacer(subjectorg, name.strip(), country.strip())
+        subject = streplacer(subject, (["/name", name.strip()], ["/nation", country.strip()], ["/newline", "\n"]))
 
         for link in soup.find_all("a", href=True):
             if link.text == "Send a Message":
@@ -408,7 +427,7 @@ def nineworker(infile, inid, logincookie, memlist, key):
     if len(memlist) != 0:
         memlist = notclosedcheck(memlist)
 
-    with open("mem/" + infile, "w") as placeholder:
+    with open("mem/" + infile, "wb") as placeholder:
         placeholder.write(com2(key, str(un).replace("'", "").replace("[", "").replace("]", ""), 256, []))
     return memlist
 
@@ -1119,11 +1138,11 @@ def inviter(choicelist, invitenum):
             updinvlist = misc1(updinvlist)
             memint = misc1(memint)
 
-            with open(infile, "w") as placeholder2:
+            with open(infile, "wb") as placeholder2:
                 placeholder2.write(updinvlist)
 
             if len(memint) != 0:
-                with open(alrfile, "a") as placeholder3:
+                with open(alrfile, "ab") as placeholder3:
                     placeholder3.write(memint + ", ")
 
         if invinf == "no":
@@ -1134,7 +1153,7 @@ def filtmcemsg(msglist, browser, name, country):
     for content in msglist:
         if content[0] == "1":
             browser.switch_to_frame("tinymcewindow_ifr")
-            browser.find_element_by_id("tinymce").send_keys(pmreplacer(content[1], name.strip(), country.strip()))
+            browser.find_element_by_id("tinymce").send_keys(streplacer(content[1], (["/name", name.strip()], ["/nation", country.strip()], ["/newline", "\n"])))
             browser.switch_to_default_content()
         elif content[0] == "2":
             browser.find_element_by_id("tinymcewindow_imageuploader").click()
@@ -1168,20 +1187,18 @@ def login():
     return logincookie
 
 def misc1(sortedlines2):
-    sortedlines2 = str(sortedlines2).replace("'", "").replace("set(", "").replace(")", "").replace("]", "").replace("[", "")
+    sortedlines2 = streplacer(str(sortedlines2), (["'", ""], ["set(", ""], [")", ""], ["(", ""], ["[", ""], ["]", ""]))
     return sortedlines2
 
 def remove_doublets(filename, target):
-    if os.stat(filename).st_size > 0:
-        for target in csv.reader(open(filename, "rb")):
-            placeholder = target
+    if os.path.isfile(filename) is True:
+        if os.stat(filename).st_size > 0:
+            for target in csv.reader(open(filename, "rb")):
+                placeholder = target
     else:
-        open(filename, "w").close()
+        open(filename, "wb").close()
         target = ""
-    sortedlines = OrderedDict.fromkeys((line for line in target if line))
-    sortedlines = str(sortedlines.keys()).replace("' ", "").replace("'", "").replace(",", "").replace("]", "").replace("[", "").replace("  ", " ")
-    sortedlines = sortedlines.split()
-    return sortedlines
+    return streplacer(str(OrderedDict.fromkeys((line for line in target if line)).keys()), (["' ", ""], ["'", ""], [",", ""], ["]", ""], ["[", ""], ["  ", " "])).split()
 
 def memprmenu():
     minrat = raw_input("\n\nMin (online chess) rating allowed. leave empty to skip: ")
@@ -1246,6 +1263,11 @@ def memprmenu():
     while memgender not in (["m", "f", ""]):
         memgender = raw_input("\nMember should be gender (determined by comparing member name to a list of male and female names). leave empty to skip (m/f): ")
     return minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender
+
+def makefolder(flst):
+    for folder in flst:
+        if not os.path.exists(folder):
+            os.makedirs(folder)
 
 def sellogin(Username, Password, browser):
     browser.get("https://www.chess.com/login")
@@ -1371,14 +1393,16 @@ def vcman(vclinklist, yourside):
     return parmemvc
 
 def memfiop(fipath, kem):
-    if os.stat(fipath).st_size > 0:
-        for placeholder in open(fipath, "rb"):
-            mem = com3(kem, placeholder, 256, []).replace("\n", "").split(", ")
-        return mem
+    if os.path.isfile(fipath) is True:
+        if os.stat(fipath).st_size > 0:
+            for placeholder in open(fipath, "rb"):
+                mem = com3(kem, placeholder, 256, []).replace("\n", "").split(", ")
+            return mem
+        open(fipath, "wb").close
     return list()
 
 def memberprocesser(silent, browser, target, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender):
-    target = str(target).replace(" ", "").replace("(", "").replace(")", "").replace("]", "").replace("[", "").replace("'", "").split(",")
+    target = streplacer(str(target), ([" ", ""], ["(", ""], [")", ""], ["]", ""], ["[", ""], ["'", ""])).split(",")
     while "" in target:
         target.remove("")
     passmem = list()
@@ -1527,7 +1551,7 @@ def gamestats(soup):
     for stats in soup.find_all(class_ = "even footer"):
         stats = str(stats.text).replace("Total Games:", "").strip()
         if "\n" not in stats:
-            stats = stats.replace("(", "").replace(")", "").replace("/", "").replace("W", "").replace("L", "").replace("D", "").split(" ")
+            stats = streplacer(stats, (["(", ""], [")", ""], ["/", ""], ["W", ""], ["L", ""], ["D", ""])).split(" ")
             while "" in stats:
                 stats.remove("")
             return [float(elem) for elem in stats]
@@ -1592,7 +1616,7 @@ def ratingchecker(soup):
 def memsin(soup):
     memsi = ""
     for placeholder in soup.find_all(class_ = "section-content section-content-2"):
-        longnumlist = placeholder.text.strip().replace("  ", "").replace(",", "").replace("Member Since:", "").replace("Profile Views:", " ").replace("Last Login:", " ").replace("\n", "").replace("Jan", "01").replace("Feb", "02").replace("Mar", "03").replace("Apr", "04").replace("May", "05").replace("Jun", "06").replace("Jul", "07").replace("Aug", "08").replace("Sep", "09").replace("Oct", "10").replace("Nov", "11").replace("Dec", "12").split(" ")
+        longnumlist = streplacer(placeholder.text.strip(), (["  ", ""], [",", ""], ["Member Since:", ""], ["Profile Views:", " "], ["Last Login:", " "], ["\n", ""], ["Jan", "01"], ["Feb", "02"], ["Mar", "03"], ["Apr", "04"], ["May", "05"], ["Jun", "06"], ["Jul", "07"], ["Aug", "08"], ["Sep", "09"], ["Oct", "10"], ["Nov", "11"], ["Dec", "12"])).split(" ")
         memsi = [int(longnumlist[2]), int(longnumlist[0]), int(longnumlist[1])], [int(longnumlist[5]), int(longnumlist[3]), int(longnumlist[4])]
     return memsi
 
@@ -1613,7 +1637,7 @@ def birthlister(soup):
         try:
             placeholder = [birth for birth in str(placeholder).split("\n") if "Birthday:" in birth][0]
             pos = placeholder.find("Birthday:")
-            birthday = placeholder[pos + 19: pos + 31].replace(",", "").replace("Jan", "01").replace("Feb", "02").replace("Mar", "03").replace("Apr", "04").replace("May", "05").replace("Jun", "06").replace("Jul", "07").replace("Aug", "08").replace("Sep", "09").replace("Oct", "10").replace("Nov", "11").replace("Dec", "12").split(" ")
+            birthday = streplacer(placeholder[pos + 19: pos + 31], (["Jan", "01"], ["Feb", "02"], ["Mar", "03"], ["Apr", "04"], ["May", "05"], ["Jun", "06"], ["Jul", "07"], ["Aug", "08"], ["Sep", "09"], ["Oct", "10"], ["Nov", "11"], ["Dec", "12"])).split(" ")
         except IndexError:
             birthday = ""
     return birthday
@@ -1710,6 +1734,8 @@ def notclosedcheck(memlist):
 
 pathway = "y"
 dommem = memfiop("mem/dommem", "keydom")
+makefolder((["mem", "Invite Lists", "namelists", "Webdriver", "Webdriver/Linux", "Webdriver/Mac", "Webdriver/Windows", "Webdriver/Linux/86", "Webdriver/Linux/64", "Webdriver/Mac/86", "Webdriver/Mac/64", "Webdriver/Windows/86", "Webdriver/Windows/64"]))
+
 while pathway in (["y"]):
     print "chess.com RK Resource 001\nversion 0.8.8 alpha\ndeveloped by Robin Karlsson\ncontact email: 'r.robin.karlsson@gmail.com'\ncontact chess.com profile: 'http://www.chess.com/members/view/RobinKarlsson'\n"
     print "What would you like to do?\n\n 1. Create a list of members from a group\n 2. Build an excell compatible csv file with data on a list of members\n 3. Send invites for a group\n 4. Check a groups finished votechess matches and count number of posts per member\n 5. Build an excell compatible csv file with data on how members of a group has performed in team matches\n 6. Check a list of members for those with a rating above and/or below a specific value, last online & member since a specific date and a timeout ratio below a specific value\n 7. Presentation of a csv-file from option 2 or 5\n 8. Remove doublets and filter out members who are in specific groups from a preexisting textfile\n 9. Look for members who has left your team\n 10. Count number of group notes per member\n 11. Collect birthdays for a list of members\n 12. Send personal messages to members"
@@ -1745,7 +1771,7 @@ while pathway in (["y"]):
 
         elif choice6 == "2":
             memfile1 = raw_input("\nName of the file to which your list will be saved: ")
-            with open(memfile1, "a") as placeholder2:
+            with open(memfile1, "ab") as placeholder2:
                 placeholder2.write(un1)
 
     elif flow == "2":
@@ -1846,7 +1872,7 @@ while pathway in (["y"]):
                 soup = BeautifulSoup(response)
                 if timeoutchecker(soup) > maxtmrat:
                     deadbeatlist.append(member)
-            print "\n\n\nThe following members has a timeoutratio above " + str(maxtmrat) + "%: " + str(deadbeatlist).replace("'", "").replace("[", "").replace("]", "")
+            print "\n\n\nThe following members has a timeoutratio above " + str(maxtmrat) + "%: " + streplacer(str(deadbeatlist), (["'", ""], ["[", ""], ["]", ""]))
 
     elif flow == "6":
         membernamelist = raw_input("\n\nList of members to check: ")
@@ -1860,12 +1886,12 @@ while pathway in (["y"]):
             choice6 = raw_input("\n\nDo you wish to\n 1. Print the names of those who fill your criterias onscreen\n 2. Save them to a file\n\nEnter choice here: ")
 
         if choice6 == "1":
-            print "\n\n" + str(passmembers).replace("'", "").replace("[", "").replace("]", "")
+            print "\n\n" + streplacer(str(passmembers), (["'", ""], ["[", ""], ["]", ""]))
 
         if choice6 == "2":
             memfile1 = raw_input("\nName of the file to which your list will be saved: ")
-            with open(memfile1, "a") as placeholder2:
-                placeholder2.write(str(passmembers).replace("'", "").replace("[", "").replace("]", ""))
+            with open(memfile1, "ab") as placeholder2:
+                placeholder2.write(streplacer(str(passmembers), (["'", ""], ["[", ""], ["]", ""])))
 
     elif flow == "7":
         memlist = list()
@@ -1969,18 +1995,7 @@ while pathway in (["y"]):
 
     elif flow == "8":
         print "\n\n\nRemoves doublets and unwanted elements from your list (ie those who are either already members or banned/unwanted)\n\nFiles in directory:\n"
-        flist = list()
-        counter3 = 1
-        for fname in os.listdir("."):
-            if os.path.isfile(fname):
-                if not fname.endswith(".csv"):
-                    if not fname.endswith(".py"):
-                        if not fname.endswith(".pyc"):
-                            if not fname.endswith(".log"):
-                                if not fname.endswith("~"):
-                                    print " " + str(counter3) + ". " + fname
-                                    flist.append(fname)
-                                    counter3 += 1
+        flist = fnamenot(([".csv", ".py", ".pyc", ".log", "~"]))
 
         preexlist = ""
         while preexlist not in flist:
@@ -1991,7 +2006,7 @@ while pathway in (["y"]):
         un4 = un4.difference(domban)
         un4 = misc1(un4)
 
-        with open(preexlist, "w") as placeholder2:
+        with open(preexlist, "wb") as placeholder2:
             placeholder2.write(un4)
 
     elif flow == "9":
@@ -2073,7 +2088,7 @@ while pathway in (["y"]):
                 memlist = nineworker("Jungle Team", "17050", logincookie, memlist, "keyJT")
                 group = "Jungle Team"
 
-            print "\n\nMembers who are no longer in " + group + ": " + str(memlist).replace("'", "").replace("[", "").replace("]", "")
+            print "\n\nMembers who are no longer in " + group + ": " + streplacer(str(memlist), (["'", ""], ["[", ""], ["]", ""]))
 
     elif flow == "10":
         grcheck = raw_input("group to check: ")
