@@ -379,7 +379,7 @@ def pmdriver(target, choice):
         if name == " ":
             name = membername2
 
-        subject = streplacer(subject, (["/name", name.strip()], ["/nation", country.strip()], ["/newline", "\n"]))
+        subject = streplacer(subjectorg, (["/name", name.strip()], ["/nation", country.strip()], ["/newline", "\n"]))
 
         for link in soup.find_all("a", href=True):
             if link.text == "Send a Message":
