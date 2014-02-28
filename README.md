@@ -22,9 +22,9 @@ Instructions
 
  1) install the required software, the libraries can either be installed to your system or tarballed
  
- 2) set up the correct file architecture by downloading and extracting this file, https://drive.google.com/file/d/0B1k9dLEBCofEeWpOOHJJV1dlTEk
+ 2) set up the correct file architecture by downloading and extracting this file (optional but highly recommended), https://drive.google.com/file/d/0B1k9dLEBCofEeWpOOHJJV1dlTEk
  
- 3) get the code from here, https://github.com/RobinKarlsson/RK-Resource-001/blob/master/RK%20Resource%20001, and save it to a .py file in your newly extracted "RK Resource 001" folder
+ 3) get the code, https://github.com/RobinKarlsson/RK-Resource-001/blob/master/RK%20Resource%20001, and save it to a .py file in your newly extracted "RK Resource 001" folder
  
  4) run the script
 
@@ -104,3 +104,8 @@ Build a birthday schedule for a list of members
 12.
 
 Send personal messages to members
+
+
+13.
+
+Pair lists of players against each others (for custom tournaments or group vs group live matches)
