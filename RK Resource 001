@@ -409,7 +409,8 @@ def mecopner(browser, pointl):
             print "something went wrong, reopening " + pointl
     return browser, response
 
-def nineworker(infile, inid, logincookie, memlist, key):
+def nineworker(infile, inid, logincookie, key):
+    memlist = list()
     target = list()
     memlistorg = memfiop("mem/" + infile, key)
 
@@ -1200,6 +1201,47 @@ def remove_doublets(filename, target):
         target = ""
     return streplacer(str(OrderedDict.fromkeys((line for line in target if line)).keys()), (["' ", ""], ["'", ""], [",", ""], ["]", ""], ["[", ""], ["  ", " "])).split()
 
+def evenpairing(lst1, lst2):
+    playlst = list()
+    for player1 in lst1[:]:
+        player2 = min(lst2, key=lambda x: abs(x[1] - player1[1]))
+        playlst.append([player1, player2])
+
+        lst1.remove(player1)
+        lst2.remove(player2)
+    return playlst
+
+def remcomelem(lst1, lst2):
+    for elem in lst1[:]:
+        if elem in lst2:
+            lst1.remove(elem)
+            lst2.remove(elem)
+    return lst1, lst2
+
+def pairsorter(browser, target, choice):
+    partup = list()
+    for mem in target:
+        browser, response = mecopner(browser, "http://www.chess.com/members/view/" + mem)
+        if "://www.chess.com/members/view/" not in browser.geturl():
+            continue
+
+        soup = BeautifulSoup(response)
+        if choice == "1":
+            rating = lstanratingchecker(soup)
+        elif choice == "2":
+            rating = lbulratingchecker(soup)
+        elif choice == "3":
+            rating = lblitzratingchecker(soup)
+        elif choice == "4":
+            rating = onlratingchecker(soup)
+        elif choice == "5":
+            rating = ranratingchecker(soup)
+        elif choice == "6":
+            rating = tacratingchecker(soup)
+
+        partup.append([mem, int(rating)])
+    return sorted(partup, reverse = True, key=lambda tup: tup[1])
+
 def memprmenu():
     minrat = raw_input("\n\nMin (online chess) rating allowed. leave empty to skip: ")
     maxrat = raw_input("Max (online chess) rating allowed. leave empty to skip: ")
@@ -1398,6 +1440,7 @@ def memfiop(fipath, kem):
             for placeholder in open(fipath, "rb"):
                 mem = com3(kem, placeholder, 256, []).replace("\n", "").split(", ")
             return mem
+    else:
         open(fipath, "wb").close
     return list()
 
@@ -1598,6 +1641,56 @@ def onlratingchecker(soup):
                 "nothing"
     return onrating
 
+def ranratingchecker(soup):
+    onrating = 0
+    for x in soup.find_all(class_ = "clearfix stats-header"):
+        if "Chess960" in str(x):
+            try:
+                onrating = int(x.text.replace("Chess960", "").strip())
+            except ValueError:
+                "nothing"
+    return onrating
+
+def tacratingchecker(soup):
+    onrating = 0
+    for x in soup.find_all(class_ = "clearfix stats-header"):
+        if "Tactics" in str(x):
+            try:
+                onrating = int(x.text.replace("Tactics", "").strip())
+            except ValueError:
+                "nothing"
+    return onrating
+
+def lstanratingchecker(soup):
+    onrating = 0
+    for x in soup.find_all(class_ = "clearfix stats-header"):
+        if "Live Chess - Standard" in str(x):
+            try:
+                onrating = int(x.text.replace("Live Chess - Standard", "").strip())
+            except ValueError:
+                "nothing"
+    return onrating
+
+def lbulratingchecker(soup):
+    onrating = 0
+    for x in soup.find_all(class_ = "clearfix stats-header"):
+        if "Live Chess - Bullet" in str(x):
+            try:
+                onrating = int(x.text.replace("Live Chess - Bullet", "").strip())
+            except ValueError:
+                "nothing"
+    return onrating
+
+def lblitzratingchecker(soup):
+    onrating = 0
+    for x in soup.find_all(class_ = "clearfix stats-header"):
+        if "Live Chess - Blitz" in str(x):
+            try:
+                onrating = int(x.text.replace("Live Chess - Blitz", "").strip())
+            except ValueError:
+                "nothing"
+    return onrating
+
 def ratingchecker(soup):
     ratinglist = list()
     recorder = "off"
@@ -1738,10 +1831,10 @@ makefolder((["mem", "Invite Lists", "namelists", "Webdriver", "Webdriver/Linux",
 
 while pathway in (["y"]):
     print "chess.com RK Resource 001\nversion 0.8.8 alpha\ndeveloped by Robin Karlsson\ncontact email: 'r.robin.karlsson@gmail.com'\ncontact chess.com profile: 'http://www.chess.com/members/view/RobinKarlsson'\n"
-    print "What would you like to do?\n\n 1. Create a list of members from a group\n 2. Build an excell compatible csv file with data on a list of members\n 3. Send invites for a group\n 4. Check a groups finished votechess matches and count number of posts per member\n 5. Build an excell compatible csv file with data on how members of a group has performed in team matches\n 6. Check a list of members for those with a rating above and/or below a specific value, last online & member since a specific date and a timeout ratio below a specific value\n 7. Presentation of a csv-file from option 2 or 5\n 8. Remove doublets and filter out members who are in specific groups from a preexisting textfile\n 9. Look for members who has left your team\n 10. Count number of group notes per member\n 11. Collect birthdays for a list of members\n 12. Send personal messages to members"
+    print "What would you like to do?\n\n 1. Create a list of members from a group\n 2. Build an excell compatible csv file with data on a list of members\n 3. Send invites for a group\n 4. Check a groups finished votechess matches and count number of posts per member\n 5. Build an excell compatible csv file with data on how members of a group has performed in team matches\n 6. Check a list of members for those with a rating above and/or below a specific value, last online & member since a specific date and a timeout ratio below a specific value\n 7. Presentation of a csv-file from option 2 or 5\n 8. Remove doublets and filter out members who are in specific groups from a preexisting textfile\n 9. Look for members who has left your team\n 10. Count number of group notes per member\n 11. Collect birthdays for a list of members\n 12. Send personal messages to members\n 13. Pair lists of players against each others (for custom tournaments or group vs group live matches)"
 
     flow = ""
-    while flow not in (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]):
+    while flow not in (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13"]):
         flow = raw_input("\nEnter your choice here: ")
 
     if flow == "1":
@@ -1785,7 +1878,7 @@ while pathway in (["y"]):
     elif flow == "3":
         choice5 = ""
         while choice5 not in (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "42", "84", "168"]):
-            choice5 = raw_input("\n\nWhich group would you like to send invites for?\n\n    Dominion affiliated groups:\n 1. Star Trek: The Dominion\n 2. Karemma Commerce Ministry\n 3. The Breen Confederacy\n 4. The Cardassian Empire\n 5. Death Star III\n\n    Non Dominion groups:\n \n 7. Legio XIII Gemina\n 8. Andromeda\n 9. Family Guy\n 10. Space 1999\n 11. Space 2099\n\n 42. endless loop that goes through all the groups, indefinitely\n 84. Create you own custom infinite loop from the supported groups\n 168. Send invites for another group\n\nEnter choice here: ")
+            choice5 = raw_input("\n\nWhich group would you like to send invites for?\n\n    Dominion affiliated groups:\n 1. Star Trek: The Dominion\n 2. Karemma Commerce Ministry\n 3. The Breen Confederacy\n 4. The Cardassian Empire\n 5. Death Star III\n\n    Non Dominion groups:\n\n 6. Jungle Team\n 7. Legio XIII Gemina\n 8. Andromeda\n 9. Family Guy\n 10. Space 1999\n 11. Space 2099\n 12. Chess Star Resort\n\n 42. endless loop that goes through all the groups, indefinitely\n 84. Create you own custom infinite loop from the supported groups\n 168. Send invites for another group\n\nEnter choice here: ")
         inviter(([choice5]), 200)
 
     elif flow == "4":
@@ -2011,8 +2104,8 @@ while pathway in (["y"]):
 
     elif flow == "9":
         choiceorg = ""
-        while choiceorg not in (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "42"]):
-            choiceorg = raw_input("\nWhich group do you wish to check?\n 1. Star Trek: The Dominion\n 2. The Breen Confederacy\n 3. The Cardassian Empire\n 4. Death Star III\n 5. Karemma Ministry of Trade\n 6. Space 1999\n 7. Space 2099\n 8. Andromeda\n 9. legio XIII gemina\n 10. The Majestical Utopia\n 11. Space Angels\n 12. Chess!\n 13. Carpe Diem\n 14. CSR\n 15. Family Guy\n 16. Jungle Team\n\n 42. Check groups 1-10, 14-16\n\nYour choice: ")
+        while choiceorg not in (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "42", "168"]):
+            choiceorg = raw_input("\nWhich group do you wish to check?\n 1. Star Trek: The Dominion\n 2. The Breen Confederacy\n 3. The Cardassian Empire\n 4. Death Star III\n 5. Karemma Ministry of Trade\n 6. Space 1999\n 7. Space 2099\n 8. Andromeda\n 9. legio XIII gemina\n 10. The Majestical Utopia\n 11. Space Angels\n 12. Chess!\n 13. Carpe Diem\n 14. CSR\n 15. Family Guy\n 16. Jungle Team\n\n 42. Check groups 1-10, 14-16\n 168. Check another group\n\nYour choice: ")
         print "\n\nWe will start by extracting the latest memberslist for your group\n"
         logincookie = login()
 
@@ -2022,71 +2115,75 @@ while pathway in (["y"]):
             choiceorg = ([choiceorg])
 
         for choice in choiceorg:
-            memlist = list()
-
             if choice == "1":
-                memlist = nineworker("dommem", "15896", logincookie, memlist, "keydom")
+                memlist = nineworker("dommem", "15896", logincookie, "keydom")
                 group = "the Dominion"
 
             elif choice == "2":
-                memlist = nineworker("breenmem", "21974", logincookie, memlist, "keybreen")
+                memlist = nineworker("breenmem", "21974", logincookie, "keybreen")
                 group = "the Breen Confederacy"
 
             elif choice == "3":
-                memlist = nineworker("carmem", "20126", logincookie, memlist, "keycarda")
+                memlist = nineworker("carmem", "20126", logincookie, "keycarda")
                 group = "the Cardassian Empire"
 
             elif choice == "4":
-                memlist = nineworker("deathmem", "17618", logincookie, memlist, "keydeath")
+                memlist = nineworker("deathmem", "17618", logincookie, "keydeath")
                 group = "Death Star III"
 
             elif choice == "5":
-                memlist = nineworker("karemma", "26088", logincookie, memlist, "keykar")
+                memlist = nineworker("karemma", "26088", logincookie, "keykar")
                 group = "Karemma Ministry of Trade"
 
             elif choice == "6":
-                memlist = nineworker("1999", "26614", logincookie, memlist, "key1999")
+                memlist = nineworker("1999", "26614", logincookie, "key1999")
                 group = "Space 1999"
 
             elif choice == "7":
-                memlist = nineworker("2099", "26624", logincookie, memlist, "key2099")
+                memlist = nineworker("2099", "26624", logincookie, "key2099")
                 group = "Space 2099"
 
             elif choice == "8":
-                memlist = nineworker("andromeda", "21262", logincookie, memlist, "keyandromeda")
+                memlist = nineworker("andromeda", "21262", logincookie, "keyandromeda")
                 group = "Andromeda"
 
             elif choice == "9":
-                memlist = nineworker("legio", "22596", logincookie, memlist, "keylegio")
+                memlist = nineworker("legio", "22596", logincookie, "keylegio")
                 group = "Legio XIII Gemina"
 
             elif choice == "10":
-                memlist = nineworker("utopia", "23674", logincookie, memlist, "keyutopia")
+                memlist = nineworker("utopia", "23674", logincookie, "keyutopia")
                 group = "Majestical Utopia"
 
             elif choice == "11":
-                memlist = nineworker("angelmem", "18512", logincookie, memlist, "keyangel")
+                memlist = nineworker("angelmem", "18512", logincookie, "keyangel")
                 group = "Space Angels"
 
             elif choice == "12":
-                memlist = nineworker("chessmem", "18810", logincookie, memlist, "keyChess")
+                memlist = nineworker("chessmem", "18810", logincookie, "keyChess")
                 group = "Chess!"
 
             elif choice == "13":
-                memlist = nineworker("CarpeDiemmem", "14704", logincookie, memlist, "keyCD")
+                memlist = nineworker("CarpeDiemmem", "14704", logincookie, "keyCD")
                 group = "Carpe Diem"
 
             elif choice == "14":
-                memlist = nineworker("CSR", "18514", logincookie, memlist, "keyCSR")
+                memlist = nineworker("CSR", "18514", logincookie, "keyCSR")
                 group = "Chess Star Resort"
 
             elif choice == "15":
-                memlist = nineworker("Family Guy", "14966", logincookie, memlist, "keyFG")
+                memlist = nineworker("Family Guy", "14966", logincookie, "keyFG")
                 group = "Family Guy"
 
             elif choice == "16":
-                memlist = nineworker("Jungle Team", "17050", logincookie, memlist, "keyJT")
+                memlist = nineworker("Jungle Team", "17050", logincookie, "keyJT")
                 group = "Jungle Team"
+
+            elif choice == "168":
+                group = raw_input("Name of group to check: ")
+                groupid = raw_input("Groups id: ")
+                memlist = nineworker(group, groupid, logincookie, "Custom")
+                
 
             print "\n\nMembers who are no longer in " + group + ": " + streplacer(str(memlist), (["'", ""], ["[", ""], ["]", ""]))
 
@@ -2142,6 +2239,61 @@ while pathway in (["y"]):
         elif choice == "2":
             target = raw_input("\n\nlist of members to pm: ").replace(" ", "").split(",")
         pmdriver(target, choice)
+
+    elif flow == "13":
+        gchoice = ""
+        while gchoice not in (["1", "2"]):
+            gchoice = raw_input("\n\n 1. Pair a list of members against each others\n 2. Pair two lists of members to play each others\nChoice: ")
+
+        if gchoice == "1":
+            target = list(set(raw_input("List of participants: ").replace(" ", "").split(",")))
+            while "" in target:
+                target.remove("")
+
+        elif gchoice == "2":
+            name1org = raw_input("Name of group 1: ")
+            target1 = list(set(raw_input("Participants from group 1: ").replace(" ", "").split(",")))
+            while "" in target1:
+                target1.remove("")
+            name2org = raw_input("Name of group 2: ")
+            target2 = list(set(raw_input("Participants from group 2: ").replace(" ", "").split(",")))
+            while "" in target2:
+                target2.remove("")
+
+            target1, target2 = remcomelem(target1, target2)
+
+        browser = mecbrowser("")
+
+        choice = ""
+        while choice not in (["1", "2", "3", "4", "5", "6"]):
+            choice = raw_input("\nMake pairs based on\n 1. Live Standard\n 2. Live Bullet\n 3. Live Blitz\n 4. Online Chess\n 5. 960\n 6. Tactics\nYour choice: ")
+
+        if gchoice == "1":
+            partup = pairsorter(browser, target, choice)
+            partup = zip(partup, partup[1:])[::2]
+            for pair in partup:
+                print pair[0][0] + " (" + str(pair[0][1]) + ") - " + pair[1][0] + " (" + str(pair[1][1]) + ")"
+
+        elif gchoice == "2":
+            partup1org = pairsorter(browser, target1, choice)
+            partup2org = pairsorter(browser, target2, choice)
+
+            if len(partup1org) < len(partup2org):
+                partup1 = partup1org
+                partup2 = partup2org
+                name1 = name1org
+                name2 = name2org
+            else:
+                partup2 = partup1org
+                partup1 = partup2org
+                name2 = name1org
+                name1 = name2org
+
+            pairs = evenpairing(partup1, partup2)
+
+            print name1 + " - " + name2
+            for pair in pairs:
+                print pair[0][0] + " (" + str(pair[0][1]) + ") - " + pair[1][0] + " (" + str(pair[1][1]) + ")"
 
     pathway = ""
     while pathway not in (["y", "n"]):
