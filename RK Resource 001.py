@@ -21,6 +21,7 @@ from datetime import datetime, date, timedelta
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.alert import Alert
@@ -149,7 +150,7 @@ def getmeminfo(target, filename):
         csvwriter.writerow((mem, namechecker(soup), onlratingchecker(soup), timeoutchecker(soup), memsinlastonl[1], memsinlastonl[0], timemove, groupmemlister(soup), ptscheck(soup), gamestat[0], gamestat[1], gamestat[2], gamestat[3], gamestat[1] / gamestat[0], nationlister(soup), AvatarCheck(soup)))
 
 def getplatform():
-    return _platform.platform(), _platform.system(), _platform.release()
+    return _platform.platform(), _platform.system(), _platform.release(), _platform.architecture()
 
 def mecbrowser(logincookie):
     browser = mechanize.Browser()
@@ -173,38 +174,59 @@ def mecbrowser(logincookie):
 
 def pickbrowser(browserchoice):
     usrplatform = getplatform()
-    if browserchoice == "1":
-        browser = webdriver.Firefox()
+    while True:
+        if browserchoice == "1":
+            try:
+                browser = webdriver.Firefox(webdriver.FirefoxProfile(os.path.abspath("Webdriver/Linux/Profiles/Firefox")))
+                break
+            except:
+                print "\n\nFailed to open custom firefox profile, reverting to standard temp profile\n\n"
+                browser = webdriver.Firefox()
+                break
 
-    elif browserchoice == "2":
-        if usrplatform[1] == "Linux":
-            chromepath = os.path.abspath("Webdriver/Linux/86/chromedriver")
-            os.environ["webdriver.chrome.driver"] = chromepath
-            browser = webdriver.Chrome(chromepath)
+        elif browserchoice == "2":
+            copt = Options()
+            try:
+                copt.add_extension(os.path.abspath("Webdriver/Linux/Extensions/Chrome/adblock-plus.crx"))
+            except:
+                print "Failed to load adblock-plus.crx in " + os.path.abspath("Webdriver/Linux/Extensions/Chrome/")
 
-        elif usrplatform[1] == "Windows":
-            chromepath = os.path.abspath("Webdriver/Windows/86/chromedriver.exe")
-            os.environ["webdriver.chrome.driver"] = chromepath
-            browser = webdriver.Chrome(chromepath)
+            if usrplatform[1] == "Linux":
+                chromepath = os.path.abspath("Webdriver/Linux/86/chromedriver")
+                os.environ["webdriver.chrome.driver"] = chromepath
+                browser = webdriver.Chrome(chromepath, chrome_options = copt)
+                break
 
-        elif usrplatform[1] == "darwin":
-            chromepath = os.path.abspath("Webdriver/Mac/86/chromedriver")
-            os.environ["webdriver.chrome.driver"] = chromepath
-            browser = webdriver.Chrome(chromepath)
+            elif usrplatform[1] == "Windows":
+                chromepath = os.path.abspath("Webdriver/Windows/86/chromedriver.exe")
+                os.environ["webdriver.chrome.driver"] = chromepath
+                browser = webdriver.Chrome(chromepath, chrome_options = copt)
+                break
 
-    elif browserchoice == "3":
-        if usrplatform[1] == "Linux":
-            browser = webdriver.PhantomJS(os.path.abspath("Webdriver/Linux/86/phantomjs"))
+            elif usrplatform[1] == "Darwin":
+                chromepath = os.path.abspath("Webdriver/Mac/86/chromedriver")
+                os.environ["webdriver.chrome.driver"] = chromepath
+                browser = webdriver.Chrome(chromepath, chrome_options = copt)
+                break
 
-        elif usrplatform[1] == "Windows":
-            browser = webdriver.PhantomJS(os.path.abspath("Webdriver/Windows/86/phantomjs.exe"))
+        elif browserchoice == "3":
+            if usrplatform[1] == "Linux":
+                browser = webdriver.PhantomJS(os.path.abspath("Webdriver/Linux/86/phantomjs"))
+                break
 
-        elif usrplatform[1] == "darwin":
-            browser = webdriver.PhantomJS(os.path.abspath("Webdriver/Mac/86/phantomjs"))
+            elif usrplatform[1] == "Windows":
+                browser = webdriver.PhantomJS(os.path.abspath("Webdriver/Windows/86/phantomjs.exe"))
+                break
 
-    elif browserchoice == "4":
-        if usrplatform[1] == "Windows":
-            browser = webdriver.Ie(os.path.abspath("Webdriver/Windows/86/IEDriverServer.exe"))
+            elif usrplatform[1] == "Darwin":
+                browser = webdriver.PhantomJS(os.path.abspath("Webdriver/Mac/86/phantomjs"))
+                break
+
+        elif browserchoice == "4":
+            if usrplatform[1] == "Windows":
+                browser = webdriver.Ie(os.path.abspath("Webdriver/Windows/86/IEDriverServer.exe"))
+                break
+        browserchoice = raw_input("\nSomething went wrong, please send this to the developer: " + browserchoice + usrplatform + "\n\nTry and pick another browser\n 1. Firefox\n 2. Chrome\n 3. PhantomJS\n 4. Internet Explorer\nEnter choice: ")
     return browser
 
 def com2(xxxxxxxxxxxxxx, xxxxxxxxxxxxx, xxxxxxxxxxxxxxxx, xxxxxxxxxxxxxxxxxxx):
@@ -1158,19 +1180,34 @@ def filtmcemsg(msglist, browser, name, country):
             browser.switch_to_default_content()
         elif content[0] == "2":
             browser.find_element_by_id("tinymcewindow_imageuploader").click()
-            time.sleep(1)
-            browser.switch_to_window(browser.window_handles[1])
-            WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.ID, "photourl")))
+            while True:
+                try:
+                    browser.switch_to_window(browser.window_handles[1])
+                    WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.ID, "photourl")))
+                    break
+                except:
+                    time.sleep(1)
+                    print "0042 Alfa"
             browser.find_element_by_id("photourl").send_keys(content[1])
             browser.find_element_by_id("insert").click()
             browser.switch_to_window(browser.window_handles[0])
             time.sleep(1)
         elif content[0] == "3":
             browser.find_element_by_id("tinymcewindow_mce_media").click()
-            alert = browser.switch_to_alert()
-            alert.send_keys(content[1])
-            alert.accept()
-            time.sleep(1)
+            while True:
+                try:
+                    alert = browser.switch_to_alert()
+                    break
+                except:
+                    print "0043 Alfa"
+            while True:
+                try:
+                    alert.send_keys(content[1])
+                    alert.accept()
+                    time.sleep(1)
+                    break
+                except:
+                    print "0043 Alfa 2"
 
 def login():
     Username = raw_input("Username: ")
@@ -1827,7 +1864,7 @@ def notclosedcheck(memlist):
 
 pathway = "y"
 dommem = memfiop("mem/dommem", "keydom")
-makefolder((["mem", "Invite Lists", "namelists", "Webdriver", "Webdriver/Linux", "Webdriver/Mac", "Webdriver/Windows", "Webdriver/Linux/86", "Webdriver/Linux/64", "Webdriver/Mac/86", "Webdriver/Mac/64", "Webdriver/Windows/86", "Webdriver/Windows/64"]))
+makefolder((["mem", "Invite Lists", "namelists", "Webdriver", "Webdriver/Linux", "Webdriver/Mac", "Webdriver/Windows", "Webdriver/Linux/86", "Webdriver/Mac/86", "Webdriver/Windows/86", "Webdriver/Linux/Extensions", "Webdriver/Linux/Profiles", "Webdriver/Linux/Extensions/Chrome", "Webdriver/Linux/Profiles/Firefox"]))
 
 while pathway in (["y"]):
     print "chess.com RK Resource 001\nversion 0.8.8 alpha\ndeveloped by Robin Karlsson\ncontact email: 'r.robin.karlsson@gmail.com'\ncontact chess.com profile: 'http://www.chess.com/members/view/RobinKarlsson'\n"
