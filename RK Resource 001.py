@@ -380,12 +380,13 @@ def pmdriver(target, choice):
             if membername2 not in memberprocesser(True, browser1, membername2, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender):
                 continue
 
-        counter += 1
-        if counter > 100:
-            browser0.quit()
-            browser0 = pickbrowser(browserchoice)
-            browser0 = sellogin(Username, Password, browser0)
-            counter = 1
+        if browserchoice == "1":
+            counter += 1
+            if counter > 100:
+                browser0.quit()
+                browser0 = pickbrowser(browserchoice)
+                browser0 = sellogin(Username, Password, browser0)
+                counter = 1
 
         print "sending pm to " + membername2
         membername = "http://www.chess.com/members/view/" + membername2
@@ -703,13 +704,14 @@ def inviter(choicelist, invitenum):
     counter = 1
     while redo == "yes":
         for choice5 in choicelist:
-            counter += 1
-            counted = "y"
-            if counter > 70:
-                browser2.quit()
-                browser2 = pickbrowser(browserchoice)
-                browser2 = sellogin(Username, Password, browser2)
-                counter = 1
+            if browserchoice == "1":
+                counter += 1
+                counted = "y"
+                if counter > 70:
+                    browser2.quit()
+                    browser2 = pickbrowser(browserchoice)
+                    browser2 = sellogin(Username, Password, browser2)
+                    counter = 1
 
             invitenum2 = invitenum
             memint = list()
@@ -1117,15 +1119,16 @@ def inviter(choicelist, invitenum):
                     if member not in memberprocesser(True, browser1, ([member]), minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender):
                         memtinv.remove(member)
                         continue
-                if counted == "y":
-                    counted = ""
-                else:
-                    counter += 1
-                if counter > 70:
-                    browser2.quit()
-                    browser2 = pickbrowser(browserchoice)
-                    browser2 = sellogin(Username, Password, browser2)
-                    counter = 1
+                if browserchoice == "1":
+                    if counted == "y":
+                        counted = ""
+                    else:
+                        counter += 1
+                    if counter > 70:
+                        browser2.quit()
+                        browser2 = pickbrowser(browserchoice)
+                        browser2 = sellogin(Username, Password, browser2)
+                        counter = 1
 
                 browser1, response = mecopner(browser1, "http://www.chess.com/members/view/" + member)
                 soup = BeautifulSoup(response)
@@ -1180,34 +1183,19 @@ def filtmcemsg(msglist, browser, name, country):
             browser.switch_to_default_content()
         elif content[0] == "2":
             browser.find_element_by_id("tinymcewindow_imageuploader").click()
-            while True:
-                try:
-                    browser.switch_to_window(browser.window_handles[1])
-                    WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.ID, "photourl")))
-                    break
-                except:
-                    time.sleep(1)
-                    print "0042 Alfa"
+            time.sleep(1)
+            browser.switch_to_window(browser.window_handles[1])
+            WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.ID, "photourl")))
             browser.find_element_by_id("photourl").send_keys(content[1])
             browser.find_element_by_id("insert").click()
             browser.switch_to_window(browser.window_handles[0])
             time.sleep(1)
         elif content[0] == "3":
             browser.find_element_by_id("tinymcewindow_mce_media").click()
-            while True:
-                try:
-                    alert = browser.switch_to_alert()
-                    break
-                except:
-                    print "0043 Alfa"
-            while True:
-                try:
-                    alert.send_keys(content[1])
-                    alert.accept()
-                    time.sleep(1)
-                    break
-                except:
-                    print "0043 Alfa 2"
+            alert = browser.switch_to_alert()
+            alert.send_keys(content[1])
+            alert.accept()
+            time.sleep(1)
 
 def login():
     Username = raw_input("Username: ")
