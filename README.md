@@ -34,27 +34,47 @@ Options
 2. Build an excell compatible csv file with the following data on a list of members.
 
 
- Column 1: Username
- Column 2: Real name (if available on members homepage)
- Column 3. Live Standard rating
- Column 4. Live Blitz rating
- Column 5. Live Bullet rating
- Column 6. Online Chess rating
- Column 7. 960 rating
- Column 8. Tactics rating
- Column 9. Timeout-ratio
- Column 10. Last online
- Column 11. Member since
- Column 12. Time per move
- Column 13. Number of groups member is in
- Column 14. Points
- Column 15. Number of online chess games played
- Column 16. Number of online chess games won
- Column 17. Number of online chess games lost
- Column 18. Number of Online chess games drawn
- Column 19. Win ratio for  online chess
- Column 20. Member nation (if available on members homepage)
- Column 21. If member has a custom avatar
+- Column 1: Username
+
+- Column 2: Real name (if available on members homepage)
+
+- Column 3. Live Standard rating
+
+- Column 4. Live Blitz rating
+
+- Column 5. Live Bullet rating
+
+- Column 6. Online Chess rating
+
+- Column 7. 960 rating
+
+- Column 8. Tactics rating
+
+- Column 9. Timeout-ratio
+
+- Column 10. Last online
+
+- Column 11. Member since
+
+- Column 12. Time per move
+
+- Column 13. Number of groups member is in
+
+- Column 14. Points
+
+- Column 15. Number of online chess games played
+
+- Column 16. Number of online chess games won
+
+- Column 17. Number of online chess games lost
+
+- Column 18. Number of Online chess games drawn
+
+- Column 19. Win ratio for  online chess
+
+- Column 20. Member nation (if available on members homepage)
+
+- Column 21. If member has a custom avatar
 
 
 This data can be presented and sorted using option 7 in the main script
@@ -71,29 +91,45 @@ This data can be presented and sorted using option 7 in the main script
                                              
 5. Build an excell compatible csv file with the following data on how each member who has ever played for a group has performed in the groups team matches
 
- Column 1. Username
- Column 2. Number of team matches member has participated in
- Column 3. Points won
- Column 4. Points lost
- Column 5. Ongoing games
- Column 6. Timeouts       
+- Column 1. Username
+
+- Column 2. Number of team matches member has participated in
+
+- Column 3. Points won
+
+- Column 4. Points lost
+
+- Column 5. Ongoing games
+
+- Column 6. Timeouts       
 
 
 
 6. Takes a comma seperated list of members and sort out those who doesn't fill a few criterias regarding:
 
- Min online chess rating
- Max online chess rating
- Last online
- Member Since
- Older than (if birthdate is available on members profile)
- Younger than (if birthdate is available on members profile)
- Min number of groups member may be in
- Max number of groups member may be in
- Timeout-ratio
- Time per move
- If they have a custom avatar
- Gender   
+- Min online chess rating
+
+- Max online chess rating
+
+- Last online
+
+- Member Since
+
+- Older than (if birthdate is available on members profile)
+
+- Younger than (if birthdate is available on members profile)
+
+- Min number of groups member may be in
+
+- Max number of groups member may be in
+
+- Timeout-ratio
+
+- Time per move
+
+- If they have a custom avatar
+
+- Gender   
        
 
                                                  
