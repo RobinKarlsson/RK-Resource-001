@@ -79,12 +79,12 @@ Options
 
 This data can be presented and sorted using option 7 in the main script
 
-    
-                                                                        
+ 
+
 3. Send personalized invites for one or more groups. The invites can include text (with member name and nation, to personalize the message), pictures and videos.                      
       
 
-                                                                  
+                                                        
 4. Goes through a groups finished, non thematic votechess matches and counts number of posts per member    
          
 
