@@ -105,7 +105,7 @@ This data can be presented and sorted using option 7 in the main script
 
 
 
-6. Takes a comma seperated list of members and sort out those who doesn't fill a few criterias regarding:
+ 6) Takes a comma seperated list of members and sort out those who doesn't fill a few criterias regarding:
 
 - Min online chess rating
 
@@ -133,14 +133,14 @@ This data can be presented and sorted using option 7 in the main script
        
 
                                                  
-7. Presentation of csv files from option 2 and 5. Can present data from the csv files sorted by any column, compare two csv files from option 5 to see what has changed or return the username of each member in the file and present it as a comma seperated list       
+ 7) Presentation of csv files from option 2 and 5. Can present data from the csv files sorted by any column, compare two csv files from option 5 to see what has changed or return the username of each member in the file and present it as a comma seperated list       
 
 
 
-8. Removes doublets from a textfile and has the option to remove those who are members of a specific group                     
+ 8) Removes doublets from a textfile and has the option to remove those who are members of a specific group                     
 
 
-9. At first run the script builds a list of members who are currently in your group.
+ 9) At first run the script builds a list of members who are currently in your group.
 
 At future runs the script will build a new memberslist of your group, look for members who are in the memberslist compiled during the last run but not in the latest run.
 
@@ -148,19 +148,19 @@ Removes those who has had their accounts closed or changed their names and print
 
 
 
-10. Count number of group notes per member in the last 100 notes pages 
+ 10) Count number of group notes per member in the last 100 notes pages 
 
 
 
-11. Takes a comma seperated list of members and builds a sorted birthday schedule of those who have their birthday visible on their profile          
+ 11) Takes a comma seperated list of members and builds a sorted birthday schedule of those who have their birthday visible on their profile          
 
 
 
-12. Send personalized personal messages to either a comma seperated list of members or those who are present in a set of pages. The message can include text (with the members real name and nation, to personalize the message) and images           
+ 12) Send personalized personal messages to either a comma seperated list of members or those who are present in a set of pages. The message can include text (with the members real name and nation, to personalize the message) and images           
 
 
 
-13. Takes either one or two list of members and offer to pair them against each others based on rating.
+ 13) Takes either one or two list of members and offer to pair them against each others based on rating.
 
 If given one lists members will be paired against each other after the format, highest ranked vs second highest rank etc. For two lists the script takes each member in the shorter list and pair this member against whoever has the most similar rating in the longer list
 
