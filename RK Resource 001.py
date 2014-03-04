@@ -133,7 +133,7 @@ def getmeminfo(target, filename):
     memlist = list()
     outputfile = open(filename + " " + strftime("%Y-%m-%d", gmtime()) + ".mem.csv", "wb")
     csvwriter = csv.writer(outputfile, delimiter = " ", quoting=csv.QUOTE_MINIMAL)
-    csvwriter.writerow(("Username", "Real name", "Online rating", "Timeout-ratio", "Last online", "Member since", "Time/move", "Groups", "Points", "Total games", "Games won", "Games lost", "Games drawn", "Win ratio", "Nation", "Custom avatar"))
+    csvwriter.writerow(("Username", "Real name", "Live Standard rating", "Live Blitz rating", "Live Bullet rating", "Online rating", "960 rating", "Tactics rating", "Timeout-ratio", "Last online", "Member since", "Time/move", "Groups", "Points", "Total games", "Games won", "Games lost", "Games drawn", "Win ratio", "Nation", "Custom avatar"))
 
     for mem in target:
         print "Processing " + mem
@@ -147,7 +147,7 @@ def getmeminfo(target, filename):
         memsinlastonl = memsin(soup)
         gamestat = gamestats(soup)
 
-        csvwriter.writerow((mem, namechecker(soup), onlratingchecker(soup), timeoutchecker(soup), memsinlastonl[1], memsinlastonl[0], timemove, groupmemlister(soup), ptscheck(soup), gamestat[0], gamestat[1], gamestat[2], gamestat[3], gamestat[1] / gamestat[0], nationlister(soup), AvatarCheck(soup)))
+        csvwriter.writerow((mem, namechecker(soup), lstanratingchecker(soup), lblitzratingchecker(soup), lbulratingchecker(soup), onlratingchecker(soup), ranratingchecker(soup), tacratingchecker(soup), timeoutchecker(soup), memsinlastonl[1], memsinlastonl[0], timemove, groupmemlister(soup), ptscheck(soup), gamestat[0], gamestat[1], gamestat[2], gamestat[3], gamestat[1] / gamestat[0], nationlister(soup), AvatarCheck(soup)))
 
 def getplatform():
     return _platform.platform(), _platform.system(), _platform.release(), _platform.architecture()
@@ -174,27 +174,41 @@ def mecbrowser(logincookie):
 
 def pickbrowser(browserchoice):
     usrplatform = getplatform()
+    handle = False
     while True:
         if browserchoice == "1":
+            fopt = webdriver.FirefoxProfile()
+            for fname in os.listdir("Webdriver/Extensions/Firefox"):
+                if fname.endswith(".xpi"):
+                    try:
+                        fopt.add_extension(os.path.abspath("Webdriver/Extensions/Firefox/" + fname))
+                    except:
+                        print "Failed to load " + os.path.abspath("Webdriver/Extensions/Firefox/" + fname)
             try:
-                browser = webdriver.Firefox(webdriver.FirefoxProfile(os.path.abspath("Webdriver/Linux/Profiles/Firefox")))
-                break
+                browser = webdriver.Firefox(fopt)
             except:
-                print "\n\nFailed to open custom firefox profile, reverting to standard temp profile\n\n"
+                print "\n\nFailed to initiate Firefox with addons, reverting to standard\n\n"
                 browser = webdriver.Firefox()
-                break
+            break
 
         elif browserchoice == "2":
             copt = Options()
-            try:
-                copt.add_extension(os.path.abspath("Webdriver/Linux/Extensions/Chrome/adblock-plus.crx"))
-            except:
-                print "Failed to load adblock-plus.crx in " + os.path.abspath("Webdriver/Linux/Extensions/Chrome/")
+            for fname in os.listdir("Webdriver/Extensions/Chrome"):
+                if fname.endswith(".crx"):
+                    try:
+                        copt.add_extension(os.path.abspath("Webdriver/Extensions/Chrome/" + fname))
+                        handle = True
+                    except:
+                        print "Failed to load " + os.path.abspath("Webdriver/Extensions/Chrome/" + fname)
 
             if usrplatform[1] == "Linux":
                 chromepath = os.path.abspath("Webdriver/Linux/86/chromedriver")
                 os.environ["webdriver.chrome.driver"] = chromepath
-                browser = webdriver.Chrome(chromepath, chrome_options = copt)
+                try:
+                    browser = webdriver.Chrome(chromepath, chrome_options = copt)
+                except:
+                    print "\n\nFailed to initiate Chrome with extensions, reverting to standard\n\n"
+                    browser = webdriver.Chrome(chromepath)
                 break
 
             elif usrplatform[1] == "Windows":
@@ -226,8 +240,8 @@ def pickbrowser(browserchoice):
             if usrplatform[1] == "Windows":
                 browser = webdriver.Ie(os.path.abspath("Webdriver/Windows/86/IEDriverServer.exe"))
                 break
-        browserchoice = raw_input("\nSomething went wrong, please send this to the developer: " + browserchoice + usrplatform + "\n\nTry and pick another browser\n 1. Firefox\n 2. Chrome\n 3. PhantomJS\n 4. Internet Explorer\nEnter choice: ")
-    return browser
+        browserchoice = raw_input("\nSomething went wrong, please send this to the developer: " + browserchoice + str(usrplatform) + "\n\nTry and pick another browser\n 1. Firefox\n 2. Chrome\n 3. PhantomJS\n 4. Internet Explorer\nEnter choice: ")
+    return browser, handle
 
 def com2(xxxxxxxxxxxxxx, xxxxxxxxxxxxx, xxxxxxxxxxxxxxxx, xxxxxxxxxxxxxxxxxxx):
     for xxxxxxxxxxxxxxxxx in xrange(len(xxxxxxxxxxxxx)):
@@ -312,10 +326,10 @@ def streplacer(text, rplst):
         text = text.replace(rptup[0], rptup[1])
     return text
 
-def fnamenot(nlst):
+def fnamenot(nlst, fdir):
     flist = list()
     ctr = 1
-    for fname in os.listdir("."):
+    for fname in os.listdir(fdir):
         if os.path.isfile(fname):
             cont = True
 
@@ -355,8 +369,8 @@ def pmdriver(target, choice):
     Username = raw_input("\n\n\nUsername: ")
     Password = raw_input("Password: ")
 
-    browser0 = pickbrowser(browserchoice)
-    browser0 = sellogin(Username, Password, browser0)
+    browser0, handle = pickbrowser(browserchoice)
+    browser0 = sellogin(Username, Password, browser0, handle)
 
     logincookie = browser0.get_cookies()
 
@@ -384,8 +398,8 @@ def pmdriver(target, choice):
             counter += 1
             if counter > 100:
                 browser0.quit()
-                browser0 = pickbrowser(browserchoice)
-                browser0 = sellogin(Username, Password, browser0)
+                browser0, handle = pickbrowser(browserchoice)
+                browser0 = sellogin(Username, Password, browser0, handle)
                 counter = 1
 
         print "sending pm to " + membername2
@@ -418,7 +432,7 @@ def pmdriver(target, choice):
         browser0.switch_to_frame("tinymcewindow_ifr")
         browser0.find_element_by_id("tinymce").clear()
         browser0.switch_to_default_content()
-        filtmcemsg(msglist, browser0, name, country)
+        filtmcemsg(msglist, browser0, name, country, browserchoice)
 
         browser0.find_element_by_id("c16").click()
         time.sleep(4)
@@ -675,8 +689,8 @@ def inviter(choicelist, invitenum):
     Username = raw_input("\n\n\nUsername: ")
     Password = raw_input("Password: ")
 
-    browser2 = pickbrowser(browserchoice)
-    browser2 = sellogin(Username, Password, browser2)
+    browser2, handle = pickbrowser(browserchoice)
+    browser2 = sellogin(Username, Password, browser2, handle)
 
     logincookie = browser2.get_cookies()
     browser1 = mecbrowser(logincookie)
@@ -699,7 +713,7 @@ def inviter(choicelist, invitenum):
 
     lonl = [int(elem) for elem in str(date.today() - timedelta(days = 3)).split("-")]
     msin = [int(elem) for elem in str(date.today() - timedelta(days = 90)).split("-")]
-    
+
     redo = "yes"
     counter = 1
     while redo == "yes":
@@ -709,8 +723,8 @@ def inviter(choicelist, invitenum):
                 counted = "y"
                 if counter > 70:
                     browser2.quit()
-                    browser2 = pickbrowser(browserchoice)
-                    browser2 = sellogin(Username, Password, browser2)
+                    browser2, handle = pickbrowser(browserchoice)
+                    browser2 = sellogin(Username, Password, browser2, handle)
                     counter = 1
 
             invitenum2 = invitenum
@@ -1126,8 +1140,8 @@ def inviter(choicelist, invitenum):
                         counter += 1
                     if counter > 70:
                         browser2.quit()
-                        browser2 = pickbrowser(browserchoice)
-                        browser2 = sellogin(Username, Password, browser2)
+                        browser2, handle = pickbrowser(browserchoice)
+                        browser2 = sellogin(Username, Password, browser2, handle)
                         counter = 1
 
                 browser1, response = mecopner(browser1, "http://www.chess.com/members/view/" + member)
@@ -1157,7 +1171,7 @@ def inviter(choicelist, invitenum):
                 browser2.find_element_by_id("tinymce").clear()
                 browser2.switch_to_default_content()
 
-                filtmcemsg(msglist, browser2, name, country)
+                filtmcemsg(msglist, browser2, name, country, browserchoice)
                 browser2.find_element_by_id("c18").click()
 
             updinvlist = set(memtinv).difference(set(memint))
@@ -1175,7 +1189,7 @@ def inviter(choicelist, invitenum):
             browser2.quit()
             redo = "no"
 
-def filtmcemsg(msglist, browser, name, country):
+def filtmcemsg(msglist, browser, name, country, browserchoice):
     for content in msglist:
         if content[0] == "1":
             browser.switch_to_frame("tinymcewindow_ifr")
@@ -1205,8 +1219,8 @@ def login():
         return ""
 
     browserchoice = selbrowch()
-    browser = pickbrowser(browserchoice)
-    browser = sellogin(Username, Password, browser)
+    browser, handle = pickbrowser(browserchoice)
+    browser = sellogin(Username, Password, browser, handle)
 
     logincookie = browser.get_cookies()
     browser.quit()
@@ -1266,6 +1280,17 @@ def pairsorter(browser, target, choice):
 
         partup.append([mem, int(rating)])
     return sorted(partup, reverse = True, key=lambda tup: tup[1])
+
+def olprint(startc, endc, inchar, endn, nline):
+    x = 0
+    sys.stdout.write(startc)
+    while x < endn:
+        sys.stdout.write(inchar)
+        x += 1
+    sys.stdout.write(endc)
+    sys.stdout.flush()
+    if nline == True:
+        print ""
 
 def memprmenu():
     minrat = raw_input("\n\nMin (online chess) rating allowed. leave empty to skip: ")
@@ -1336,7 +1361,11 @@ def makefolder(flst):
         if not os.path.exists(folder):
             os.makedirs(folder)
 
-def sellogin(Username, Password, browser):
+def sellogin(Username, Password, browser, handle):
+    if handle == True:
+        time.sleep(1)
+        browser.close()
+        browser.switch_to_window(browser.window_handles[-1])
     browser.get("https://www.chess.com/login")
     WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.ID, "btnLogin")))
 
@@ -1347,10 +1376,15 @@ def sellogin(Username, Password, browser):
     time.sleep(1)
     return browser
 
+def olprint2(tlen, middle, right, left):
+    print right,
+    print tlen.format(middle),
+    print left
+
 def vcman(vclinklist, yourside):
     browserchoice = selbrowch()
-    browser3 = pickbrowser(browserchoice)
-    browser3 = sellogin(raw_input("Username: "), raw_input("Password: "), browser3)
+    browser3, handle = pickbrowser(browserchoice)
+    browser3 = sellogin(raw_input("Username: "), raw_input("Password: "), browser3, handle)
 
     logincookie = browser3.get_cookies()
     browser1 = mecbrowser(logincookie)
@@ -1850,17 +1884,56 @@ def notclosedcheck(memlist):
             memlist2.append(mem)
     return memlist2
 
+olprint("*", "*", "-", 72, True)
+for content in (["", "", "", "RK Resource 001", "version 0.8.8 alpha", "", "", ""]):
+    olprint2("{0: ^70}", content, "|", "|")
+olprint("|", "|", "-", 72, True)
+
+for content in (["", "", "developed by Robin Karlsson", "", "", "Contact information", "", "r.robin.karlsson@gmail.com", "http://www.chess.com/members/view/RobinKarlsson", "", ""]):
+    olprint2("{0: ^70}", content, "|", "|")
+olprint("|", "|", "-", 72, True)
+
+for content in (["", "", "Options", "Type /help or /help <number> for more info", "", "", "1. Extract the memberslist of one or more groups", "", "2. Build a csv file with data on a list of members", "", "3. Send invites for a group", "", "4. Posts per member in a groups finished votechess matches", "", "5. Build a csv file of a groups team match participants", "", "6. Filter a list of members for those who fill a few requirements", "", "7. Presentation of csv-files from options 2 and 5", "", "8. Process invite lists", "", "9. Look for members who has recenty left your group", "", "10. Count number of group notes per member in the last 100 notes pages", "", "11. Build a birthday schedule for a list of members", "", "12. Send a personal message to a list of members", "", "13. Pair lists of players against each others", "", ""]):
+    olprint2("{0: ^70}", content, "|", "|")
+olprint("*", "*", "-", 72, True)
+
 pathway = "y"
+makefolder((["mem", "Invite Lists", "namelists", "Webdriver", "Webdriver/Linux", "Webdriver/Mac", "Webdriver/Windows", "Webdriver/Linux/86", "Webdriver/Mac/86", "Webdriver/Windows/86", "Webdriver/Extensions", "Webdriver/Extensions/Chrome", "Webdriver/Extensions/Firefox"]))
 dommem = memfiop("mem/dommem", "keydom")
-makefolder((["mem", "Invite Lists", "namelists", "Webdriver", "Webdriver/Linux", "Webdriver/Mac", "Webdriver/Windows", "Webdriver/Linux/86", "Webdriver/Mac/86", "Webdriver/Windows/86", "Webdriver/Linux/Extensions", "Webdriver/Linux/Profiles", "Webdriver/Linux/Extensions/Chrome", "Webdriver/Linux/Profiles/Firefox"]))
 
 while pathway in (["y"]):
-    print "chess.com RK Resource 001\nversion 0.8.8 alpha\ndeveloped by Robin Karlsson\ncontact email: 'r.robin.karlsson@gmail.com'\ncontact chess.com profile: 'http://www.chess.com/members/view/RobinKarlsson'\n"
-    print "What would you like to do?\n\n 1. Create a list of members from a group\n 2. Build an excell compatible csv file with data on a list of members\n 3. Send invites for a group\n 4. Check a groups finished votechess matches and count number of posts per member\n 5. Build an excell compatible csv file with data on how members of a group has performed in team matches\n 6. Check a list of members for those with a rating above and/or below a specific value, last online & member since a specific date and a timeout ratio below a specific value\n 7. Presentation of a csv-file from option 2 or 5\n 8. Remove doublets and filter out members who are in specific groups from a preexisting textfile\n 9. Look for members who has left your team\n 10. Count number of group notes per member\n 11. Collect birthdays for a list of members\n 12. Send personal messages to members\n 13. Pair lists of players against each others (for custom tournaments or group vs group live matches)"
-
     flow = ""
     while flow not in (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13"]):
-        flow = raw_input("\nEnter your choice here: ")
+        flow = raw_input("\n\n\nEnter your choice here: ")
+
+        if flow == "/help 1":
+            print "\n\nCreates a list of members from one or more groups. Has the option to remove those who're also members of a specific group (using the members list built in option 9). The list can either be saved to a file or be directly printed onscreen\n\nOptional login if you wish to extract members from pages that arent public (for example the manage members page)"
+        elif flow == "/help 2":
+            print "\n\nBuild an excell compatible csv file with the following data on a list of members.\n\n Column 1: Username\n Column 2: Real name (if available on members homepage)\n Column 3. Live Standard rating\n Column 4. Live Blitz rating\n Column 5. Live Bullet rating\n Column 6. Online Chess rating\n Column 7. 960 rating\n Column 8. Tactics rating\n Column 9. Timeout-ratio\n Column 10. Last online\n Column 11. Member since\n Column 12. Time per move\n Column 13. Number of groups member is in\n Column 14. Points\n Column 15. Number of online chess games played\n Column 16. Number of online chess games won\n Column 17. Number of online chess games lost\n Column 18. Number of Online chess games drawn\n Column 19. Win ratio for online chess\n Column 20. Member nation (if available on members homepage)\n Column 21. If member has a custom avatar\n\nThis data can be presented and sorted using option 7 in the main script"
+        elif flow == "/help 3":
+            print "\n\nSend personalized invites for one or more groups. The invites can include text (with member name and nation, to personalize the message), pictures and videos.\n\nTo use this function you need to have a text document with a comma seperated list of members in the folder called 'Invite Lists'. The script sends an invite to each member in that file and creates a second file in the Invite Lists folder, with the usernames of those who has received an invite\n\n\nMembers who are present in the groups 'already invited' file will be skipped when sending invites. To block the script from inviting specific members you can add their names to the already invited file for the group in question, and they will be effectivily blocked\n\nWhen running the inviter with the option to only invite those who fill a few requirements the script will remove those who didn't fill the requirements from your invites list\n\nRequires the script to log in on chess.com, to send the invites from your account"
+        elif flow == "/help 4":
+            print "\n\nGoes through a groups finished, non thematic votechess matches and counts number of posts per member\n\nRequires the script to log in on chess.com, to acess comments in games"
+        elif flow == "/help 5":
+            print "\n\nBuild an excell compatible csv file with the following data on how each member who has ever played for a group has performed in the groups team matches\n\n Column 1. Username\n Column 2. Number of team matches member has participated in\n Column 3. Points won\n Column 4. Points lost\n Column 5. Ongoing games\n Column 6. Timeouts"
+        elif flow == "/help 6":
+            print "\n\nTakes a comma seperated list of members and sort out those who doesn't fill a few criterias regarding:\n\n Min online chess rating\n Max online chess rating\n Last online\n Member Since\n Older than (if birthdate is available on members profile)\n Younger than (if birthdate is available on members profile)\n Min number of groups member may be in\n Max number of groups member may be in\n Timeout-ratio\n Time per move\n If they have a custom avatar\n Gender, determined by comparing the members name to a list of male and female names"
+        elif flow == "/help 7":
+            print "\n\nPresentation of csv files from option 2 and 5. Can present data from the csv files sorted by any column, compare two csv files from option 5 to see what has changed or return the username of each member in the file and present it as a comma seperated list"
+        elif flow == "/help 8":
+            print "\n\nRemoves doublets from a textfile and has the option to remove those who are members of a specific group"
+        elif flow == "/help 9":
+            print "\n\nAt first run the script builds a list of members who are currently in your group.\nAt future runs the script will build a new memberslist of your group, look for members who are in the memberslist compiled during the last run but not in the latest run.\nRemoves those who has had their accounts closed or changed their names and print the result, which is the members who has left your group in the timeperiod between two runs\n\nRequires the script to log in to and you to be an admin of the group that's checked, to access the manage members page"
+        elif flow == "/help 10":
+            print "\n\nCount the number of group notes posted per member in the last 100 pages of notes\n\nRequires the script to login to chess.com, to access group notes"
+        elif flow == "/help 11":
+            print "\n\nTakes a comma seperated list of members and builds a sorted birthday schedule of those who have their birthday visible on their profile"
+        elif flow == "/help 12":
+            print "\n\nSend personalized personal messages to either a comma seperated list of members or those who are present in a set of pages. The message can include text (with the members real name and nation, to personalize the message) and images.\n\nRequires the script to log in to chess.com, to send pm's from your account"
+        elif flow == "/help 13":
+            print "\n\nTakes either one or two list of members and offer to pair them against each others based on rating.\nIf given one lists members will be paired against each other after the format, highest ranked vs second highest rank etc. For two lists the script takes each member in the shorter list and pair this member against whoever has the most similar rating in the longer list\n\nRatings can be Live Standard, Live Blitz, Live Bullet, Online chess, 960 or tactics"
+        elif flow == "/help":
+            print "\n\n\nTo add extensions/addons to the scripts chrome or firefox browser you need to download the extension in crx format for chrome or xpi for firefox. Once the addon is downloaded, place it in the Webdriver/Extensions/Chrome or Webdriver/Extensions/Firefox folder.\n\nIt's recommended to use the adblock plus extension\n\n\n\n\nTo use the scripts ability to determine a members gender you will need to have a list of male and female first names in the namelists folder. male names should be stored in a file called 'male' and female names in a file called 'female'.\n\nFor best performance the names should be in the format:\nname1\nname2\nname3\netc\n\nIt's also recommended to sort the names based on how commonly they are used"
 
     if flow == "1":
         print "\n\n\nchess.com members list extractor\n"
@@ -2113,7 +2186,7 @@ while pathway in (["y"]):
 
     elif flow == "8":
         print "\n\n\nRemoves doublets and unwanted elements from your list (ie those who are either already members or banned/unwanted)\n\nFiles in directory:\n"
-        flist = fnamenot(([".csv", ".py", ".pyc", ".log", "~"]))
+        flist = fnamenot(([".csv", ".py", ".pyc", ".log", "~"]), ".")
 
         preexlist = ""
         while preexlist not in flist:
