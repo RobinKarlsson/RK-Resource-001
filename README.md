@@ -28,10 +28,10 @@ Options
                                                                         
                                                                         
 
- 1. Creates a list of members from one or more groups. Has the option to remove those who're also members of a specific group (using the members list built in option 9). The list can either be saved to a file or be directly printed onscreen          
+ 1) Creates a list of members from one or more groups. Has the option to remove those who're also members of a specific group (using the members list built in option 9). The list can either be saved to a file or be directly printed onscreen          
 
                                                                         
- 2. Build an excell compatible csv file with the following data on a list of members.
+ 2) Build an excell compatible csv file with the following data on a list of members.
 
 
 - Column 1: Username
@@ -81,15 +81,15 @@ This data can be presented and sorted using option 7 in the main script
 
  
 
- 3. Send personalized invites for one or more groups. The invites can include text (with member name and nation, to personalize the message), pictures and videos.                      
+ 3) Send personalized invites for one or more groups. The invites can include text (with member name and nation, to personalize the message), pictures and videos.                      
       
 
                                                         
- 4. Goes through a groups finished, non thematic votechess matches and counts number of posts per member    
+ 4) Goes through a groups finished, non thematic votechess matches and counts number of posts per member    
          
 
                                              
- 5. Build an excell compatible csv file with the following data on how each member who has ever played for a group has performed in the groups team matches
+ 5) Build an excell compatible csv file with the following data on how each member who has ever played for a group has performed in the groups team matches
 
 - Column 1. Username
 
