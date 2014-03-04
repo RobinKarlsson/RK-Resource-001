@@ -21,57 +21,37 @@ Instructions
 ===============
 
 
-                                Options                                 
+                 
+                 
+Options                                 
 
                                                                         
                                                                         
 
-            1. Extract the memberslist of one or more groups            
+1. Extract the memberslist of one or more groups            
 
                                                                         
-
-           2. Build a csv file with data on a list of members           
-
-                                                                        
-
-                      3. Send invites for a group                       
+2. Build a csv file with data on a list of members           
 
                                                                         
-
-       4. Posts per member in a groups finished votechess matches       
-
+3. Send invites for a group                       
                                                                         
+4. Posts per member in a groups finished votechess matches       
+                                                      
+5. Build a csv file of a groups team match participants         
 
-        5. Build a csv file of a groups team match participants         
+6. Filter a list of members for those who fill a few requirements    
+                                                        
+7. Presentation of csv-files from options 2 and 5            
 
-                                                                        
+8. Process invite lists                         
 
-   6. Filter a list of members for those who fill a few requirements    
+9. Look for members who has recenty left your group           
 
-                                                                        
+10. Count number of group notes per member in the last 100 notes pages 
 
-           7. Presentation of csv-files from options 2 and 5            
+11. Build a birthday schedule for a list of members           
 
+12. Send a personal message to a list of members            
 
-
-                        8. Process invite lists                         
-
-                                                                        
-
-          9. Look for members who has recenty left your group           
-
-                                                                        
-
- 10. Count number of group notes per member in the last 100 notes pages 
-
-                                                                        
-
-          11. Build a birthday schedule for a list of members           
-
-                                                                        
-
-            12. Send a personal message to a list of members            
-
-                                                                        
-
-             13. Pair lists of players against each others              
+13. Pair lists of players against each others              
