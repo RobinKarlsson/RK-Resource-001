@@ -197,7 +197,8 @@ def pickbrowser(browserchoice):
                 if fname.endswith(".crx"):
                     try:
                         copt.add_extension(os.path.abspath("Webdriver/Extensions/Chrome/" + fname))
-                        handle = True
+                        if "adblock" in fname:
+                            handle = True
                     except:
                         print "Failed to load " + os.path.abspath("Webdriver/Extensions/Chrome/" + fname)
 
