@@ -391,13 +391,21 @@ def pmdriver(target, choice):
 
     counter = 1
     for membername2 in memtpm:
+        print membername2
+        raw_input("adwadwad")
         if choice2 == "y":
-            if membername2 not in memberprocesser(True, browser1, membername2, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender):
+            while True:
+                try:
+                    passmemfil = memberprocesser(True, browser1, ([membername2]), minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender)
+                    break
+                except:
+                    print "\n\nsomething went wrong loading " + membername2 + ", reprocessing\n\n"
+            if membername2 not in passmemfil:
                 continue
 
         if browserchoice == "1":
             counter += 1
-            if counter > 100:
+            if counter > 70:
                 browser0.quit()
                 browser0, handle = pickbrowser(browserchoice)
                 browser0 = sellogin(Username, Password, browser0, handle)
@@ -1131,9 +1139,16 @@ def inviter(choicelist, invitenum):
 
             for member in already_picked:
                 if choice2 == "y":
-                    if member not in memberprocesser(True, browser1, ([member]), minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender):
+                    while True:
+                        try:
+                            passmemfil = memberprocesser(True, browser1, ([member]), minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender)
+                            break
+                        except:
+                            print "\n\nsomething went wrong loading " + member + ", reprocessing\n\n"
+                    if member not in passmemfil:
                         memtinv.remove(member)
                         continue
+
                 if browserchoice == "1":
                     if counted == "y":
                         counted = ""
