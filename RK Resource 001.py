@@ -198,7 +198,7 @@ def pickbrowser(browserchoice):
                     try:
                         copt.add_extension(os.path.abspath("Webdriver/Extensions/Chrome/" + fname))
                         if "adblock" in fname:
-                            handle = True
+                            handle = False
                     except:
                         print "Failed to load " + os.path.abspath("Webdriver/Extensions/Chrome/" + fname)
 
