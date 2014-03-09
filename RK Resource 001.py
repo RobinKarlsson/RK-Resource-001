@@ -391,7 +391,6 @@ def pmdriver(target, choice):
 
     counter = 1
     for membername2 in memtpm:
-        print membername2
         if choice2 == "y":
             while True:
                 try:
