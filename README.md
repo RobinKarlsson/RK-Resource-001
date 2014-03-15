@@ -12,11 +12,13 @@ Instructions
 
  1) install the required software, the libraries can either be installed to your system or tarballed
  
- 2) set up the correct file architecture by downloading and extracting this file (optional but highly recommended), https://drive.google.com/file/d/0B1k9dLEBCofEeWpOOHJJV1dlTEk
+ 2) get the script
  
- 3) put the script in your newly extracted "RK Resource 001" folder
+ 3) run the script
  
- 4) run the script
+===============
+
+At first run the script will set up its file architecture. Selenium webdrivers should be placed in the Webdriver/"YOUR_OS" folder. Addons to the to the Webdriver goes to the Webdriver/Extensions/"BROWSER_YOU_USE" folder
 
 ===============
 
