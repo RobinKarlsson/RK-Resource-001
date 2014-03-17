@@ -329,7 +329,6 @@ def streplacer(text, rplst):
 
 def fnamenot(nlst, fdir):
     flist = list()
-    ctr = 1
     for fname in os.listdir(fdir):
         if os.path.isfile(fname):
             cont = True
@@ -339,9 +338,8 @@ def fnamenot(nlst, fdir):
                     cont = False
 
             if cont != False:
-                print " " + str(ctr) + ". " + fname
+                print fname
                 flist.append(fname)
-                ctr += 1
     return flist
 
 def pmdriver(target, choice):
@@ -392,12 +390,8 @@ def pmdriver(target, choice):
     counter = 1
     for membername2 in memtpm:
         if choice2 == "y":
-            while True:
-                try:
-                    passmemfil = memberprocesser(True, browser1, ([membername2]), minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender)
-                    break
-                except:
-                    print "\n\nsomething went wrong loading " + membername2 + ", reprocessing\n\n"
+            passmemfil = memberprocesser(True, browser1, ([membername2]), minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender)
+
             if membername2 not in passmemfil:
                 continue
 
