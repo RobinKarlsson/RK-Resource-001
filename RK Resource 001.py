@@ -892,10 +892,10 @@ def inviter(choicelist, invitenum):
                 msglist = (("1", "Hello /name. Welcome to the Death Star, a Dynamically Dangerous Spacestation and Superweapon capable of Destroying an Entire Planet with its Powerful Superlaser../newline/newline"), ("2", "http://loyalkng.com/wp-content/uploads/2009/05/deathstarfiring2.jpg"), ("1", "/newlineThe Death Star has a crew of 265,675, as well as 52,276 gunners, 607,360 troops, 30,984 stormtroopers, and 180,216 pilots Its hangars contain assault shuttles, blastboats, Strike cruisers, land vehicles, support ships, and 7,293 TIE Fighters. It is protected by 10,000 turbolaser batteries, 2,600 Ion Cannons, and 768 Tractor Beam projectors./newline/newlineWelcome To Our Leader, Darth Vader :) Join us and together we will rule this galaxy!!!!/newline/newline"), ("3", "http://www.youtube.com/watch?v=4ImO0ST1WkM"))
 
             elif choice5 == "6": #Jungle Team
-                minrat = 1300
+                minrat = ""
                 maxrat = ""
-                mingames = 50
-                minwinrat = 0.33
+                mingames = ""
+                minwinrat = ""
                 lastloginyear = lonl[0]
                 lastloginmonth = lonl[1]
                 lastloginday = lonl[2]
@@ -908,8 +908,8 @@ def inviter(choicelist, invitenum):
                 olderyear = ""
                 oldermonth = ""
                 olderday = ""
-                timemax = 10
-                maxgroup = 100
+                timemax = ""
+                maxgroup = ""
                 mingroup = ""
                 timovchoicemin = ""
                 timovchoicemax = ""
@@ -1131,12 +1131,7 @@ def inviter(choicelist, invitenum):
 
             for member in already_picked:
                 if choice2 == "y":
-                    while True:
-                        try:
-                            passmemfil = memberprocesser(True, browser1, ([member]), minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender)
-                            break
-                        except:
-                            print "\n\nsomething went wrong loading " + member + ", reprocessing\n\n"
+                    passmemfil = memberprocesser(True, browser1, ([member]), minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender)
                     if member not in passmemfil:
                         memtinv.remove(member)
                         continue
