@@ -18,7 +18,7 @@ Instructions
  
 ===============
 
-At first run the script will set up its file architecture. Selenium webdrivers should be placed in the Webdriver/"YOUR_OS" folder. Addons to the Webdriver goes to Webdriver/Extensions/"BROWSER_YOU_USE" folder
+At first run the script will set up its file architecture. Selenium webdrivers should be placed in the Webdriver/"YOUR_OS"/"BROWSER_YOU_USE" folder. Addons to the Webdriver goes to Webdriver/Extensions/"BROWSER_YOU_USE" folder
 
 ===============
 
