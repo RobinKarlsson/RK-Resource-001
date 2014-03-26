@@ -146,8 +146,12 @@ def getmeminfo(target, filename):
         timemove = TimeMoveChecker(soup)
         memsinlastonl = memsin(soup)
         gamestat = gamestats(soup)
+        if gamestat[0] != 0.0:
+            winratm = gamestat[1] / gamestat[0]
+        else:
+            winratm = 0
 
-        csvwriter.writerow((mem, namechecker(soup), lstanratingchecker(soup), lblitzratingchecker(soup), lbulratingchecker(soup), onlratingchecker(soup), ranratingchecker(soup), tacratingchecker(soup), timeoutchecker(soup), memsinlastonl[1], memsinlastonl[0], timemove, groupmemlister(soup), ptscheck(soup), gamestat[0], gamestat[1], gamestat[2], gamestat[3], gamestat[1] / gamestat[0], nationlister(soup), AvatarCheck(soup)))
+        csvwriter.writerow((mem, namechecker(soup), lstanratingchecker(soup), lblitzratingchecker(soup), lbulratingchecker(soup), onlratingchecker(soup), ranratingchecker(soup), tacratingchecker(soup), timeoutchecker(soup), memsinlastonl[1], memsinlastonl[0], timemove, groupmemlister(soup), ptscheck(soup), gamestat[0], gamestat[1], gamestat[2], gamestat[3], winratm, nationlister(soup), AvatarCheck(soup)))
 
 def getplatform():
     return _platform.platform(), _platform.system(), _platform.release(), _platform.architecture()
@@ -1131,7 +1135,10 @@ def inviter(choicelist, invitenum):
 
             for member in already_picked:
                 if choice2 == "y":
-                    passmemfil = memberprocesser(True, browser1, ([member]), minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender)
+                    try:
+                        passmemfil = memberprocesser(True, browser1, ([member]), minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender)
+                    except UnboundLocalError:
+                        continue
                     if member not in passmemfil:
                         memtinv.remove(member)
                         continue
