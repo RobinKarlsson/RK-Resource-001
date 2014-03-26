@@ -1792,7 +1792,7 @@ def nationlister(soup):
     nationlist = list()
     for placeholder in soup.find_all(class_ = "bottom-12"):
         break
-    return str(placeholder.text.strip())
+    return str(placeholder.text.strip().encode('utf-8'))
 
 def birthlister(soup):
     for placeholder in soup.find_all(class_ = "section-content section-content-2"):
