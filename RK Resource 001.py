@@ -1652,7 +1652,7 @@ def namechecker(soup):
     for placeholder in soup.find_all("strong"):
         strplaceholder = str(placeholder)
         if "Click here" not in strplaceholder and "ChessTV" not in strplaceholder:
-            return placeholder.text
+            return placeholder.text.encode("utf-8")
 
 def AvatarCheck(soup):
     if "noavatar" in str(soup.find_all(class_ = "avatar-container bottom-8")):
@@ -1792,7 +1792,7 @@ def nationlister(soup):
     nationlist = list()
     for placeholder in soup.find_all(class_ = "bottom-12"):
         break
-    return str(placeholder.text.strip().encode('utf-8'))
+    return str(placeholder.text.strip().encode("utf-8"))
 
 def birthlister(soup):
     for placeholder in soup.find_all(class_ = "section-content section-content-2"):
