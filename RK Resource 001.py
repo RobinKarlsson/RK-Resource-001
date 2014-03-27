@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # RK resource 001
 # developed by Robin Karlsson
 # contact email: "r.robin.karlsson@gmail.com"
@@ -151,7 +152,7 @@ def getmeminfo(target, filename):
         else:
             winratm = 0
 
-        csvwriter.writerow((mem, namechecker(soup), lstanratingchecker(soup), lblitzratingchecker(soup), lbulratingchecker(soup), onlratingchecker(soup), ranratingchecker(soup), tacratingchecker(soup), timeoutchecker(soup), memsinlastonl[1], memsinlastonl[0], timemove, groupmemlister(soup), ptscheck(soup), gamestat[0], gamestat[1], gamestat[2], gamestat[3], winratm, nationlister(soup), AvatarCheck(soup)))
+        csvwriter.writerow((mem, namechecker(soup).encode("utf-8"), lstanratingchecker(soup), lblitzratingchecker(soup), lbulratingchecker(soup), onlratingchecker(soup), ranratingchecker(soup), tacratingchecker(soup), timeoutchecker(soup), memsinlastonl[1], memsinlastonl[0], timemove, groupmemlister(soup), ptscheck(soup), gamestat[0], gamestat[1], gamestat[2], gamestat[3], winratm, nationlister(soup).encode("utf-8"), AvatarCheck(soup)))
 
 def getplatform():
     return _platform.platform(), _platform.system(), _platform.release(), _platform.architecture()
@@ -717,7 +718,7 @@ def inviter(choicelist, invitenum):
             block = raw_input("Add another group? (y/n) ")
 
     lonl = [int(elem) for elem in str(date.today() - timedelta(days = 3)).split("-")]
-    msin = [int(elem) for elem in str(date.today() - timedelta(days = 90)).split("-")]
+    msin = [int(elem) for elem in str(date.today() - timedelta(days = 60)).split("-")]
 
     redo = "yes"
     counter = 1
@@ -1652,7 +1653,7 @@ def namechecker(soup):
     for placeholder in soup.find_all("strong"):
         strplaceholder = str(placeholder)
         if "Click here" not in strplaceholder and "ChessTV" not in strplaceholder:
-            return placeholder.text.encode("utf-8")
+            return placeholder.text
 
 def AvatarCheck(soup):
     if "noavatar" in str(soup.find_all(class_ = "avatar-container bottom-8")):
@@ -1792,7 +1793,7 @@ def nationlister(soup):
     nationlist = list()
     for placeholder in soup.find_all(class_ = "bottom-12"):
         break
-    return str(placeholder.text.strip().encode("utf-8"))
+    return placeholder.text.strip()
 
 def birthlister(soup):
     for placeholder in soup.find_all(class_ = "section-content section-content-2"):
