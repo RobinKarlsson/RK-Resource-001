@@ -704,7 +704,7 @@ def inviter(choicelist, invitenum):
     invinf = "no"
     if choicelist[0] == "42":
         invinf = "yes"
-        choicelist = (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"])
+        choicelist = (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14"])
 
     elif choicelist[0] == "84":
         choicelist = list()
@@ -712,7 +712,7 @@ def inviter(choicelist, invitenum):
         block = ""
         while block not in (["n"]):
             tempval = ""
-            while tempval not in (["1", "2", "3", "4", "5", "7", "8", "9", "10", "11"]):
+            while tempval not in (["1", "2", "3", "4", "5", "7", "8", "9", "10", "11", "12", "13", "14"]):
                 tempval = raw_input("Group number: ")
             choicelist.append(tempval)
             block = raw_input("Add another group? (y/n) ")
@@ -1120,6 +1120,70 @@ def inviter(choicelist, invitenum):
                 groupinv = "http://www.chess.com/groups/invite_members?id=18514"
                 msglist = (("2", "http://files.chesscomfiles.com/images_users/tiny_mce/Pepra/knightmoves.gif"), ("1", "/newline/newlineWelcome, /name, to Chess Star Resort. The one and only luxury 5 star hotel resort on chess.com/newlineJoin us, and experience all our activities firsthand... puzzles... team matches... tournaments and much much more/newline"), ("2", "http://www.washingtonpost.com/rf/image_606w/2010-2019/WashingtonPost/2013/10/18/Travel/Images/SALAMANDER20111382132477.jpg"), ("1", "/newlineCSR has since its founding just over a year ago housed some of the greatest chess players from many nations, including /nation. But without the great /name in our ranks, this hold little value/newline"), ("3", "http://www.youtube.com/watch?v=6_SqDur3IvQ"))
 
+            elif choice5 == "13": #Magnus Carlsen group
+                countryalt = ""
+                minrat = ""
+                maxrat = ""
+                mingames = 20
+                minwinrat = 0.25
+                lastloginyear = lonl[0]
+                lastloginmonth = lonl[1]
+                lastloginday = lonl[2]
+                membersinceyear = msin[0]
+                membersincemonth = msin[1]
+                membersinceday = msin[2]
+                youngeryear = ""
+                youngermonth = ""
+                youngerday = ""
+                olderyear = ""
+                oldermonth = ""
+                olderday = ""
+                timemax = 10
+                maxgroup = ""
+                mingroup = ""
+                timovchoicemin = ""
+                timovchoicemax = ""
+                avatarch = "y"
+                heritage = ""
+                memgender = ""
+                invgroup = "to the Magnus Carlsen group"
+                infile = "Invite Lists/The Magnus Carlsen Group"
+                alrfile = "Invite Lists/The Magnus Carlsen Group already invited"
+                groupinv = "http://www.chess.com/groups/invite_members?id=19744"
+                msglist = (("2", "http://kevinthegerbil.com/images/blonde_chess.jpg"), ("1", "/newline/newlineWelcome /name to the Magnus Carlsen group. Magnus Carlsen was the third youngest GM in history at an age of 13 years, 4 months, 27 days! He has become the highest rated player in history before he reached 25 (years old) and he is on his way to becoming the world champion. He may also become the first person to reach and ELO of 3000. This is a group where we discuss his games and himself. We find out his strategies and then use them to win team matches and become the best in chess.com just like Magnus did!/newline"), ("3", "http://www.youtube.com/watch?v=ZD0Z0CwRDJw"))
+
+            elif choice5 == "14": #October
+                countryalt = ""
+                minrat = 1900
+                maxrat = ""
+                mingames = 20
+                minwinrat = 0.25
+                lastloginyear = lonl[0]
+                lastloginmonth = lonl[1]
+                lastloginday = lonl[2]
+                membersinceyear = msin[0]
+                membersincemonth = msin[1]
+                membersinceday = msin[2]
+                youngeryear = ""
+                youngermonth = ""
+                youngerday = ""
+                olderyear = ""
+                oldermonth = ""
+                olderday = ""
+                timemax = 10
+                maxgroup = ""
+                mingroup = ""
+                timovchoicemin = ""
+                timovchoicemax = ""
+                avatarch = ""
+                heritage = ""
+                memgender = ""
+                invgroup = "to October"
+                groupinv = "http://www.chess.com/groups/invite_members?id=11977"
+                infile = "Invite Lists/October"
+                alrfile = "Invite Lists/October already invited"
+                msglist = (("2", "http://img0.joyreactor.com/pics/post/comics-chess-soldier-577272.jpeg"), ("1", "/newlinePuzzles, Riddles, Chess!!!/newline/newlineWinter is coming! and October wants you, /name, for this elite, high rated and fun-loving chess group/newline"), ("2", "http://kevinthegerbil.com/images/blonde_chess.jpg"), ("3", "http://www.youtube.com/watch?v=6_SqDur3IvQ"))
+
             memtinv = remove_doublets(infile, "")
             memalrinv = remove_doublets(alrfile, "")
             memtinv = [x for x in memtinv if x not in memalrinv]
@@ -1525,128 +1589,131 @@ def memberprocesser(silent, browser, target, minrat, maxrat, mingames, minwinrat
             print "checking " + targetx
 
         browser, response = mecopner(browser, "http://www.chess.com/members/view/" + targetx)
-        if "://www.chess.com/members/view/" not in browser.geturl():
-            continue
-        soup = BeautifulSoup(response)
-
-        if membersinceyear != "" or lastloginyear != "":
-            memsinlist = memsin(soup)
-            if memsinlist == "":
+        try:
+            if "://www.chess.com/members/view/" not in browser.geturl():
                 continue
+            soup = BeautifulSoup(response)
 
-            if lastloginyear != "":
-                lonln = memsinlist[1]
-                if datetime(lonln[0], lonln[1], lonln[2]) < datetime(lastloginyear, lastloginmonth, lastloginday):
+            if membersinceyear != "" or lastloginyear != "":
+                memsinlist = memsin(soup)
+                if memsinlist == "":
                     continue
 
-        if timemax != "":
-            if timeoutchecker(soup) > int(timemax):
-                continue
+                if lastloginyear != "":
+                    lonln = memsinlist[1]
+                    if datetime(lonln[0], lonln[1], lonln[2]) < datetime(lastloginyear, lastloginmonth, lastloginday):
+                        continue
 
-        if timovchoicemax != "" or timovchoicemin != "":
-            timemove = TimeMoveChecker(soup)
-
-            if timovchoicemax != "":
-                if timemove[0] > timovchoicemax[0]:
-                    continue
-                if timemove[1] > timovchoicemax[1] and timemove[0] >= timovchoicemax[0]:
-                    continue
-                if timemove[2] > timovchoicemax[2] and timemove[1] >= timovchoicemax[1] and timemove[0] >= timovchoicemax[0]:
+            if timemax != "":
+                if timeoutchecker(soup) > int(timemax):
                     continue
 
-            if timovchoicemin != "":
-                if timemove[0] < timovchoicemin[0]:
-                    continue
-                if timemove[1] < timovchoicemin[1] and timemove[0] <= timovchoicemin[0]:
-                    continue
-                if timemove[2] < timovchoicemin[2] and timemove[1] <= timovchoicemin[1] and timemove[0] <= timovchoicemin[0]:
-                    continue
+            if timovchoicemax != "" or timovchoicemin != "":
+                timemove = TimeMoveChecker(soup)
 
-        if mingames != "" or minwinrat != "":
-            gamestat = gamestats(soup)
+                if timovchoicemax != "":
+                    if timemove[0] > timovchoicemax[0]:
+                        continue
+                    if timemove[1] > timovchoicemax[1] and timemove[0] >= timovchoicemax[0]:
+                        continue
+                    if timemove[2] > timovchoicemax[2] and timemove[1] >= timovchoicemax[1] and timemove[0] >= timovchoicemax[0]:
+                        continue
 
-            if mingames != "":
-                if gamestat[0] < int(mingames):
-                    continue
-            if minwinrat != "":
-                if gamestat[1] / gamestat[0]  < float(minwinrat):
-                    continue
+                if timovchoicemin != "":
+                    if timemove[0] < timovchoicemin[0]:
+                        continue
+                    if timemove[1] < timovchoicemin[1] and timemove[0] <= timovchoicemin[0]:
+                        continue
+                    if timemove[2] < timovchoicemin[2] and timemove[1] <= timovchoicemin[1] and timemove[0] <= timovchoicemin[0]:
+                        continue
 
-        if membersinceyear != "":
-            memsi = memsinlist[0]
-            if datetime(memsi[0], memsi[1], memsi[2]) > datetime(membersinceyear, membersincemonth, membersinceday):
-                continue
+            if mingames != "" or minwinrat != "":
+                gamestat = gamestats(soup)
 
-        if minrat != "" or maxrat != "":
-            rating = onlratingchecker(soup)
-            if minrat != "":
-                minrat = int(minrat)
-                if rating < minrat:
-                    continue
-            if maxrat != "":
-                maxrat = int(maxrat)
-                if rating > maxrat:
-                    continue
+                if mingames != "":
+                    if gamestat[0] < int(mingames):
+                        continue
+                if minwinrat != "":
+                    if gamestat[1] / gamestat[0]  < float(minwinrat):
+                        continue
 
-        if maxgroup != "" or mingroup != "":
-            groupcount = groupmemlister(soup)
-
-            if maxgroup != "":
-                if groupcount > int(maxgroup):
-                    continue
-            if mingroup != "":
-                if groupcount < int(mingroup):
+            if membersinceyear != "":
+                memsi = memsinlist[0]
+                if datetime(memsi[0], memsi[1], memsi[2]) > datetime(membersinceyear, membersincemonth, membersinceday):
                     continue
 
-        if avatarch == "y":
-            if AvatarCheck(soup) == False:
-                continue
+            if minrat != "" or maxrat != "":
+                rating = onlratingchecker(soup)
+                if minrat != "":
+                    minrat = int(minrat)
+                    if rating < minrat:
+                        continue
+                if maxrat != "":
+                    maxrat = int(maxrat)
+                    if rating > maxrat:
+                        continue
 
-        if youngeryear != "" or olderyear != "":
-            birthdate = birthlister(soup)
-            if birthdate == "":
-                continue
-            while "" in birthdate:
-                birthdate.remove("")
+            if maxgroup != "" or mingroup != "":
+                groupcount = groupmemlister(soup)
 
-            birthdate = [int(birthdate[2]), int(birthdate[0]), int(birthdate[1])]
+                if maxgroup != "":
+                    if groupcount > int(maxgroup):
+                        continue
+                if mingroup != "":
+                    if groupcount < int(mingroup):
+                        continue
 
-            if youngeryear != "":
-                if datetime(birthdate[0], birthdate[1], birthdate[2]) < datetime(youngeryear, youngermonth, youngerday):
+            if avatarch == "y":
+                if AvatarCheck(soup) == False:
                     continue
-            if olderyear != "":
-                if datetime(birthdate[0], birthdate[1], birthdate[2]) > datetime(olderyear, oldermonth, olderday):
+
+            if youngeryear != "" or olderyear != "":
+                birthdate = birthlister(soup)
+                if birthdate == "":
+                    continue
+                while "" in birthdate:
+                    birthdate.remove("")
+
+                birthdate = [int(birthdate[2]), int(birthdate[0]), int(birthdate[1])]
+
+                if youngeryear != "":
+                    if datetime(birthdate[0], birthdate[1], birthdate[2]) < datetime(youngeryear, youngermonth, youngerday):
+                        continue
+                if olderyear != "":
+                    if datetime(birthdate[0], birthdate[1], birthdate[2]) > datetime(olderyear, oldermonth, olderday):
+                        continue
+
+            if heritage != "":
+                nation = nationlister(soup)
+
+                if heritage not in nation:
                     continue
 
-        if heritage != "":
-            nation = nationlister(soup)
+            if memgender != "":
+                name = namechecker(soup)
+                if name == " ":
+                    continue
+                name = name.split(" ")[0].lower()
+                Found = "n"
 
-            if heritage not in nation:
-                continue
+                if memgender == "f":
+                    with open("namelists/female", "rb") as fnlist:
+                        for line in fnlist:
+                            if name in line:
+                                Found = "y"
+                                break
+                elif memgender == "m":
+                    with open("namelists/male", "rb") as mnlist:
+                        for line in mnlist:
+                            if name in line:
+                                Found = "y"
+                                break
+                if Found == "n":
+                    continue
 
-        if memgender != "":
-            name = namechecker(soup)
-            if name == " ":
-                continue
-            name = name.split(" ")[0].lower()
-            Found = "n"
-
-            if memgender == "f":
-                with open("namelists/female", "rb") as fnlist:
-                    for line in fnlist:
-                        if name in line:
-                            Found = "y"
-                            break
-            elif memgender == "m":
-                with open("namelists/male", "rb") as mnlist:
-                    for line in mnlist:
-                        if name in line:
-                            Found = "y"
-                            break
-            if Found == "n":
-                continue
-
-        passmem.append(targetx)
+            passmem.append(targetx)
+        except:
+            print "\n\nskipped " + targetx + "\n\n"
     return passmem
 
 def namechecker(soup):
@@ -1904,7 +1971,7 @@ for content in (["", "", "developed by Robin Karlsson", "", "", "Contact informa
     olprint2("{0: ^70}", content, "|", "|")
 olprint("|", "|", "-", 72, True)
 
-for content in (["", "", "Options", "Type /help or /help <number> for more info", "", "", "1. Extract the memberslist of one or more groups", "", "2. Build a csv file with data on a list of members", "", "3. Send invites for a group", "", "4. Posts per member in a groups finished votechess matches", "", "5. Build a csv file of a groups team match participants", "", "6. Filter a list of members for those who fill a few requirements", "", "7. Presentation of csv-files from options 2 and 5", "", "8. Process invite lists", "", "9. Look for members who has recenty left your group", "", "10. Count number of group notes per member in the last 100 notes pages", "", "11. Build a birthday schedule for a list of members", "", "12. Send a personal message to a list of members", "", "13. Pair lists of players against each others", "", ""]):
+for content in (["", "", "Options", "Type /help or /help <number> for more info", "", "", "1. Extract the memberslist of one or more groups", "", "2. Build a csv file with data on a list of members", "", "3. Send invites for a group", "", "4. Posts per member in a groups finished votechess matches", "", "5. Build a csv file of a groups team match participants", "", "6. Filter a list of members for those who fill a few requirements", "", "7. Presentation of csv-files from options 2 and 5", "", "8. Process invite lists", "", "9. Look for members who has recenty left your group", "", "10. Count number of group notes per member in the last 100 notes pages", "", "11. Build a birthday schedule for a list of members", "", "12. Send a personal message to a list of members", "", "13. Pair lists of players against each others", "", "14. Get intersection of two lists", "", ""]):
     olprint2("{0: ^70}", content, "|", "|")
 olprint("*", "*", "-", 72, True)
 
@@ -1914,7 +1981,7 @@ dommem = memfiop("mem/dommem", "keydom")
 
 while pathway in (["y"]):
     flow = ""
-    while flow not in (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13"]):
+    while flow not in (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14"]):
         flow = raw_input("\n\n\nEnter your choice here: ")
 
         if flow == "/help 1":
@@ -1986,8 +2053,8 @@ while pathway in (["y"]):
 
     elif flow == "3":
         choice5 = ""
-        while choice5 not in (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "42", "84", "168"]):
-            choice5 = raw_input("\n\nWhich group would you like to send invites for?\n\n    Dominion affiliated groups:\n 1. Star Trek: The Dominion\n 2. Karemma Commerce Ministry\n 3. The Breen Confederacy\n 4. The Cardassian Empire\n 5. Death Star III\n\n    Non Dominion groups:\n\n 6. Jungle Team\n 7. Legio XIII Gemina\n 8. Andromeda\n 9. Family Guy\n 10. Space 1999\n 11. Space 2099\n 12. Chess Star Resort\n\n 42. endless loop that goes through all the groups, indefinitely\n 84. Create you own custom infinite loop from the supported groups\n 168. Send invites for another group\n\nEnter choice here: ")
+        while choice5 not in (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "42", "84", "168"]):
+            choice5 = raw_input("\n\nWhich group would you like to send invites for?\n\n    Dominion affiliated groups:\n 1. Star Trek: The Dominion\n 2. Karemma Commerce Ministry\n 3. The Breen Confederacy\n 4. The Cardassian Empire\n 5. Death Star III\n\n    Non Dominion groups:\n\n 6. Jungle Team\n 7. Legio XIII Gemina\n 8. Andromeda\n 9. Family Guy\n 10. Space 1999\n 11. Space 2099\n 12. Chess Star Resort\n 13. Magnus Carlsen group\n 14. October\n\n 42. endless loop that goes through all the groups, indefinitely\n 84. Create you own custom infinite loop from the supported groups\n 168. Send invites for another group\n\nEnter choice here: ")
         inviter(([choice5]), 200)
 
     elif flow == "4":
@@ -2403,6 +2470,45 @@ while pathway in (["y"]):
             print name1 + " - " + name2
             for pair in pairs:
                 print pair[0][0] + " (" + str(pair[0][1]) + ") - " + pair[1][0] + " (" + str(pair[1][1]) + ")"
+
+    elif flow == "14":
+        choice = ""
+        while choice not in (["1", "2"]):
+            choice = raw_input("\n\nGet the list of members from\n 1. a file in the scripts direcroty\n 2. input\nYour choice: ")
+
+        if choice == "1":
+            print "\n\nFiles in direcroty:"
+            list1 = ""
+            list2 = ""
+            flist = fnamenot(([".csv", ".py", ".pyc", ".log", "~"]), ".")
+
+            while list1 not in flist:
+                list1 = raw_input("\n\nName of file 1: ")
+            list1 = set(remove_doublets(list1, ""))
+
+            while list2 not in flist:
+                list2 = raw_input("\n\nName of file 2: ")
+            list2 = set(remove_doublets(list2, ""))
+
+            prlst = streplacer(str(list(list1.intersection(list2))), ([" ", ""], ["(", ""], [")", ""], ["]", ""], ["[", ""], ["'", ""]))
+
+        elif choice == "2":
+            list1 = streplacer(raw_input("\n\nList 1: "), ([" ", ""], ["(", ""], [")", ""], ["]", ""], ["[", ""], ["'", ""])).split(",")
+            list2 = streplacer(raw_input("\n\nList 2: "), ([" ", ""], ["(", ""], [")", ""], ["]", ""], ["[", ""], ["'", ""])).split(",")
+
+            prlst = streplacer(str(list(set(list1).intersection(set(list2)))), ([" ", ""], ["(", ""], [")", ""], ["]", ""], ["[", ""], ["'", ""]))
+
+        choice6 = ""
+        while choice6 not in (["1", "2"]):
+            choice6 = raw_input("\n\nDo you wish to\n 1. Print the data onscreen\n 2. Save it to a file\n\nEnter choice here: ")
+
+        if choice6 == "1":
+            print "\n\n" + prlst
+
+        elif choice6 == "2":
+            sfile = raw_input("\nName of the file to which your list will be saved: ")
+            with open(sfile, "wb") as placeholder2:
+                placeholder2.write(prlst)
 
     pathway = ""
     while pathway not in (["y", "n"]):
