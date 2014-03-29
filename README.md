@@ -166,4 +166,8 @@ Removes those who has had their accounts closed or changed their names and print
 
 If given one lists members will be paired against each other after the format, highest ranked vs second highest rank etc. For two lists the script takes each member in the shorter list and pair this member against whoever has the most similar rating in the longer list
 
-Ratings can be Live Standard, Live Blitz, Live Bullet, Online chess, 960 or tactics             
+Ratings can be Live Standard, Live Blitz, Live Bullet, Online chess, 960 or tactics      
+
+
+
+ 14) Get the intersection of two lists
