@@ -704,7 +704,7 @@ def inviter(choicelist, invitenum):
     invinf = "no"
     if choicelist[0] == "42":
         invinf = "yes"
-        choicelist = (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14"])
+        choicelist = (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15"])
 
     elif choicelist[0] == "84":
         choicelist = list()
@@ -712,7 +712,7 @@ def inviter(choicelist, invitenum):
         block = ""
         while block not in (["n"]):
             tempval = ""
-            while tempval not in (["1", "2", "3", "4", "5", "7", "8", "9", "10", "11", "12", "13", "14"]):
+            while tempval not in (["1", "2", "3", "4", "5", "7", "8", "9", "10", "11", "12", "13", "14", "15"]):
                 tempval = raw_input("Group number: ")
             choicelist.append(tempval)
             block = raw_input("Add another group? (y/n) ")
@@ -1183,6 +1183,38 @@ def inviter(choicelist, invitenum):
                 infile = "Invite Lists/October"
                 alrfile = "Invite Lists/October already invited"
                 msglist = (("2", "http://img0.joyreactor.com/pics/post/comics-chess-soldier-577272.jpeg"), ("1", "/newlinePuzzles, Riddles, Chess!!!/newline/newlineWinter is coming! and October wants you, /name, for this elite, high rated and fun-loving chess group/newline"), ("2", "http://kevinthegerbil.com/images/blonde_chess.jpg"), ("3", "http://www.youtube.com/watch?v=6_SqDur3IvQ"))
+
+            elif choice5 == "15": #Knights of the Realm
+                countryalt = "the uncharted territories"
+                minrat = 1400
+                maxrat = ""
+                mingames = 40
+                minwinrat = 0.33
+                lastloginyear = lonl[0]
+                lastloginmonth = lonl[1]
+                lastloginday = lonl[2]
+                membersinceyear = msin[0]
+                membersincemonth = msin[1]
+                membersinceday = msin[2]
+                youngeryear = ""
+                youngermonth = ""
+                youngerday = ""
+                olderyear = ""
+                oldermonth = ""
+                olderday = ""
+                timemax = 10
+                maxgroup = ""
+                mingroup = ""
+                timovchoicemin = ""
+                timovchoicemax = ""
+                avatarch = "y"
+                heritage = ""
+                memgender = ""
+                invgroup = "to Knights of the Realm"
+                groupinv = "http://www.chess.com/groups/invite_members?id=23260"
+                infile = "Invite Lists/Knights of the Realm"
+                alrfile = "Invite Lists/Knights of the Realm already invited"
+                msglist = (("2", "http://d1lalstwiwz2br.cloudfront.net/images_users/tiny_mce/thee_black_knight/phpUJ1yFu.gif"), ("1", "/newline/newlineWelcome to the Knights of the Realm, squire /name of /nation. The Knights set up fair team matches, vote chess matches, 960 matches and inhouse tournaments (Jousts). By fair matches, we mean that each individual game, has less than a 100 point rating difference./newline/newlineWe also have an analysis Department to post games in, and have them analyized, or maybe help to analyze the games of others. There is plenty of information to improve your game in the forums, and other interesting things./newline/newline/Lord Robin Karlsson/newline"), ("3", "http://www.youtube.com/watch?v=QMy6xsvxSfg"))
 
             memtinv = remove_doublets(infile, "")
             memalrinv = remove_doublets(alrfile, "")
@@ -2053,8 +2085,8 @@ while pathway in (["y"]):
 
     elif flow == "3":
         choice5 = ""
-        while choice5 not in (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "42", "84", "168"]):
-            choice5 = raw_input("\n\nWhich group would you like to send invites for?\n\n    Dominion affiliated groups:\n 1. Star Trek: The Dominion\n 2. Karemma Commerce Ministry\n 3. The Breen Confederacy\n 4. The Cardassian Empire\n 5. Death Star III\n\n    Non Dominion groups:\n\n 6. Jungle Team\n 7. Legio XIII Gemina\n 8. Andromeda\n 9. Family Guy\n 10. Space 1999\n 11. Space 2099\n 12. Chess Star Resort\n 13. Magnus Carlsen group\n 14. October\n\n 42. endless loop that goes through all the groups, indefinitely\n 84. Create you own custom infinite loop from the supported groups\n 168. Send invites for another group\n\nEnter choice here: ")
+        while choice5 not in (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "42", "84", "168"]):
+            choice5 = raw_input("\n\nWhich group would you like to send invites for?\n\n    Dominion affiliated groups:\n 1. Star Trek: The Dominion\n 2. Karemma Commerce Ministry\n 3. The Breen Confederacy\n 4. The Cardassian Empire\n 5. Death Star III\n\n    Non Dominion groups:\n\n 6. Jungle Team\n 7. Legio XIII Gemina\n 8. Andromeda\n 9. Family Guy\n 10. Space 1999\n 11. Space 2099\n 12. Chess Star Resort\n 13. Magnus Carlsen group\n 14. October\n 15. Knights of the Realm\n\n 42. endless loop that goes through all the groups, indefinitely\n 84. Create you own custom infinite loop from the supported groups\n 168. Send invites for another group\n\nEnter choice here: ")
         inviter(([choice5]), 200)
 
     elif flow == "4":
