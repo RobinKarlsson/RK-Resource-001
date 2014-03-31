@@ -370,6 +370,15 @@ def pmdriver(target, choice):
 
     nnation = raw_input("If member nation is International, use this instead: ")
 
+    while True:
+        sleeptime = raw_input("\n\nSeconds to wait between pm's: ")
+        try:
+            sleeptime = int(sleeptime)
+            break
+        except ValueError:
+            "do nothing"
+        
+
     browserchoice = selbrowch()
 
     Username = raw_input("\n\n\nUsername: ")
@@ -460,7 +469,7 @@ def pmdriver(target, choice):
                     except:
                         print "retrying"
 
-        time.sleep(4)
+        time.sleep(sleeptime)
 
 def mecopner(browser, pointl):
     while True:
