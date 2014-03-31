@@ -170,4 +170,4 @@ Ratings can be Live Standard, Live Blitz, Live Bullet, Online chess, 960 or tact
 
 
 
- 14) Get the intersection of two lists
+ 14) Perform set operations on two lists (union, intersection, difference, symmetric difference)
