@@ -3,7 +3,7 @@
 # developed by Robin Karlsson
 # contact email: "r.robin.karlsson@gmail.com"
 # contact chess.com profile: "http://www.chess.com/members/view/RobinKarlsson"
-# version 0.8.8 alpha
+# version 0.8.9 alpha dev
 
 import mechanize
 import os
@@ -177,18 +177,19 @@ def mecbrowser(logincookie):
     browser.set_handle_refresh(mechanize._http.HTTPRefreshProcessor(), max_time=1)
     return browser
 
-def pickbrowser(browserchoice):
+def pickbrowser(browserchoice, adext):
     usrplatform = getplatform()
     handle = False
     while True:
         if browserchoice == "1":
             fopt = webdriver.FirefoxProfile()
-            for fname in os.listdir("Webdriver/Extensions/Firefox"):
-                if fname.endswith(".xpi"):
-                    try:
-                        fopt.add_extension(os.path.abspath("Webdriver/Extensions/Firefox/" + fname))
-                    except:
-                        print "Failed to load " + os.path.abspath("Webdriver/Extensions/Firefox/" + fname)
+            if adext == True:
+                for fname in os.listdir("Webdriver/Extensions/Firefox"):
+                    if fname.endswith(".xpi"):
+                        try:
+                            fopt.add_extension(os.path.abspath("Webdriver/Extensions/Firefox/" + fname))
+                        except:
+                            print "Failed to load " + os.path.abspath("Webdriver/Extensions/Firefox/" + fname)
             try:
                 browser = webdriver.Firefox(fopt)
             except:
@@ -198,14 +199,15 @@ def pickbrowser(browserchoice):
 
         elif browserchoice == "2":
             copt = Options()
-            for fname in os.listdir("Webdriver/Extensions/Chrome"):
-                if fname.endswith(".crx"):
-                    try:
-                        copt.add_extension(os.path.abspath("Webdriver/Extensions/Chrome/" + fname))
-                        if "adblock" in fname:
-                            handle = False
-                    except:
-                        print "Failed to load " + os.path.abspath("Webdriver/Extensions/Chrome/" + fname)
+            if adext == True:
+                for fname in os.listdir("Webdriver/Extensions/Chrome"):
+                    if fname.endswith(".crx"):
+                        try:
+                            copt.add_extension(os.path.abspath("Webdriver/Extensions/Chrome/" + fname))
+                            if "adblock" in fname:
+                                handle = False
+                        except:
+                            print "Failed to load " + os.path.abspath("Webdriver/Extensions/Chrome/" + fname)
 
             if usrplatform[1] == "Linux":
                 chromepath = os.path.abspath("Webdriver/Linux/86/chromedriver")
@@ -373,7 +375,7 @@ def pmdriver(target, choice):
     Username = raw_input("\n\n\nUsername: ")
     Password = raw_input("Password: ")
 
-    browser0, handle = pickbrowser(browserchoice)
+    browser0, handle = pickbrowser(browserchoice, True)
     browser0 = sellogin(Username, Password, browser0, handle)
 
     logincookie = browser0.get_cookies()
@@ -404,12 +406,13 @@ def pmdriver(target, choice):
             counter += 1
             if counter > 70:
                 browser0.quit()
-                browser0, handle = pickbrowser(browserchoice)
+                browser0, handle = pickbrowser(browserchoice, True)
                 browser0 = sellogin(Username, Password, browser0, handle)
                 counter = 1
 
         print "sending pm to " + membername2
         membername = "http://www.chess.com/members/view/" + membername2
+
         browser1, response = mecopner(browser1, membername)
         soup = BeautifulSoup(response)
 
@@ -426,7 +429,8 @@ def pmdriver(target, choice):
 
         for link in soup.find_all("a", href=True):
             if link.text == "Send a Message":
-                browser0.get("http://www.chess.com" + link["href"])
+                memlink = link["href"]
+                browser0.get("http://www.chess.com" + memlink)
                 time.sleep(2)
 
         try:
@@ -435,12 +439,27 @@ def pmdriver(target, choice):
         except:
             continue
 
-        browser0.switch_to_frame("tinymcewindow_ifr")
-        browser0.find_element_by_id("tinymce").clear()
-        browser0.switch_to_default_content()
-        filtmcemsg(msglist, browser0, name, country, browserchoice)
+        while True:
+            try:
+                browser0.switch_to_frame("tinymcewindow_ifr")
+                browser0.find_element_by_id("tinymce").clear()
+                browser0.switch_to_default_content()
+                filtmcemsg(msglist, browser0, name, country, browserchoice)
 
-        browser0.find_element_by_id("c16").click()
+                browser0.find_element_by_id("c16").click()
+                break
+            except:
+                print "\n\nRetrying " + membername2
+
+                while True:
+                    browser0.get("http://www.chess.com" + memlink)
+                    try:
+                        WebDriverWait(browser0, 10).until(EC.presence_of_element_located((By.ID, "c15")))
+                        browser0.find_element_by_name("c15").send_keys(subject)
+                        break
+                    except:
+                        print "retrying"
+
         time.sleep(4)
 
 def mecopner(browser, pointl):
@@ -644,7 +663,7 @@ def ageproc(target):
         while "" in birthdate:
             birthdate.remove("")
 
-        birthdate = map(int, birthdate)
+        birthdate = map(int, [element.replace(",", "") for element in birthdate])
         flist.append(birthdate + tlst)
     return flist
 
@@ -690,17 +709,6 @@ def inviter(choicelist, invitenum):
                 choice = raw_input("add another snippet? (y/n) ")
         countryalt = raw_input("If member nation is International, use this instead: ")
 
-    browserchoice = selbrowch()
-
-    Username = raw_input("\n\n\nUsername: ")
-    Password = raw_input("Password: ")
-
-    browser2, handle = pickbrowser(browserchoice)
-    browser2 = sellogin(Username, Password, browser2, handle)
-
-    logincookie = browser2.get_cookies()
-    browser1 = mecbrowser(logincookie)
-
     invinf = "no"
     if choicelist[0] == "42":
         invinf = "yes"
@@ -717,6 +725,17 @@ def inviter(choicelist, invitenum):
             choicelist.append(tempval)
             block = raw_input("Add another group? (y/n) ")
 
+    browserchoice = selbrowch()
+
+    Username = raw_input("\n\n\nUsername: ")
+    Password = raw_input("Password: ")
+
+    browser2, handle = pickbrowser(browserchoice, True)
+    browser2 = sellogin(Username, Password, browser2, handle)
+
+    logincookie = browser2.get_cookies()
+    browser1 = mecbrowser(logincookie)
+
     lonl = [int(elem) for elem in str(date.today() - timedelta(days = 3)).split("-")]
     msin = [int(elem) for elem in str(date.today() - timedelta(days = 60)).split("-")]
 
@@ -729,7 +748,7 @@ def inviter(choicelist, invitenum):
                 counted = "y"
                 if counter > 70:
                     browser2.quit()
-                    browser2, handle = pickbrowser(browserchoice)
+                    browser2, handle = pickbrowser(browserchoice, True)
                     browser2 = sellogin(Username, Password, browser2, handle)
                     counter = 1
 
@@ -897,10 +916,10 @@ def inviter(choicelist, invitenum):
                 msglist = (("1", "Hello /name. Welcome to the Death Star, a Dynamically Dangerous Spacestation and Superweapon capable of Destroying an Entire Planet with its Powerful Superlaser../newline/newline"), ("2", "http://loyalkng.com/wp-content/uploads/2009/05/deathstarfiring2.jpg"), ("1", "/newlineThe Death Star has a crew of 265,675, as well as 52,276 gunners, 607,360 troops, 30,984 stormtroopers, and 180,216 pilots Its hangars contain assault shuttles, blastboats, Strike cruisers, land vehicles, support ships, and 7,293 TIE Fighters. It is protected by 10,000 turbolaser batteries, 2,600 Ion Cannons, and 768 Tractor Beam projectors./newline/newlineWelcome To Our Leader, Darth Vader :) Join us and together we will rule this galaxy!!!!/newline/newline"), ("3", "http://www.youtube.com/watch?v=4ImO0ST1WkM"))
 
             elif choice5 == "6": #Jungle Team
-                minrat = ""
+                minrat = 1300
                 maxrat = ""
                 mingames = ""
-                minwinrat = ""
+                minwinrat = 0.25
                 lastloginyear = lonl[0]
                 lastloginmonth = lonl[1]
                 lastloginday = lonl[2]
@@ -913,7 +932,7 @@ def inviter(choicelist, invitenum):
                 olderyear = ""
                 oldermonth = ""
                 olderday = ""
-                timemax = ""
+                timemax = 15
                 maxgroup = ""
                 mingroup = ""
                 timovchoicemin = ""
@@ -1247,7 +1266,7 @@ def inviter(choicelist, invitenum):
                         counter += 1
                     if counter > 70:
                         browser2.quit()
-                        browser2, handle = pickbrowser(browserchoice)
+                        browser2, handle = pickbrowser(browserchoice, True)
                         browser2 = sellogin(Username, Password, browser2, handle)
                         counter = 1
 
@@ -1271,15 +1290,29 @@ def inviter(choicelist, invitenum):
                 except:
                     break
 
-                print "\nInviting " + member + " " + invgroup
-                memint.append(member)
+                while True:
+                    try:
+                        print "\nInviting " + member + " " + invgroup
+                        memint.append(member)
 
-                browser2.switch_to_frame("tinymcewindow_ifr")
-                browser2.find_element_by_id("tinymce").clear()
-                browser2.switch_to_default_content()
+                        browser2.switch_to_frame("tinymcewindow_ifr")
+                        browser2.find_element_by_id("tinymce").clear()
+                        browser2.switch_to_default_content()
 
-                filtmcemsg(msglist, browser2, name, country, browserchoice)
-                browser2.find_element_by_id("c18").click()
+                        filtmcemsg(msglist, browser2, name, country, browserchoice)
+                        browser2.find_element_by_id("c18").click()
+                        break
+
+                    except:
+                        print "\n\nRetrying " + member + " " + invgroup + "!!!\n\n"
+                        while True:
+                            browser2.get(groupinv)
+                            try:
+                                WebDriverWait(browser2, 5).until(EC.presence_of_element_located((By.ID, "c15")))
+                                browser2.find_element_by_name("c15").send_keys(member)
+                                break
+                            except:
+                                print "retrying"
 
             updinvlist = set(memtinv).difference(set(memint))
             updinvlist = misc1(updinvlist)
@@ -1306,11 +1339,19 @@ def filtmcemsg(msglist, browser, name, country, browserchoice):
             browser.find_element_by_id("tinymcewindow_imageuploader").click()
             time.sleep(1)
             browser.switch_to_window(browser.window_handles[1])
-            WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.ID, "photourl")))
-            browser.find_element_by_id("photourl").send_keys(content[1])
-            browser.find_element_by_id("insert").click()
+            while True:
+                try:
+                    WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.ID, "photourl")))
+                    browser.find_element_by_id("photourl").send_keys(content[1])
+                    browser.find_element_by_id("insert").click()
+                    break
+                except:
+                    print "\n\nrefreshing page\n\n"
+                    browser.refresh()
+
             browser.switch_to_window(browser.window_handles[0])
             time.sleep(1)
+
         elif content[0] == "3":
             browser.find_element_by_id("tinymcewindow_mce_media").click()
             alert = browser.switch_to_alert()
@@ -1326,7 +1367,7 @@ def login():
         return ""
 
     browserchoice = selbrowch()
-    browser, handle = pickbrowser(browserchoice)
+    browser, handle = pickbrowser(browserchoice, True)
     browser = sellogin(Username, Password, browser, handle)
 
     logincookie = browser.get_cookies()
@@ -1490,7 +1531,7 @@ def olprint2(tlen, middle, right, left):
 
 def vcman(vclinklist, yourside):
     browserchoice = selbrowch()
-    browser3, handle = pickbrowser(browserchoice)
+    browser3, handle = pickbrowser(browserchoice, True)
     browser3 = sellogin(raw_input("Username: "), raw_input("Password: "), browser3, handle)
 
     logincookie = browser3.get_cookies()
@@ -1962,6 +2003,34 @@ def memremoverf(un1):
             pointer = raw_input("Filter out members from another group? (y/n)")
     return un1
 
+def file_or_input(mult, fdiag1, fdiag2, idiag1, idiag2):
+    list1 = ""
+    list2 = ""
+
+    choice = ""
+    while choice not in (["1", "2"]):
+        choice = raw_input("\n\nGet the list from\n 1. Enter onscreen\n 2. Import from file in root directory\nYour choice: ")
+
+    if choice == "2":
+        print "\n\nFiles in direcroty:"
+        flist = fnamenot(([".csv", ".py", ".pyc", ".log", "~"]), ".")
+
+        while list1 not in flist:
+            list1 = raw_input(fdiag1)
+        list1 = remove_doublets(list1, "")
+
+        if mult == True:
+            while list2 not in flist:
+                list2 = raw_input(fdiag2)
+            list2 = remove_doublets(list2, "")
+
+    elif choice == "1":
+        list1 = streplacer(raw_input(idiag1), ([" ", ""], ["(", ""], [")", ""], ["]", ""], ["[", ""], ["'", ""])).split(",")
+        if mult == True:
+            list2 = streplacer(raw_input(idiag2), ([" ", ""], ["(", ""], [")", ""], ["]", ""], ["[", ""], ["'", ""])).split(",")
+
+    return list1, list2
+
 def tlstcreator():
     targetlist = list()
     choice1 = ""
@@ -1979,12 +2048,10 @@ def tlstcreator():
         choice1 = ""
         while choice1 not in (["y", "n"]):
             choice1 = raw_input("\nDo you wish to process any additional targets? (y/n): ")
-
     return targetlist
 
 def notclosedcheck(memlist):
     browser = mecbrowser("")
-
     memlist2 = list()
     for mem in memlist:
         browser, response = mecopner(browser, "http://www.chess.com/members/view/" + mem)
@@ -1995,7 +2062,7 @@ def notclosedcheck(memlist):
     return memlist2
 
 olprint("*", "*", "-", 72, True)
-for content in (["", "", "", "RK Resource 001", "version 0.8.8 alpha", "", "", ""]):
+for content in (["", "", "", "RK Resource 001", "version 0.8.9 alpha dev", "", "", ""]):
     olprint2("{0: ^70}", content, "|", "|")
 olprint("|", "|", "-", 72, True)
 
@@ -2003,7 +2070,7 @@ for content in (["", "", "developed by Robin Karlsson", "", "", "Contact informa
     olprint2("{0: ^70}", content, "|", "|")
 olprint("|", "|", "-", 72, True)
 
-for content in (["", "", "Options", "Type /help or /help <number> for more info", "", "", "1. Extract the memberslist of one or more groups", "", "2. Build a csv file with data on a list of members", "", "3. Send invites for a group", "", "4. Posts per member in a groups finished votechess matches", "", "5. Build a csv file of a groups team match participants", "", "6. Filter a list of members for those who fill a few requirements", "", "7. Presentation of csv-files from options 2 and 5", "", "8. Process invite lists", "", "9. Look for members who has recenty left your group", "", "10. Count number of group notes per member in the last 100 notes pages", "", "11. Build a birthday schedule for a list of members", "", "12. Send a personal message to a list of members", "", "13. Pair lists of players against each others", "", "14. Get intersection of two lists", "", ""]):
+for content in (["", "", "Options", "Type /help or /help <number> for more info", "", "", "1. Extract the memberslist of one or more groups", "", "2. Build a csv file with data on a list of members", "", "3. Send invites for a group", "", "4. Posts per member in a groups finished votechess matches", "", "5. Build a csv file of a groups team match participants", "", "6. Filter a list of members for those who fill a few requirements", "", "7. Presentation of csv-files from options 2 and 5", "", "8. Process invite lists", "", "9. Look for members who has recenty left your group", "", "10. Count number of group notes per member in the last 100 notes pages", "", "11. Build a birthday schedule for a list of members", "", "12. Send a personal message to a list of members", "", "13. Pair lists of players against each others", "", "14. Set operations on two lists", "", ""]):
     olprint2("{0: ^70}", content, "|", "|")
 olprint("*", "*", "-", 72, True)
 
@@ -2042,6 +2109,8 @@ while pathway in (["y"]):
             print "\n\nSend personalized personal messages to either a comma seperated list of members or those who are present in a set of pages. The message can include text (with the members real name and nation, to personalize the message) and images.\n\nRequires the script to log in to chess.com, to send pm's from your account"
         elif flow == "/help 13":
             print "\n\nTakes either one or two list of members and offer to pair them against each others based on rating.\nIf given one lists members will be paired against each other after the format, highest ranked vs second highest rank etc. For two lists the script takes each member in the shorter list and pair this member against whoever has the most similar rating in the longer list\n\nRatings can be Live Standard, Live Blitz, Live Bullet, Online chess, 960 or tactics"
+        elif flow == "/help 14":
+            print "\n\n Perform set operations (union, intersection, difference, symmetric difference) on two lists"
         elif flow == "/help":
             print "\n\n\nTo add extensions/addons to the scripts chrome or firefox browser you need to download the extension in crx format for chrome or xpi for firefox. Once the addon is downloaded, place it in the Webdriver/Extensions/Chrome or Webdriver/Extensions/Firefox folder.\n\nIt's recommended to use the adblock plus extension\n\n\n\n\nTo use the scripts ability to determine a members gender you will need to have a list of male and female first names in the namelists folder. male names should be stored in a file called 'male' and female names in a file called 'female'.\n\nFor best performance the names should be in the format:\nname1\nname2\nname3\netc\n\nIt's also recommended to sort the names based on how commonly they are used"
 
@@ -2076,7 +2145,7 @@ while pathway in (["y"]):
                 placeholder2.write(un1)
 
     elif flow == "2":
-        target = raw_input("\n\nList of members: ").replace(" ", "").split(",")
+        target = file_or_input(False, "\n\nName of the file containing your list: ", "", "\n\nEnter list of members to check: ", "")[0]
         while "" in target:
             target.remove("")
         filename = raw_input("Name of the file to which your data will be saved: ")
@@ -2176,7 +2245,7 @@ while pathway in (["y"]):
             print "\n\n\nThe following members has a timeoutratio above " + str(maxtmrat) + "%: " + streplacer(str(deadbeatlist), (["'", ""], ["[", ""], ["]", ""]))
 
     elif flow == "6":
-        membernamelist = raw_input("\n\nList of members to check: ")
+        membernamelist = file_or_input(False, "\n\nName of the file containing your list: ", "", "\n\nEnter list of members to check: ", "")[0]
         browser = mecbrowser("")
 
         minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender = memprmenu()
@@ -2434,18 +2503,18 @@ while pathway in (["y"]):
             print nam + " has made " + str(num) + " notes"
 
     elif flow == "11":
-        target = raw_input("\n\nList of members to check: ").replace(" ", "").split(",")
+        target = file_or_input(False, "\n\nName of the file containing your list: ", "", "\n\nEnter list of members to check: ", "")[0]
         birthdaylist = ageproc(target)
         birthdsorter(birthdaylist)
 
     elif flow == "12":
         choice = ""
         while choice not in (["1", "2"]):
-            choice = raw_input("\n\noptions:\n 1. send a pm to all members from a set of pages\n 2. manually enter the usernames of those you wish to pm\nYour choice, young padawan: ")
+            choice = raw_input("\n\noptions:\n 1. send a pm to all members from a set of pages\n 2. pm members from a custom list\nYour choice, young padawan: ")
         if choice == "1":
             target = tlstcreator()
         elif choice == "2":
-            target = raw_input("\n\nlist of members to pm: ").replace(" ", "").split(",")
+            target = file_or_input(False, "\n\nName of the file containing your list: ", "", "\n\nEnter list of members to pm: ", "")[0]
         pmdriver(target, choice)
 
     elif flow == "13":
@@ -2454,17 +2523,17 @@ while pathway in (["y"]):
             gchoice = raw_input("\n\n 1. Pair a list of members against each others\n 2. Pair two lists of members to play each others\nChoice: ")
 
         if gchoice == "1":
-            target = list(set(raw_input("List of participants: ").replace(" ", "").split(",")))
+            target = file_or_input(False, "\n\nName of the file containing your list of players: ", "", "\n\nEnter list of players: ", "")[0]
             while "" in target:
                 target.remove("")
 
         elif gchoice == "2":
             name1org = raw_input("Name of group 1: ")
-            target1 = list(set(raw_input("Participants from group 1: ").replace(" ", "").split(",")))
+            target1 = file_or_input(False, "\n\nName of the file containing " + name1org + "'s players: ", "", "\n\nEnter " + name1org + "'s list of players: ", "")[0]
             while "" in target1:
                 target1.remove("")
             name2org = raw_input("Name of group 2: ")
-            target2 = list(set(raw_input("Participants from group 2: ").replace(" ", "").split(",")))
+            target2 = file_or_input(False, "\n\nName of the file containing " + name2org + "'s players: ", "", "\n\nEnter " + name2org + "'s list of players: ", "")[0]
             while "" in target2:
                 target2.remove("")
 
@@ -2504,31 +2573,20 @@ while pathway in (["y"]):
                 print pair[0][0] + " (" + str(pair[0][1]) + ") - " + pair[1][0] + " (" + str(pair[1][1]) + ")"
 
     elif flow == "14":
-        choice = ""
-        while choice not in (["1", "2"]):
-            choice = raw_input("\n\nGet the list of members from\n 1. a file in the scripts direcroty\n 2. input\nYour choice: ")
+        choice14 = ""
+        while choice14 not in (["1", "2", "3", "4"]):
+            choice14 = raw_input("\n\nwhat would you like to get\n 1. Elements common to both lists (intersection)\n 2. Elements from both lists (union)\n 3. Elements in list 1 but not in list 2 (difference)\n 4. Elements in either list but not in both (symmetric difference)\nYour choice: ")
 
-        if choice == "1":
-            print "\n\nFiles in direcroty:"
-            list1 = ""
-            list2 = ""
-            flist = fnamenot(([".csv", ".py", ".pyc", ".log", "~"]), ".")
+        list1, list2 = file_or_input(True, "\n\nName of file 1: ", "Name of file 2: ", "\n\nList1: ", "List2: ")
 
-            while list1 not in flist:
-                list1 = raw_input("\n\nName of file 1: ")
-            list1 = set(remove_doublets(list1, ""))
-
-            while list2 not in flist:
-                list2 = raw_input("\n\nName of file 2: ")
-            list2 = set(remove_doublets(list2, ""))
-
-            prlst = streplacer(str(list(list1.intersection(list2))), ([" ", ""], ["(", ""], [")", ""], ["]", ""], ["[", ""], ["'", ""]))
-
-        elif choice == "2":
-            list1 = streplacer(raw_input("\n\nList 1: "), ([" ", ""], ["(", ""], [")", ""], ["]", ""], ["[", ""], ["'", ""])).split(",")
-            list2 = streplacer(raw_input("\n\nList 2: "), ([" ", ""], ["(", ""], [")", ""], ["]", ""], ["[", ""], ["'", ""])).split(",")
-
+        if choice14 == "1":
             prlst = streplacer(str(list(set(list1).intersection(set(list2)))), ([" ", ""], ["(", ""], [")", ""], ["]", ""], ["[", ""], ["'", ""]))
+        elif choice14 == "2":
+            prlst = streplacer(str(list(set(list1).union(set(list2)))), ([" ", ""], ["(", ""], [")", ""], ["]", ""], ["[", ""], ["'", ""]))
+        elif choice14 == "3":
+            prlst = streplacer(str(list(set(list1).difference(set(list2)))), ([" ", ""], ["(", ""], [")", ""], ["]", ""], ["[", ""], ["'", ""]))
+        elif choice14 == "4":
+            prlst = streplacer(str(list(set(list1).symmetric_difference(set(list2)))), ([" ", ""], ["(", ""], [")", ""], ["]", ""], ["[", ""], ["'", ""]))
 
         choice6 = ""
         while choice6 not in (["1", "2"]):
