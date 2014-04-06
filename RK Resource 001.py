@@ -188,6 +188,8 @@ def pickbrowser(browserchoice, adext):
                     if fname.endswith(".xpi"):
                         try:
                             fopt.add_extension(os.path.abspath("Webdriver/Extensions/Firefox/" + fname))
+                            if "adblock" in fname:
+                                handle = True
                         except:
                             print "Failed to load " + os.path.abspath("Webdriver/Extensions/Firefox/" + fname)
             try:
@@ -205,7 +207,7 @@ def pickbrowser(browserchoice, adext):
                         try:
                             copt.add_extension(os.path.abspath("Webdriver/Extensions/Chrome/" + fname))
                             if "adblock" in fname:
-                                handle = False
+                                handle = True
                         except:
                             print "Failed to load " + os.path.abspath("Webdriver/Extensions/Chrome/" + fname)
 
@@ -249,6 +251,10 @@ def pickbrowser(browserchoice, adext):
                 browser = webdriver.Ie(os.path.abspath("Webdriver/Windows/86/IEDriverServer.exe"))
                 break
         browserchoice = raw_input("\nSomething went wrong, please send this to the developer: " + browserchoice + str(usrplatform) + "\n\nTry and pick another browser\n 1. Firefox\n 2. Chrome\n 3. PhantomJS\n 4. Internet Explorer\nEnter choice: ")
+
+    if handle == True:
+        time.sleep(2)
+        browser.switch_to_window(browser.window_handles[-1])
     return browser, handle
 
 def com2(xxxxxxxxxxxxxx, xxxxxxxxxxxxx, xxxxxxxxxxxxxxxx, xxxxxxxxxxxxxxxxxxx):
@@ -385,7 +391,7 @@ def pmdriver(target, choice):
     Password = raw_input("Password: ")
 
     browser0, handle = pickbrowser(browserchoice, True)
-    browser0 = sellogin(Username, Password, browser0, handle)
+    browser0 = sellogin(Username, Password, browser0)
 
     logincookie = browser0.get_cookies()
 
@@ -416,7 +422,7 @@ def pmdriver(target, choice):
             if counter > 70:
                 browser0.quit()
                 browser0, handle = pickbrowser(browserchoice, True)
-                browser0 = sellogin(Username, Password, browser0, handle)
+                browser0 = sellogin(Username, Password, browser0)
                 counter = 1
 
         print "sending pm to " + membername2
@@ -721,7 +727,7 @@ def inviter(choicelist, invitenum):
     invinf = "no"
     if choicelist[0] == "42":
         invinf = "yes"
-        choicelist = (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15"])
+        choicelist = (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16"])
 
     elif choicelist[0] == "84":
         choicelist = list()
@@ -729,7 +735,7 @@ def inviter(choicelist, invitenum):
         block = ""
         while block not in (["n"]):
             tempval = ""
-            while tempval not in (["1", "2", "3", "4", "5", "7", "8", "9", "10", "11", "12", "13", "14", "15"]):
+            while tempval not in (["1", "2", "3", "4", "5", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16"]):
                 tempval = raw_input("Group number: ")
             choicelist.append(tempval)
             block = raw_input("Add another group? (y/n) ")
@@ -740,7 +746,7 @@ def inviter(choicelist, invitenum):
     Password = raw_input("Password: ")
 
     browser2, handle = pickbrowser(browserchoice, True)
-    browser2 = sellogin(Username, Password, browser2, handle)
+    browser2 = sellogin(Username, Password, browser2)
 
     logincookie = browser2.get_cookies()
     browser1 = mecbrowser(logincookie)
@@ -758,7 +764,7 @@ def inviter(choicelist, invitenum):
                 if counter > 70:
                     browser2.quit()
                     browser2, handle = pickbrowser(browserchoice, True)
-                    browser2 = sellogin(Username, Password, browser2, handle)
+                    browser2 = sellogin(Username, Password, browser2)
                     counter = 1
 
             invitenum2 = invitenum
@@ -1244,6 +1250,38 @@ def inviter(choicelist, invitenum):
                 alrfile = "Invite Lists/Knights of the Realm already invited"
                 msglist = (("2", "http://d1lalstwiwz2br.cloudfront.net/images_users/tiny_mce/thee_black_knight/phpUJ1yFu.gif"), ("1", "/newline/newlineWelcome to the Knights of the Realm, squire /name of /nation. The Knights set up fair team matches, vote chess matches, 960 matches and inhouse tournaments (Jousts). By fair matches, we mean that each individual game, has less than a 100 point rating difference./newline/newlineWe also have an analysis Department to post games in, and have them analyized, or maybe help to analyze the games of others. There is plenty of information to improve your game in the forums, and other interesting things./newline/newline/Lord Robin Karlsson/newline"), ("3", "http://www.youtube.com/watch?v=QMy6xsvxSfg"))
 
+            elif choice5 == "16": #Stargate Command
+                countryalt = ""
+                minrat = 1300
+                maxrat = ""
+                mingames = 50
+                minwinrat = 0.25
+                lastloginyear = lonl[0]
+                lastloginmonth = lonl[1]
+                lastloginday = lonl[2]
+                membersinceyear = msin[0]
+                membersincemonth = msin[1]
+                membersinceday = msin[2]
+                youngeryear = ""
+                youngermonth = ""
+                youngerday = ""
+                olderyear = ""
+                oldermonth = ""
+                olderday = ""
+                timemax = 13
+                maxgroup = 300
+                mingroup = ""
+                timovchoicemin = ""
+                timovchoicemax = ""
+                avatarch = "y"
+                heritage = ""
+                memgender = ""
+                invgroup = "to Stargate Command"
+                groupinv = "http://www.chess.com/groups/invite_members?id=21212"
+                infile = "Invite Lists/Stargate Command"
+                alrfile = "Invite Lists/Stargate Command already invited"
+                msglist = (("2", "http://www.bullshift.net/data/images/2013/10/tumblr-m0ocvrknvb1qzrlhgo2-r1-500.gif"), ("1", "/newline/newlineWelcome, /name, to Stargate Command!!!/newline/newline"), ("2", "http://www.stargate-sg1-solutions.com/screencaps/AOT/23%20Under%20Siege/slides/AOT23180.jpg"), ("1", "/newline/newlineThe SGC base acts as the secure ground station for all Stargate activities. It is typically commanded by a Major General and is staffed by subject matter experts and military support personnel, several elite special operations teams, and several SG teams, including SG-1. Follow through through the Stargate, as we explore the universe of Chess.com. We will see many wonders,encounter friends and foes,and play brilliant chess in spectacular matches..../newlineand maybe even play some stargate golf, if time allow ;))/newline/newline"), ("3", "https://www.youtube.com/watch?v=MUBQLcKvcfI"))
+
             memtinv = remove_doublets(infile, "")
             memalrinv = remove_doublets(alrfile, "")
             memtinv = [x for x in memtinv if x not in memalrinv]
@@ -1276,7 +1314,7 @@ def inviter(choicelist, invitenum):
                     if counter > 70:
                         browser2.quit()
                         browser2, handle = pickbrowser(browserchoice, True)
-                        browser2 = sellogin(Username, Password, browser2, handle)
+                        browser2 = sellogin(Username, Password, browser2)
                         counter = 1
 
                 browser1, response = mecopner(browser1, "http://www.chess.com/members/view/" + member)
@@ -1341,6 +1379,8 @@ def inviter(choicelist, invitenum):
 def filtmcemsg(msglist, browser, name, country, browserchoice):
     for content in msglist:
         if content[0] == "1":
+            #browser.execute_script("tinyMCE.activeEditor.insertContent('%s')" % streplacer(content[1], (["/name", name.strip()], ["/nation", country.strip()], ["/newline", " <br/>"])))
+
             browser.switch_to_frame("tinymcewindow_ifr")
             browser.find_element_by_id("tinymce").send_keys(streplacer(content[1], (["/name", name.strip()], ["/nation", country.strip()], ["/newline", "\n"])))
             browser.switch_to_default_content()
@@ -1377,7 +1417,7 @@ def login():
 
     browserchoice = selbrowch()
     browser, handle = pickbrowser(browserchoice, True)
-    browser = sellogin(Username, Password, browser, handle)
+    browser = sellogin(Username, Password, browser)
 
     logincookie = browser.get_cookies()
     browser.quit()
@@ -1518,11 +1558,7 @@ def makefolder(flst):
         if not os.path.exists(folder):
             os.makedirs(folder)
 
-def sellogin(Username, Password, browser, handle):
-    if handle == True:
-        time.sleep(1)
-        browser.close()
-        browser.switch_to_window(browser.window_handles[-1])
+def sellogin(Username, Password, browser):
     browser.get("https://www.chess.com/login")
     WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.ID, "btnLogin")))
 
@@ -1541,7 +1577,7 @@ def olprint2(tlen, middle, right, left):
 def vcman(vclinklist, yourside):
     browserchoice = selbrowch()
     browser3, handle = pickbrowser(browserchoice, True)
-    browser3 = sellogin(raw_input("Username: "), raw_input("Password: "), browser3, handle)
+    browser3 = sellogin(raw_input("Username: "), raw_input("Password: "), browser3)
 
     logincookie = browser3.get_cookies()
     browser1 = mecbrowser(logincookie)
@@ -2089,7 +2125,7 @@ dommem = memfiop("mem/dommem", "keydom")
 
 while pathway in (["y"]):
     flow = ""
-    while flow not in (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14"]):
+    while flow not in (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "42"]):
         flow = raw_input("\n\n\nEnter your choice here: ")
 
         if flow == "/help 1":
@@ -2163,8 +2199,8 @@ while pathway in (["y"]):
 
     elif flow == "3":
         choice5 = ""
-        while choice5 not in (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "42", "84", "168"]):
-            choice5 = raw_input("\n\nWhich group would you like to send invites for?\n\n    Dominion affiliated groups:\n 1. Star Trek: The Dominion\n 2. Karemma Commerce Ministry\n 3. The Breen Confederacy\n 4. The Cardassian Empire\n 5. Death Star III\n\n    Non Dominion groups:\n\n 6. Jungle Team\n 7. Legio XIII Gemina\n 8. Andromeda\n 9. Family Guy\n 10. Space 1999\n 11. Space 2099\n 12. Chess Star Resort\n 13. Magnus Carlsen group\n 14. October\n 15. Knights of the Realm\n\n 42. endless loop that goes through all the groups, indefinitely\n 84. Create you own custom infinite loop from the supported groups\n 168. Send invites for another group\n\nEnter choice here: ")
+        while choice5 not in (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "42", "84", "168"]):
+            choice5 = raw_input("\n\nWhich group would you like to send invites for?\n\n    Dominion affiliated groups:\n 1. Star Trek: The Dominion\n 2. Karemma Commerce Ministry\n 3. The Breen Confederacy\n 4. The Cardassian Empire\n 5. Death Star III\n\n    Non Dominion groups:\n\n 6. Jungle Team\n 7. Legio XIII Gemina\n 8. Andromeda\n 9. Family Guy\n 10. Space 1999\n 11. Space 2099\n 12. Chess Star Resort\n 13. Magnus Carlsen group\n 14. October\n 15. Knights of the Realm\n 16. Stargate Command\n\n 42. endless loop that goes through all the groups, indefinitely\n 84. Create you own custom infinite loop from the supported groups\n 168. Send invites for another group\n\nEnter choice here: ")
         inviter(([choice5]), 200)
 
     elif flow == "4":
@@ -2208,10 +2244,10 @@ while pathway in (["y"]):
             for pointer in set(tmparcount.keys())|set(winssdic.keys())|set(losedic.keys())|set(tmtimeoutcount.keys()):
                 joined[pointer] = (float(tmparcount.get(pointer, 0))/10 + (float(tmparcount.get(pointer, 0))*2 - float(winssdic.get(pointer, 0)) - float(losedic.get(pointer, 0)))*5/4 + float(winssdic.get(pointer, 0)) - float(losedic.get(pointer, 0)) - tmtimeoutcount.get(pointer, 0)*3, tmparcount.get(pointer, 0), winssdic.get(pointer, 0), losedic.get(pointer, 0), tmtimeoutcount.get(pointer, 0))
 
-            csvwriter.writerow(("Member name", "tm's participated in", "points won", "points lost", "ongoing games", "timeouts"))
+            csvwriter.writerow(("Member name", "tm's participated in", "points won", "points lost", "ongoing games", "timeouts", "win ratio"))
 
             for key, value in sorted(joined.items(), key = itemgetter(1), reverse = True):
-                csvwriter.writerow((key, value[1], value[2], value[3], value[1]*2 - value[2] - value[3], value[4]))
+                csvwriter.writerow((key, value[1], value[2], value[3], value[1]*2 - value[2] - value[3], value[4], value[2] / (value[1] * 2)))
 
             choicetm = ""
             while choicetm not in (["y", "n"]):
@@ -2231,11 +2267,11 @@ while pathway in (["y"]):
                     if key in passmembers:
                         joined2[key] = joined[key]
 
-                csvwriter.writerow(("Member name (those who fill your requirements)", "tm's participated in", "points won", "points lost", "ongoing games", "timeouts"))
+                csvwriter.writerow(("Member name (those who fill your requirements)", "tm's participated in", "points won", "points lost", "ongoing games", "timeouts", "win ratio"))
 
                 for key, value in sorted(joined2.items(), key = itemgetter(1), reverse = True):
 
-                    csvwriter.writerow((key, value[1], value[2], value[3], value[1]*2 - value[2] - value[3], value[4]))
+                    csvwriter.writerow((key, value[1], value[2], value[3], value[1]*2 - value[2] - value[3], value[4], value[2] / (value[1] * 2)))
             outputfile.close()
 
         elif pathtm == "2":
