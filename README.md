@@ -108,7 +108,9 @@ This data can be presented and sorted using option 7 in the main script
 
 - Column 5. Ongoing games
 
-- Column 6. Timeouts       
+- Column 6. Timeouts   
+
+- Column 7. Win ratio
 
 
 
