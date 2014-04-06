@@ -252,8 +252,9 @@ def pickbrowser(browserchoice, adext):
                 break
         browserchoice = raw_input("\nSomething went wrong, please send this to the developer: " + browserchoice + str(usrplatform) + "\n\nTry and pick another browser\n 1. Firefox\n 2. Chrome\n 3. PhantomJS\n 4. Internet Explorer\nEnter choice: ")
 
-    time.sleep(2)
-    browser.switch_to_window(browser.window_handles[-1])
+    if handle == True:
+        time.sleep(2)
+        browser.switch_to_window(browser.window_handles[-1])
     return browser, handle
 
 def com2(xxxxxxxxxxxxxx, xxxxxxxxxxxxx, xxxxxxxxxxxxxxxx, xxxxxxxxxxxxxxxxxxx):
@@ -1763,4 +1764,894 @@ def memberprocesser(silent, browser, target, minrat, maxrat, mingames, minwinrat
                 rating = onlratingchecker(soup)
                 if minrat != "":
                     minrat = int(minrat)
-                    if 
+                    if rating < minrat:
+                        continue
+                if maxrat != "":
+                    maxrat = int(maxrat)
+                    if rating > maxrat:
+                        continue
+
+            if maxgroup != "" or mingroup != "":
+                groupcount = groupmemlister(soup)
+
+                if maxgroup != "":
+                    if groupcount > int(maxgroup):
+                        continue
+                if mingroup != "":
+                    if groupcount < int(mingroup):
+                        continue
+
+            if avatarch == "y":
+                if AvatarCheck(soup) == False:
+                    continue
+
+            if youngeryear != "" or olderyear != "":
+                birthdate = birthlister(soup)
+                if birthdate == "":
+                    continue
+                while "" in birthdate:
+                    birthdate.remove("")
+
+                birthdate = [int(birthdate[2]), int(birthdate[0]), int(birthdate[1])]
+
+                if youngeryear != "":
+                    if datetime(birthdate[0], birthdate[1], birthdate[2]) < datetime(youngeryear, youngermonth, youngerday):
+                        continue
+                if olderyear != "":
+                    if datetime(birthdate[0], birthdate[1], birthdate[2]) > datetime(olderyear, oldermonth, olderday):
+                        continue
+
+            if heritage != "":
+                nation = nationlister(soup)
+
+                if heritage not in nation:
+                    continue
+
+            if memgender != "":
+                name = namechecker(soup)
+                if name == " ":
+                    continue
+                name = name.split(" ")[0].lower()
+                Found = "n"
+
+                if memgender == "f":
+                    with open("namelists/female", "rb") as fnlist:
+                        for line in fnlist:
+                            if name in line:
+                                Found = "y"
+                                break
+                elif memgender == "m":
+                    with open("namelists/male", "rb") as mnlist:
+                        for line in mnlist:
+                            if name in line:
+                                Found = "y"
+                                break
+                if Found == "n":
+                    continue
+
+            passmem.append(targetx)
+        except:
+            print "\n\nskipped " + targetx + "\n\n"
+    return passmem
+
+def namechecker(soup):
+    for placeholder in soup.find_all("strong"):
+        strplaceholder = str(placeholder)
+        if "Click here" not in strplaceholder and "ChessTV" not in strplaceholder:
+            return placeholder.text
+
+def AvatarCheck(soup):
+    if "noavatar" in str(soup.find_all(class_ = "avatar-container bottom-8")):
+        return False
+    return True
+
+def gamestats(soup):
+    for stats in soup.find_all(class_ = "even footer"):
+        stats = str(stats.text).replace("Total Games:", "").strip()
+        if "\n" not in stats:
+            stats = streplacer(stats, (["(", ""], [")", ""], ["/", ""], ["W", ""], ["L", ""], ["D", ""])).split(" ")
+            while "" in stats:
+                stats.remove("")
+            return [float(elem) for elem in stats]
+
+def ptscheck(soup):
+    for pts in soup.find_all(class_ = "last"):
+        pts = str(pts.text)
+        if "Points" in pts:
+            return int(pts.replace("Points:", "").strip())
+
+def timeoutchecker(soup):
+    for placeholder in soup.find_all(class_ = "even"):
+        if "Timeouts:" in str(placeholder):
+            timeout = int(placeholder.text.replace("Timeouts:", "").strip().replace("% (last 90 days)", ""))
+            return timeout
+
+def TimeMoveChecker(soup):
+    timemove = (["", "", ""])
+    for x in soup.find_all(class_ = "odd"):
+        if "Time/Move:" in str(x):
+            timemov = x.text.replace("Time/Move:", "").strip().split(" ")
+            timemov = [i+j for i,j in zip(timemov[::2],timemov[1::2])]
+            for xx in timemov:
+                if "days" in xx:
+                    timemove[0] = int(xx.replace("days", ""))
+                if "hr" in xx:
+                    timemove[1] = int(xx.replace("hr", ""))
+                if "fewmin" in xx:
+                    timemove[2] = xx.replace("fewmin", "")
+                elif "min" in xx:
+                    timemove[2] = int(xx.replace("min", ""))
+            break
+    while "" in timemove:
+        timemove[timemove.index("")] = 0
+    return timemove
+
+def onlratingchecker(soup):
+    onrating = 0
+    for x in soup.find_all(class_ = "clearfix stats-header"):
+        if "Online Chess" in str(x):
+            try:
+                onrating = int(x.text.replace("Online Chess", "").strip())
+            except ValueError:
+                "nothing"
+    return onrating
+
+def ranratingchecker(soup):
+    onrating = 0
+    for x in soup.find_all(class_ = "clearfix stats-header"):
+        if "Chess960" in str(x):
+            try:
+                onrating = int(x.text.replace("Chess960", "").strip())
+            except ValueError:
+                "nothing"
+    return onrating
+
+def tacratingchecker(soup):
+    onrating = 0
+    for x in soup.find_all(class_ = "clearfix stats-header"):
+        if "Tactics" in str(x):
+            try:
+                onrating = int(x.text.replace("Tactics", "").strip())
+            except ValueError:
+                "nothing"
+    return onrating
+
+def lstanratingchecker(soup):
+    onrating = 0
+    for x in soup.find_all(class_ = "clearfix stats-header"):
+        if "Live Chess - Standard" in str(x):
+            try:
+                onrating = int(x.text.replace("Live Chess - Standard", "").strip())
+            except ValueError:
+                "nothing"
+    return onrating
+
+def lbulratingchecker(soup):
+    onrating = 0
+    for x in soup.find_all(class_ = "clearfix stats-header"):
+        if "Live Chess - Bullet" in str(x):
+            try:
+                onrating = int(x.text.replace("Live Chess - Bullet", "").strip())
+            except ValueError:
+                "nothing"
+    return onrating
+
+def lblitzratingchecker(soup):
+    onrating = 0
+    for x in soup.find_all(class_ = "clearfix stats-header"):
+        if "Live Chess - Blitz" in str(x):
+            try:
+                onrating = int(x.text.replace("Live Chess - Blitz", "").strip())
+            except ValueError:
+                "nothing"
+    return onrating
+
+def ratingchecker(soup):
+    ratinglist = list()
+    recorder = "off"
+    for placeholder in soup.find_all(class_ = "right"):
+        if "View All Stats" in placeholder:
+            recorder = "on"
+        elif "Games Archive" in placeholder:
+            break
+        elif recorder == "on":
+            try:
+                ratinglist.append(int(placeholder.text))
+            except ValueError:
+                "nada"
+    return ratinglist
+
+def memsin(soup):
+    memsi = ""
+    for placeholder in soup.find_all(class_ = "section-content section-content-2"):
+        longnumlist = streplacer(placeholder.text.strip(), (["  ", ""], [",", ""], ["Member Since:", ""], ["Profile Views:", " "], ["Last Login:", " "], ["\n", ""], ["Jan", "01"], ["Feb", "02"], ["Mar", "03"], ["Apr", "04"], ["May", "05"], ["Jun", "06"], ["Jul", "07"], ["Aug", "08"], ["Sep", "09"], ["Oct", "10"], ["Nov", "11"], ["Dec", "12"])).split(" ")
+        memsi = [int(longnumlist[2]), int(longnumlist[0]), int(longnumlist[1])], [int(longnumlist[5]), int(longnumlist[3]), int(longnumlist[4])]
+    return memsi
+
+def groupmemlister(soup):
+    groupcountlist = list()
+    for placeholder in soup.find_all(class_ = "parenthesis-link"):
+        memgroups = placeholder.text
+    return int(memgroups)
+
+def nationlister(soup):
+    nationlist = list()
+    for placeholder in soup.find_all(class_ = "bottom-12"):
+        break
+    return placeholder.text.strip()
+
+def birthlister(soup):
+    for placeholder in soup.find_all(class_ = "section-content section-content-2"):
+        try:
+            placeholder = [birth for birth in str(placeholder).split("\n") if "Birthday:" in birth][0]
+            pos = placeholder.find("Birthday:")
+            birthday = streplacer(placeholder[pos + 19: pos + 31], (["Jan", "01"], ["Feb", "02"], ["Mar", "03"], ["Apr", "04"], ["May", "05"], ["Jun", "06"], ["Jul", "07"], ["Aug", "08"], ["Sep", "09"], ["Oct", "10"], ["Nov", "11"], ["Dec", "12"])).split(" ")
+        except IndexError:
+            birthday = ""
+    return birthday
+
+def memremoverf(un1):
+    pointer = ""
+    while pointer != "n":
+        while pointer not in (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", ""]):
+            pointer = raw_input("\nChose group to filter out\n 1. Star Trek: The Dominion\n 2. The Breen Confederacy\n 3. The Cardassian Empire\n 4. Death Star III\n 5. Karemma\n 6. Space 1999\n 7. Space 2099\n 8. Andromeda\n 9. Legio XIII Gemina\n 10. Utopia\n 11. Space Angels\n 12. Chess!\n 13. Carpe Diem\n 14. Chess Star Resort\n 15. Jungle Team\n 16. Family Guy\nYour choice: ")
+
+        if pointer == "1":
+            un1 = un1.difference(dommem)
+
+        elif pointer == "2":
+            un1 = un1.difference(memfiop("mem/breenmem", "keybreen"))
+
+        elif pointer == "3":
+            un1 = un1.difference(memfiop("mem/carmem", "keycarda"))
+
+        elif pointer == "4":
+            un1 = un1.difference(memfiop("mem/deathmem", "keydeath"))
+
+        elif pointer == "5":
+            un1 = un1.difference(memfiop("mem/karemma", "keykar"))
+
+        elif pointer == "6":
+            un1 = un1.difference(memfiop("mem/1999", "key1999"))
+
+        elif pointer == "7":
+            un1 = un1.difference(memfiop("mem/2099", "key2099"))
+
+        elif pointer == "8":
+            un1 = un1.difference(memfiop("mem/andromeda", "keyandromeda"))
+
+        elif pointer == "9":
+            un1 = un1.difference(memfiop("mem/legio", "keylegio"))
+
+        elif pointer == "10":
+            un1 = un1.difference(memfiop("mem/utopia", "keyutopia"))
+
+        elif pointer == "11":
+            un1 = un1.difference(memfiop("mem/angelmem", "keyangel"))
+
+        elif pointer == "12":
+            un1 = un1.difference(memfiop("mem/chessmem", "keyChess"))
+
+        elif pointer == "13":
+            un1 = un1.difference(memfiop("mem/CarpeDiemmem", "keyCD"))
+
+        elif pointer == "14":
+            un1 = un1.difference(memfiop("mem/CSR", "keyCSR"))
+
+        elif pointer == "15":
+            un1 = un1.difference(memfiop("mem/Jungle Team", "keyJT"))
+
+        elif pointer == "16":
+            un1 = un1.difference(memfiop("mem/Family Guy", "keyFG"))
+
+        while pointer not in (["y", "n"]):
+            pointer = raw_input("Filter out members from another group? (y/n)")
+    return un1
+
+def file_or_input(mult, fdiag1, fdiag2, idiag1, idiag2):
+    list1 = ""
+    list2 = ""
+
+    choice = ""
+    while choice not in (["1", "2"]):
+        choice = raw_input("\n\nGet the list from\n 1. Enter onscreen\n 2. Import from file in root directory\nYour choice: ")
+
+    if choice == "2":
+        print "\n\nFiles in direcroty:"
+        flist = fnamenot(([".csv", ".py", ".pyc", ".log", "~"]), ".")
+
+        while list1 not in flist:
+            list1 = raw_input(fdiag1)
+        list1 = remove_doublets(list1, "")
+
+        if mult == True:
+            while list2 not in flist:
+                list2 = raw_input(fdiag2)
+            list2 = remove_doublets(list2, "")
+
+    elif choice == "1":
+        list1 = streplacer(raw_input(idiag1), ([" ", ""], ["(", ""], [")", ""], ["]", ""], ["[", ""], ["'", ""])).split(",")
+        if mult == True:
+            list2 = streplacer(raw_input(idiag2), ([" ", ""], ["(", ""], [")", ""], ["]", ""], ["[", ""], ["'", ""])).split(",")
+
+    return list1, list2
+
+def tlstcreator():
+    targetlist = list()
+    choice1 = ""
+    while choice1 not in (["n"]):
+        tlst = list()
+        url1 = raw_input("\nPaste the url here: ") + "&page="
+        start1 = int(raw_input("\nEnter pagenumber to start on: "))
+        stop1 = int(raw_input("\nEnter pagenumber to end on: "))
+
+        while start1 <= stop1:
+            tlst.append(url1 + str(start1))
+            start1 += 1
+        targetlist.append(tlst)
+
+        choice1 = ""
+        while choice1 not in (["y", "n"]):
+            choice1 = raw_input("\nDo you wish to process any additional targets? (y/n): ")
+    return targetlist
+
+def notclosedcheck(memlist):
+    browser = mecbrowser("")
+    memlist2 = list()
+    for mem in memlist:
+        browser, response = mecopner(browser, "http://www.chess.com/members/view/" + mem)
+        soup = str(BeautifulSoup(response))
+
+        if mem in soup:
+            memlist2.append(mem)
+    return memlist2
+
+olprint("*", "*", "-", 72, True)
+for content in (["", "", "", "RK Resource 001", "version 0.8.9 alpha dev", "", "", ""]):
+    olprint2("{0: ^70}", content, "|", "|")
+olprint("|", "|", "-", 72, True)
+
+for content in (["", "", "developed by Robin Karlsson", "", "", "Contact information", "", "r.robin.karlsson@gmail.com", "http://www.chess.com/members/view/RobinKarlsson", "", ""]):
+    olprint2("{0: ^70}", content, "|", "|")
+olprint("|", "|", "-", 72, True)
+
+for content in (["", "", "Options", "Type /help or /help <number> for more info", "", "", "1. Extract the memberslist of one or more groups", "", "2. Build a csv file with data on a list of members", "", "3. Send invites for a group", "", "4. Posts per member in a groups finished votechess matches", "", "5. Build a csv file of a groups team match participants", "", "6. Filter a list of members for those who fill a few requirements", "", "7. Presentation of csv-files from options 2 and 5", "", "8. Process invite lists", "", "9. Look for members who has recenty left your group", "", "10. Count number of group notes per member in the last 100 notes pages", "", "11. Build a birthday schedule for a list of members", "", "12. Send a personal message to a list of members", "", "13. Pair lists of players against each others", "", "14. Set operations on two lists", "", ""]):
+    olprint2("{0: ^70}", content, "|", "|")
+olprint("*", "*", "-", 72, True)
+
+pathway = "y"
+makefolder((["mem", "Invite Lists", "namelists", "Webdriver", "Webdriver/Linux", "Webdriver/Mac", "Webdriver/Windows", "Webdriver/Linux/86", "Webdriver/Mac/86", "Webdriver/Windows/86", "Webdriver/Extensions", "Webdriver/Extensions/Chrome", "Webdriver/Extensions/Firefox"]))
+dommem = memfiop("mem/dommem", "keydom")
+
+while pathway in (["y"]):
+    flow = ""
+    while flow not in (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "42"]):
+        flow = raw_input("\n\n\nEnter your choice here: ")
+
+        if flow == "/help 1":
+            print "\n\nCreates a list of members from one or more groups. Has the option to remove those who're also members of a specific group (using the members list built in option 9). The list can either be saved to a file or be directly printed onscreen\n\nOptional login if you wish to extract members from pages that arent public (for example the manage members page)"
+        elif flow == "/help 2":
+            print "\n\nBuild an excell compatible csv file with the following data on a list of members.\n\n Column 1: Username\n Column 2: Real name (if available on members homepage)\n Column 3. Live Standard rating\n Column 4. Live Blitz rating\n Column 5. Live Bullet rating\n Column 6. Online Chess rating\n Column 7. 960 rating\n Column 8. Tactics rating\n Column 9. Timeout-ratio\n Column 10. Last online\n Column 11. Member since\n Column 12. Time per move\n Column 13. Number of groups member is in\n Column 14. Points\n Column 15. Number of online chess games played\n Column 16. Number of online chess games won\n Column 17. Number of online chess games lost\n Column 18. Number of Online chess games drawn\n Column 19. Win ratio for online chess\n Column 20. Member nation (if available on members homepage)\n Column 21. If member has a custom avatar\n\nThis data can be presented and sorted using option 7 in the main script"
+        elif flow == "/help 3":
+            print "\n\nSend personalized invites for one or more groups. The invites can include text (with member name and nation, to personalize the message), pictures and videos.\n\nTo use this function you need to have a text document with a comma seperated list of members in the folder called 'Invite Lists'. The script sends an invite to each member in that file and creates a second file in the Invite Lists folder, with the usernames of those who has received an invite\n\n\nMembers who are present in the groups 'already invited' file will be skipped when sending invites. To block the script from inviting specific members you can add their names to the already invited file for the group in question, and they will be effectivily blocked\n\nWhen running the inviter with the option to only invite those who fill a few requirements the script will remove those who didn't fill the requirements from your invites list\n\nRequires the script to log in on chess.com, to send the invites from your account"
+        elif flow == "/help 4":
+            print "\n\nGoes through a groups finished, non thematic votechess matches and counts number of posts per member\n\nRequires the script to log in on chess.com, to acess comments in games"
+        elif flow == "/help 5":
+            print "\n\nBuild an excell compatible csv file with the following data on how each member who has ever played for a group has performed in the groups team matches\n\n Column 1. Username\n Column 2. Number of team matches member has participated in\n Column 3. Points won\n Column 4. Points lost\n Column 5. Ongoing games\n Column 6. Timeouts"
+        elif flow == "/help 6":
+            print "\n\nTakes a comma seperated list of members and sort out those who doesn't fill a few criterias regarding:\n\n Min online chess rating\n Max online chess rating\n Last online\n Member Since\n Older than (if birthdate is available on members profile)\n Younger than (if birthdate is available on members profile)\n Min number of groups member may be in\n Max number of groups member may be in\n Timeout-ratio\n Time per move\n If they have a custom avatar\n Gender, determined by comparing the members name to a list of male and female names"
+        elif flow == "/help 7":
+            print "\n\nPresentation of csv files from option 2 and 5. Can present data from the csv files sorted by any column, compare two csv files from option 5 to see what has changed or return the username of each member in the file and present it as a comma seperated list"
+        elif flow == "/help 8":
+            print "\n\nRemoves doublets from a textfile and has the option to remove those who are members of a specific group"
+        elif flow == "/help 9":
+            print "\n\nAt first run the script builds a list of members who are currently in your group.\nAt future runs the script will build a new memberslist of your group, look for members who are in the memberslist compiled during the last run but not in the latest run.\nRemoves those who has had their accounts closed or changed their names and print the result, which is the members who has left your group in the timeperiod between two runs\n\nRequires the script to log in to and you to be an admin of the group that's checked, to access the manage members page"
+        elif flow == "/help 10":
+            print "\n\nCount the number of group notes posted per member in the last 100 pages of notes\n\nRequires the script to login to chess.com, to access group notes"
+        elif flow == "/help 11":
+            print "\n\nTakes a comma seperated list of members and builds a sorted birthday schedule of those who have their birthday visible on their profile"
+        elif flow == "/help 12":
+            print "\n\nSend personalized personal messages to either a comma seperated list of members or those who are present in a set of pages. The message can include text (with the members real name and nation, to personalize the message) and images.\n\nRequires the script to log in to chess.com, to send pm's from your account"
+        elif flow == "/help 13":
+            print "\n\nTakes either one or two list of members and offer to pair them against each others based on rating.\nIf given one lists members will be paired against each other after the format, highest ranked vs second highest rank etc. For two lists the script takes each member in the shorter list and pair this member against whoever has the most similar rating in the longer list\n\nRatings can be Live Standard, Live Blitz, Live Bullet, Online chess, 960 or tactics"
+        elif flow == "/help 14":
+            print "\n\n Perform set operations (union, intersection, difference, symmetric difference) on two lists"
+        elif flow == "/help":
+            print "\n\n\nTo add extensions/addons to the scripts chrome or firefox browser you need to download the extension in crx format for chrome or xpi for firefox. Once the addon is downloaded, place it in the Webdriver/Extensions/Chrome or Webdriver/Extensions/Firefox folder.\n\nIt's recommended to use the adblock plus extension\n\n\n\n\nTo use the scripts ability to determine a members gender you will need to have a list of male and female first names in the namelists folder. male names should be stored in a file called 'male' and female names in a file called 'female'.\n\nFor best performance the names should be in the format:\nname1\nname2\nname3\netc\n\nIt's also recommended to sort the names based on how commonly they are used"
+
+    if flow == "1":
+        print "\n\n\nchess.com members list extractor\n"
+        print "Locate the members list url of the group you wish to target.\n\n  example: http://www.chess.com/groups/membersearch?allnew=1&id=8893\n\nCopy the url.\n"
+        target = tlstcreator()
+
+        logincookie = login()
+        un1 = set(spider(target, logincookie, False))
+
+        remmem = ""
+        while remmem not in (["y", "n"]):
+            remmem = raw_input("\n\nFilter out members of a group? (y/n) ")
+
+        if remmem == "y":
+            un1 = memremoverf(un1)
+
+        un1 = un1.difference(domban)
+        un1 = misc1(un1)
+
+        choice6 = ""
+        while choice6 not in (["1", "2"]):
+            choice6 = raw_input("\n\nDo you wish to\n 1. Print the extracted names onscreen\n 2. Save them to a file\n\nEnter choice here: ")
+
+        if choice6 == "1":
+            print "\n\n" + un1
+
+        elif choice6 == "2":
+            memfile1 = raw_input("\nName of the file to which your list will be saved: ")
+            with open(memfile1, "ab") as placeholder2:
+                placeholder2.write(un1)
+
+    elif flow == "2":
+        target = file_or_input(False, "\n\nName of the file containing your list: ", "", "\n\nEnter list of members to check: ", "")[0]
+        while "" in target:
+            target.remove("")
+        filename = raw_input("Name of the file to which your data will be saved: ")
+
+        getmeminfo(target, filename)
+
+    elif flow == "3":
+        choice5 = ""
+        while choice5 not in (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "42", "84", "168"]):
+            choice5 = raw_input("\n\nWhich group would you like to send invites for?\n\n    Dominion affiliated groups:\n 1. Star Trek: The Dominion\n 2. Karemma Commerce Ministry\n 3. The Breen Confederacy\n 4. The Cardassian Empire\n 5. Death Star III\n\n    Non Dominion groups:\n\n 6. Jungle Team\n 7. Legio XIII Gemina\n 8. Andromeda\n 9. Family Guy\n 10. Space 1999\n 11. Space 2099\n 12. Chess Star Resort\n 13. Magnus Carlsen group\n 14. October\n 15. Knights of the Realm\n 16. Stargate Command\n\n 42. endless loop that goes through all the groups, indefinitely\n 84. Create you own custom infinite loop from the supported groups\n 168. Send invites for another group\n\nEnter choice here: ")
+        inviter(([choice5]), 200)
+
+    elif flow == "4":
+        yourside = raw_input("Name of group to check: ")
+        vclinklist = getvclinks(yourside)
+        parmemvc = vcman(vclinklist, yourside)
+
+        for key, value in sorted(parmemvc.items(), key = itemgetter(1), reverse = True):
+            print "\n" + key + " has made " + str(int(value)) + " posts"
+
+    elif flow == "5":
+        pathtm = ""
+        while pathtm not in (["1", "2"]):
+            pathtm = raw_input(" 1. Check all tm's for a group\n 2. Check a single tm\nYour choice: ")
+        targetnameorg = raw_input("\n\n\nName of the group you wish to check: ")
+        targetname = re.sub(r"[^a-z A-Z 0-9]","", targetnameorg)
+        targetname = targetname.replace(" ", "-").lower()
+
+        if pathtm == "1":
+            targetnameorgf = targetnameorg
+            pagelist = gettmlinks(targetname)
+        elif pathtm == "2":
+            pathtm = ""
+            while pathtm not in (["1", "2"]):
+                pathtm = raw_input("\n\n 1. Check the tm for results\n 2. Check match for members with a timeout-ratio above a specific value\nYour choice: ")
+            pagelist = raw_input("team match id: ")
+            targetnameorgf = "team match: " + pagelist + " ... "
+            pagelist = (["http://www.chess.com/groups/team_match?id=" + pagelist])
+
+        tmpar, tmtimeout, winssdic, losedic = tmparchecker(pagelist, targetname)
+
+        if pathtm == "1":
+            tmparcount = Counter(tmpar)
+            tmtimeoutcount = Counter(tmtimeout)
+            joined = {}
+            membernamelist = list()
+
+            outputfile = open(targetnameorgf + " " + strftime("%Y-%m-%d", gmtime()) + ".tm.csv", "wb")
+            csvwriter = csv.writer(outputfile, delimiter = " ", quoting=csv.QUOTE_MINIMAL)
+
+            for pointer in set(tmparcount.keys())|set(winssdic.keys())|set(losedic.keys())|set(tmtimeoutcount.keys()):
+                joined[pointer] = (float(tmparcount.get(pointer, 0))/10 + (float(tmparcount.get(pointer, 0))*2 - float(winssdic.get(pointer, 0)) - float(losedic.get(pointer, 0)))*5/4 + float(winssdic.get(pointer, 0)) - float(losedic.get(pointer, 0)) - tmtimeoutcount.get(pointer, 0)*3, tmparcount.get(pointer, 0), winssdic.get(pointer, 0), losedic.get(pointer, 0), tmtimeoutcount.get(pointer, 0))
+
+            csvwriter.writerow(("Member name", "tm's participated in", "points won", "points lost", "ongoing games", "timeouts", "win ratio"))
+
+            for key, value in sorted(joined.items(), key = itemgetter(1), reverse = True):
+                try:
+                    winrat = value[2] / (value[3] + value[2])
+                except ZeroDivisionError:
+                    winrat = 0
+                csvwriter.writerow((key, value[1], value[2], value[3], value[1]*2 - value[2] - value[3], value[4], winrat))
+
+            choicetm = ""
+            while choicetm not in (["y", "n"]):
+                choicetm = raw_input("continue to remove those who dosn't fill your requirements? (y/n) ")
+
+            if choicetm == "y":
+                membernamelist = list()
+                browser = mecbrowser("")
+                for key in joined:
+                    membernamelist.append(key)
+
+                minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender = memprmenu()
+                passmembers = memberprocesser(False, browser, membernamelist, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender)
+                joined2 = dict()
+                membernamelist = list()
+                for key in joined:
+                    if key in passmembers:
+                        joined2[key] = joined[key]
+
+                csvwriter.writerow(("Member name (those who fill your requirements)", "tm's participated in", "points won", "points lost", "ongoing games", "timeouts", "win ratio"))
+
+                for key, value in sorted(joined2.items(), key = itemgetter(1), reverse = True):
+                    try:
+                        winrat = value[2] / (value[3] + value[2])
+                    except ZeroDivisionError:
+                        winrat = 0
+                    csvwriter.writerow((key, value[1], value[2], value[3], value[1]*2 - value[2] - value[3], value[4], winrat))
+            outputfile.close()
+
+        elif pathtm == "2":
+            maxtmrat = int(raw_input("\n\nGet members with a timeout-ratio above: ").replace("%", ""))
+            browser = mecbrowser("")
+
+            deadbeatlist = list()
+            for member in tmpar:
+                print "checking " + member
+                browser, response = mecopner(browser, "http://www.chess.com/members/view/" + member)
+                if "://www.chess.com/members/view/" not in browser.geturl():
+                    continue
+                soup = BeautifulSoup(response)
+                if timeoutchecker(soup) > maxtmrat:
+                    deadbeatlist.append(member)
+            print "\n\n\nThe following members has a timeoutratio above " + str(maxtmrat) + "%: " + streplacer(str(deadbeatlist), (["'", ""], ["[", ""], ["]", ""]))
+
+    elif flow == "6":
+        membernamelist = file_or_input(False, "\n\nName of the file containing your list: ", "", "\n\nEnter list of members to check: ", "")[0]
+        browser = mecbrowser("")
+
+        minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender = memprmenu()
+        passmembers = memberprocesser(False, browser, membernamelist, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender)
+
+        choice6 = ""
+        while choice6 not in (["1", "2"]):
+            choice6 = raw_input("\n\nDo you wish to\n 1. Print the names of those who fill your criterias onscreen\n 2. Save them to a file\n\nEnter choice here: ")
+
+        if choice6 == "1":
+            print "\n\n" + streplacer(str(passmembers), (["'", ""], ["[", ""], ["]", ""]))
+
+        if choice6 == "2":
+            memfile1 = raw_input("\nName of the file to which your list will be saved: ")
+            with open(memfile1, "ab") as placeholder2:
+                placeholder2.write(streplacer(str(passmembers), (["'", ""], ["[", ""], ["]", ""])))
+
+    elif flow == "7":
+        memlist = list()
+        clist = list()
+        flist = list()
+        counter3 = 1
+
+        choicepath = ""
+        while choicepath not in (["1", "2"]):
+            choicepath = raw_input("\nWhat would you like to process\n 1. csv file over team matches from option 5\n 2. csv file of member stats from option 2\nYour choice, monkeyboy: ")
+
+        print "\n\ncsv files in directory"
+        filesindic = os.listdir(".")
+        for fname in filesindic:
+            if choicepath == "1":
+                if fname.endswith(".tm.csv"):
+                    flist.append(fname)
+                    print " " + str(counter3) + ". " + fname
+                    clist.append(str(counter3))
+                    counter3 += 1
+            elif choicepath == "2":
+                if fname.endswith(".mem.csv"):
+                    flist.append(fname)
+                    print " " + str(counter3) + ". " + fname
+                    clist.append(str(counter3))
+                    counter3 += 1
+
+        if choicepath == "1":
+            choice = ""
+            while choice not in (["1", "2"]):
+                choice = raw_input("\noptions:\n 1. Get data from one of the csvfiles\n 2. Compare two csv-files\nYour choice: ")
+        elif choicepath == "2":
+            choice = "1"
+
+        if choice == "1":
+            choice1 = ""
+            while choice1 not in clist:
+                choice1 = raw_input("\nwhich one do you wish to check? ")
+
+            with open(flist[int(choice1) - 1], "rb") as f:
+                csvreader = csv.reader(f, delimiter = " ")
+                if choicepath == "1":
+                    choice5 = ""
+                    while choice5 not in (["1", "2"]):
+                        choice5 = raw_input("\n\nWhat part of the csv-file do you wish to inspect?\n 1. everyone who has ever plaid for said group\n 2. those who fill your requirements\n\nYour choice, young padawan? ")
+
+                    if choice5 == "1":
+                        for row in csvreader:
+                            if row[0] == "Member name (those who fill your requirements)":
+                                break
+                            memlist.append(row)
+
+                    elif choice5 == "2":
+                        recorder = ""
+                        for row in csvreader:
+                            if row[0] == "Member name (those who fill your requirements)":
+                                recorder = "yy"
+                                row[0] = "Member name"
+
+                            if recorder == "yy":
+                                memlist.append(row)
+
+                elif choicepath == "2":
+                    for row in csvreader:
+                        memlist.append(row)
+
+            csvsoworker(memlist, choicepath)
+
+        elif choice == "2":
+            ichoice = ""
+            while ichoice not in (["1", "2", "3", "4", "5"]):
+                ichoice = raw_input("\nwhat values would you like to compare?\n 1. tm's participated in\n 2. points won\n 3. points lost\n 4. ongoing games\n 5. timeouts\nYour choice: ")
+            ichoice = int(ichoice)
+
+            with open(flist[int(raw_input("\nnumber of the older file ")) - 1], "rb") as f:
+                csvreader = csv.reader(f, delimiter = " ")
+                for row in csvreader:
+                    if row[0] == "Member name (those who fill your requirements)":
+                        break
+                    memlist.append((row[0], row[ichoice]))
+
+            memlist2 = list()
+            with open(flist[int(raw_input("number of the new file ")) - 1], "rb") as f:
+                csvreader = csv.reader(f, delimiter = " ")
+                for row in csvreader:
+                    if row[0] == "Member name (those who fill your requirements)":
+                        break
+                    memlist2.append((row[0], row[ichoice]))
+
+            col_width = max(len(element) for row in memlist for element in row) + 2
+            print "\n\n" + "".join(element.ljust(col_width) for element in (memlist[0][0], memlist[0][1] + " old", memlist[0][1] + " new", "difference")) + "\n"
+            fmemlist = list()
+            for tup in memlist2:
+                if tup not in memlist:
+                    for tup2 in memlist:
+                        if tup[tup.index(tup[0])] in tup2 and max(float(tup[1]), float(tup2[1])) != 0.0:
+                            fmemlist.append((tup[0], str(min(float(tup[1]), float(tup2[1]))).replace(".0", ""), str(max(float(tup[1]), float(tup2[1]))).replace(".0", ""), str(abs(float(tup[1]) - float(tup2[1]))).replace(".0", "")))
+            fmemlist = sorted(fmemlist, reverse = True, key=lambda tup: tup[-1])
+            for cpointer in fmemlist:
+                print "".join(element.ljust(col_width) for element in cpointer)
+
+    elif flow == "8":
+        print "\n\n\nRemoves doublets and unwanted elements from your list (ie those who are either already members or banned/unwanted)\n\nFiles in directory:\n"
+        flist = fnamenot(([".csv", ".py", ".pyc", ".log", "~"]), ".")
+
+        preexlist = ""
+        while preexlist not in flist:
+            preexlist = raw_input("\nFull name of the file containing your invites list: ")
+
+        un4 = set(remove_doublets(preexlist, ""))
+        un4 = memremoverf(un4)
+        un4 = un4.difference(domban)
+        un4 = misc1(un4)
+
+        with open(preexlist, "wb") as placeholder2:
+            placeholder2.write(un4)
+
+    elif flow == "9":
+        choiceorg = ""
+        while choiceorg not in (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "42", "168"]):
+            choiceorg = raw_input("\nWhich group do you wish to check?\n 1. Star Trek: The Dominion\n 2. The Breen Confederacy\n 3. The Cardassian Empire\n 4. Death Star III\n 5. Karemma Ministry of Trade\n 6. Space 1999\n 7. Space 2099\n 8. Andromeda\n 9. legio XIII gemina\n 10. The Majestical Utopia\n 11. Space Angels\n 12. Chess!\n 13. Carpe Diem\n 14. CSR\n 15. Family Guy\n 16. Jungle Team\n\n 42. Check groups 1-10, 14-16\n 168. Check another group\n\nYour choice: ")
+        print "\n\nWe will start by extracting the latest memberslist for your group\n"
+        logincookie = login()
+
+        if choiceorg == "42":
+            choiceorg = (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "14", "15", "16"])
+        else:
+            choiceorg = ([choiceorg])
+
+        for choice in choiceorg:
+            if choice == "1":
+                memlist = nineworker("dommem", "15896", logincookie, "keydom")
+                group = "the Dominion"
+
+            elif choice == "2":
+                memlist = nineworker("breenmem", "21974", logincookie, "keybreen")
+                group = "the Breen Confederacy"
+
+            elif choice == "3":
+                memlist = nineworker("carmem", "20126", logincookie, "keycarda")
+                group = "the Cardassian Empire"
+
+            elif choice == "4":
+                memlist = nineworker("deathmem", "17618", logincookie, "keydeath")
+                group = "Death Star III"
+
+            elif choice == "5":
+                memlist = nineworker("karemma", "26088", logincookie, "keykar")
+                group = "Karemma Ministry of Trade"
+
+            elif choice == "6":
+                memlist = nineworker("1999", "26614", logincookie, "key1999")
+                group = "Space 1999"
+
+            elif choice == "7":
+                memlist = nineworker("2099", "26624", logincookie, "key2099")
+                group = "Space 2099"
+
+            elif choice == "8":
+                memlist = nineworker("andromeda", "21262", logincookie, "keyandromeda")
+                group = "Andromeda"
+
+            elif choice == "9":
+                memlist = nineworker("legio", "22596", logincookie, "keylegio")
+                group = "Legio XIII Gemina"
+
+            elif choice == "10":
+                memlist = nineworker("utopia", "23674", logincookie, "keyutopia")
+                group = "Majestical Utopia"
+
+            elif choice == "11":
+                memlist = nineworker("angelmem", "18512", logincookie, "keyangel")
+                group = "Space Angels"
+
+            elif choice == "12":
+                memlist = nineworker("chessmem", "18810", logincookie, "keyChess")
+                group = "Chess!"
+
+            elif choice == "13":
+                memlist = nineworker("CarpeDiemmem", "14704", logincookie, "keyCD")
+                group = "Carpe Diem"
+
+            elif choice == "14":
+                memlist = nineworker("CSR", "18514", logincookie, "keyCSR")
+                group = "Chess Star Resort"
+
+            elif choice == "15":
+                memlist = nineworker("Family Guy", "14966", logincookie, "keyFG")
+                group = "Family Guy"
+
+            elif choice == "16":
+                memlist = nineworker("Jungle Team", "17050", logincookie, "keyJT")
+                group = "Jungle Team"
+
+            elif choice == "168":
+                group = raw_input("Name of group to check: ")
+                groupid = raw_input("Groups id: ")
+                memlist = nineworker(group, groupid, logincookie, "Custom")
+                
+
+            print "\n\nMembers who are no longer in " + group + ": " + streplacer(str(memlist), (["'", ""], ["[", ""], ["]", ""]))
+
+    elif flow == "10":
+        grcheck = raw_input("group to check: ")
+        grcheck = re.sub(r"[^a-z A-Z 0-9]","", grcheck)
+        grcheck = grcheck.replace(" ", "-").lower()
+        grcheck = "http://www.chess.com/groups/notes/" + grcheck + "?page="
+        logincookie = login()
+
+        browser = mecbrowser(logincookie)
+
+        target = list()
+        counter = 1
+        while counter <= 100:
+            target.append(grcheck + str(counter))
+            counter += 1
+
+        notedic = dict()
+        for targetp in target:
+            print targetp
+            browser, response = mecopner(browser, targetp)
+            soup = BeautifulSoup(response)
+
+            links1 = browser.links()
+            for link in links1:
+                ltext = link.text
+                if "/members/view/" in str(link) and ltext != "View profile[IMG]":
+                    if ltext in notedic:
+                        notedic[ltext] += 1
+                    else:
+                        notedic[ltext] = 1
+            soupbrake = str(soup.find_all(class_ = "next-on"))
+            if soupbrake == "[]":
+                break
+
+        sorteddic = OrderedDict(sorted(notedic.items(), key = lambda x: x[1], reverse = True))
+
+        for nam, num in sorteddic.items():
+            print nam + " has made " + str(num) + " notes"
+
+    elif flow == "11":
+        target = file_or_input(False, "\n\nName of the file containing your list: ", "", "\n\nEnter list of members to check: ", "")[0]
+        birthdaylist = ageproc(target)
+        birthdsorter(birthdaylist)
+
+    elif flow == "12":
+        choice = ""
+        while choice not in (["1", "2"]):
+            choice = raw_input("\n\noptions:\n 1. send a pm to all members from a set of pages\n 2. pm members from a custom list\nYour choice, young padawan: ")
+        if choice == "1":
+            target = tlstcreator()
+        elif choice == "2":
+            target = file_or_input(False, "\n\nName of the file containing your list: ", "", "\n\nEnter list of members to pm: ", "")[0]
+        pmdriver(target, choice)
+
+    elif flow == "13":
+        gchoice = ""
+        while gchoice not in (["1", "2"]):
+            gchoice = raw_input("\n\n 1. Pair a list of members against each others\n 2. Pair two lists of members to play each others\nChoice: ")
+
+        if gchoice == "1":
+            target = file_or_input(False, "\n\nName of the file containing your list of players: ", "", "\n\nEnter list of players: ", "")[0]
+            while "" in target:
+                target.remove("")
+
+        elif gchoice == "2":
+            name1org = raw_input("Name of group 1: ")
+            target1 = file_or_input(False, "\n\nName of the file containing " + name1org + "'s players: ", "", "\n\nEnter " + name1org + "'s list of players: ", "")[0]
+            while "" in target1:
+                target1.remove("")
+            name2org = raw_input("Name of group 2: ")
+            target2 = file_or_input(False, "\n\nName of the file containing " + name2org + "'s players: ", "", "\n\nEnter " + name2org + "'s list of players: ", "")[0]
+            while "" in target2:
+                target2.remove("")
+
+            target1, target2 = remcomelem(target1, target2)
+
+        browser = mecbrowser("")
+
+        choice = ""
+        while choice not in (["1", "2", "3", "4", "5", "6"]):
+            choice = raw_input("\nMake pairs based on\n 1. Live Standard\n 2. Live Bullet\n 3. Live Blitz\n 4. Online Chess\n 5. 960\n 6. Tactics\nYour choice: ")
+
+        if gchoice == "1":
+            partup = pairsorter(browser, target, choice)
+            partup = zip(partup, partup[1:])[::2]
+            for pair in partup:
+                print pair[0][0] + " (" + str(pair[0][1]) + ") - " + pair[1][0] + " (" + str(pair[1][1]) + ")"
+
+        elif gchoice == "2":
+            partup1org = pairsorter(browser, target1, choice)
+            partup2org = pairsorter(browser, target2, choice)
+
+            if len(partup1org) < len(partup2org):
+                partup1 = partup1org
+                partup2 = partup2org
+                name1 = name1org
+                name2 = name2org
+            else:
+                partup2 = partup1org
+                partup1 = partup2org
+                name2 = name1org
+                name1 = name2org
+
+            pairs = evenpairing(partup1, partup2)
+
+            print name1 + " - " + name2
+            for pair in pairs:
+                print pair[0][0] + " (" + str(pair[0][1]) + ") - " + pair[1][0] + " (" + str(pair[1][1]) + ")"
+
+    elif flow == "14":
+        choice14 = ""
+        while choice14 not in (["1", "2", "3", "4"]):
+            choice14 = raw_input("\n\nwhat would you like to get\n 1. Elements common to both lists (intersection)\n 2. Elements from both lists (union)\n 3. Elements in list 1 but not in list 2 (difference)\n 4. Elements in either list but not in both (symmetric difference)\nYour choice: ")
+
+        list1, list2 = file_or_input(True, "\n\nName of file 1: ", "Name of file 2: ", "\n\nList1: ", "List2: ")
+
+        if choice14 == "1":
+            prlst = streplacer(str(list(set(list1).intersection(set(list2)))), ([" ", ""], ["(", ""], [")", ""], ["]", ""], ["[", ""], ["'", ""]))
+        elif choice14 == "2":
+            prlst = streplacer(str(list(set(list1).union(set(list2)))), ([" ", ""], ["(", ""], [")", ""], ["]", ""], ["[", ""], ["'", ""]))
+        elif choice14 == "3":
+            prlst = streplacer(str(list(set(list1).difference(set(list2)))), ([" ", ""], ["(", ""], [")", ""], ["]", ""], ["[", ""], ["'", ""]))
+        elif choice14 == "4":
+            prlst = streplacer(str(list(set(list1).symmetric_difference(set(list2)))), ([" ", ""], ["(", ""], [")", ""], ["]", ""], ["[", ""], ["'", ""]))
+
+        choice6 = ""
+        while choice6 not in (["1", "2"]):
+            choice6 = raw_input("\n\nDo you wish to\n 1. Print the data onscreen\n 2. Save it to a file\n\nEnter choice here: ")
+
+        if choice6 == "1":
+            print "\n\n" + prlst
+
+        elif choice6 == "2":
+            sfile = raw_input("\nName of the file to which your list will be saved: ")
+            with open(sfile, "wb") as placeholder2:
+                placeholder2.write(prlst)
+
+    pathway = ""
+    while pathway not in (["y", "n"]):
+        pathway = raw_input("\n\n\nRun again? (y/n) ")
