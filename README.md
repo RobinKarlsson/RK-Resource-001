@@ -1,4 +1,10 @@
-RK-Resource-001
+RK Resource 001
+
+Developed by Robin Karlsson
+
+contact mail: r.robin.karlsson@gmail.com
+contact chess.com: chess.com/members/view/RobinKarlsson
+
 ===============
 
 Requirements
