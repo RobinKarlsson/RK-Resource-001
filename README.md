@@ -1,6 +1,6 @@
 Developed by Robin Karlsson
 
-contact mail: r.robin.karlsson@gmail.com
+contact: r.robin.karlsson@gmail.com
 
    chess.com/members/view/RobinKarlsson
 
