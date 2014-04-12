@@ -782,6 +782,8 @@ def inviter(choicelist, invitenum):
                 countryalt = ""
                 minrat = 1300
                 maxrat = ""
+                minranrat = ""
+                maxranrat = ""
                 mingames = 20
                 minwinrat = 0.33
                 lastloginyear = lonl[0]
@@ -808,12 +810,14 @@ def inviter(choicelist, invitenum):
                 groupinv = "http://www.chess.com/groups/invite_members?id=15896"
                 infile = "Invite Lists/Star Trek: The Dominion"
                 alrfile = "Invite Lists/Star Trek: The Dominion already invited"
-                msglist = (("2", "http://4.bp.blogspot.com/_KcFkeN0I6po/SxKzhR0mUCI/AAAAAAAAEbE/jcE4_kPJu6Q/s1600/7of9.jpg"), ("1", "/newline/newlinePuzzles, Riddles, Chess!!!/newline/newlineThe largest Star Trek themed group on chess.com wants you, /name, for the grand Dominions /nation contingent/newline/newlineWith over 700 members we run vote chess, team matches, doubles chess and an in-house members league. Join now, and together we will impose order on this galaxy!!!/newline/newline"), ("2", "http://d1lalstwiwz2br.cloudfront.net/images_users/tiny_mce/RobinKarlsson/phpiGxzYM.jpeg"), ("1", "/newline/newlineBenjamin Sisko was a chemist's son/newlinebut Sisko is no more./newlineWhat Sisko thought was H2O/newlinewas H2SO4/newline/newline"), ("3", "https://www.youtube.com/watch?v=JKPISUSOjiw"))
+                msglist = (("2", "http://4.bp.blogspot.com/_KcFkeN0I6po/SxKzhR0mUCI/AAAAAAAAEbE/jcE4_kPJu6Q/s1600/7of9.jpg"), ("1", "/newline/newlinePuzzles, Riddles, Chess!!!/newline/newlineThe largest Star Trek themed group on chess.com wants you, /name, for the grand Dominions /nation contingent/newline/newlineWith over 700 members we run vote chess, team matches, doubles chess and an in-house members league. Join now, and together we will impose order on this galaxy!!!/newline/newline"), ("2", "http://d1lalstwiwz2br.cloudfront.net/images_users/tiny_mce/RobinKarlsson/phpiGxzYM.jpeg"), ("1", "/newline/newlineA chess game is divided into three stages:/newlinethe first, when you hope you have the advantage/newlinethe second, when you believe you have an advantage/newlineand the third, when you know you’re going to lose!/newline/newline"), ("3", "https://www.youtube.com/watch?v=JKPISUSOjiw"))
 
             elif choice5 == "2": #Karemma Ministry of Trade
                 countryalt = ""
                 minrat = 1700
                 maxrat = ""
+                minranrat = ""
+                maxranrat = ""
                 mingames = 80
                 minwinrat = 0.5
                 lastloginyear = lonl[0]
@@ -846,6 +850,8 @@ def inviter(choicelist, invitenum):
                 countryalt = ""
                 minrat = 1300
                 maxrat = ""
+                minranrat = ""
+                maxranrat = ""
                 mingames = 50
                 minwinrat = 0.33
                 lastloginyear = lonl[0]
@@ -878,6 +884,8 @@ def inviter(choicelist, invitenum):
                 countryalt = ""
                 minrat = 1300
                 maxrat = ""
+                minranrat = ""
+                maxranrat = ""
                 mingames = 50
                 minwinrat = 0.33
                 lastloginyear = lonl[0]
@@ -910,6 +918,8 @@ def inviter(choicelist, invitenum):
                 countryalt = ""
                 minrat = 1300
                 maxrat = ""
+                minranrat = ""
+                maxranrat = ""
                 mingames = 50
                 minwinrat = 0.33
                 lastloginyear = lonl[0]
@@ -942,6 +952,8 @@ def inviter(choicelist, invitenum):
                 minrat = 1300
                 maxrat = ""
                 mingames = ""
+                minranrat = ""
+                maxranrat = ""
                 minwinrat = 0.25
                 lastloginyear = lonl[0]
                 lastloginmonth = lonl[1]
@@ -973,6 +985,8 @@ def inviter(choicelist, invitenum):
             elif choice5 == "7": #Legio XIII Gemina
                 minrat = 1300
                 maxrat = ""
+                minranrat = ""
+                maxranrat = ""
                 mingames = 50
                 minwinrat = 0.33
                 lastloginyear = lonl[0]
@@ -1005,6 +1019,8 @@ def inviter(choicelist, invitenum):
             elif choice5 == "8": #Andromeda
                 minrat = 1300
                 maxrat = ""
+                minranrat = ""
+                maxranrat = ""
                 mingames = 50
                 minwinrat = 0.33
                 lastloginyear = lonl[0]
@@ -1037,6 +1053,8 @@ def inviter(choicelist, invitenum):
             elif choice5 == "9": #Family Guy
                 minrat = 1300
                 maxrat = ""
+                minranrat = ""
+                maxranrat = ""
                 mingames = 50
                 minwinrat = 0.33
                 lastloginyear = lonl[0]
@@ -1070,6 +1088,8 @@ def inviter(choicelist, invitenum):
                 countryalt = ""
                 minrat = 1300
                 maxrat = ""
+                minranrat = ""
+                maxranrat = ""
                 mingames = 50
                 minwinrat = 0.33
                 lastloginyear = lonl[0]
@@ -1102,6 +1122,8 @@ def inviter(choicelist, invitenum):
                 countryalt = ""
                 minrat = 1300
                 maxrat = ""
+                minranrat = ""
+                maxranrat = ""
                 mingames = 50
                 minwinrat = 0.33
                 lastloginyear = lonl[0]
@@ -1134,6 +1156,8 @@ def inviter(choicelist, invitenum):
                 countryalt = "the International kingdom of Atlantis"
                 minrat = 1300
                 maxrat = ""
+                minranrat = ""
+                maxranrat = ""
                 mingames = 50
                 minwinrat = 0.33
                 lastloginyear = lonl[0]
@@ -1166,6 +1190,8 @@ def inviter(choicelist, invitenum):
                 countryalt = ""
                 minrat = ""
                 maxrat = ""
+                minranrat = ""
+                maxranrat = ""
                 mingames = 20
                 minwinrat = 0.25
                 lastloginyear = lonl[0]
@@ -1198,6 +1224,8 @@ def inviter(choicelist, invitenum):
                 countryalt = ""
                 minrat = 1900
                 maxrat = ""
+                minranrat = ""
+                maxranrat = ""
                 mingames = 20
                 minwinrat = 0.25
                 lastloginyear = lonl[0]
@@ -1230,6 +1258,8 @@ def inviter(choicelist, invitenum):
                 countryalt = "the uncharted territories"
                 minrat = 1400
                 maxrat = ""
+                minranrat = ""
+                maxranrat = ""
                 mingames = 40
                 minwinrat = 0.33
                 lastloginyear = lonl[0]
@@ -1262,6 +1292,8 @@ def inviter(choicelist, invitenum):
                 countryalt = ""
                 minrat = 1300
                 maxrat = ""
+                minranrat = ""
+                maxranrat = ""
                 mingames = 50
                 minwinrat = 0.25
                 lastloginyear = lonl[0]
@@ -2675,6 +2707,9 @@ while pathway in (["y"]):
             sfile = raw_input("\nName of the file to which your list will be saved: ")
             with open(sfile, "wb") as placeholder2:
                 placeholder2.write(prlst)
+
+    elif flow == "42":
+        os.system("shutdown -h now")
 
     pathway = ""
     while pathway not in (["y", "n"]):
