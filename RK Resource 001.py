@@ -2676,9 +2676,6 @@ while pathway in (["y"]):
             with open(sfile, "wb") as placeholder2:
                 placeholder2.write(prlst)
 
-    elif flow == "42":
-        os.system("shutdown -h now")
-
     pathway = ""
     while pathway not in (["y", "n"]):
         pathway = raw_input("\n\n\nRun again? (y/n) ")
