@@ -492,6 +492,7 @@ def mecopner(browser, pointl):
             break
         except:
             print "something went wrong, reopening " + pointl
+            time.sleep(1)
     return browser, response
 
 def nineworker(infile, inid, logincookie, key):
@@ -518,11 +519,10 @@ def nineworker(infile, inid, logincookie, key):
     return memlist
 
 def tmparchecker(pagelist, targetname):
-    tmyear = raw_input("\nOnly check tm's that has been open for registration since year, leave empty to skip (YYYY) ")
+    tmyear = enterint("\nOnly check tm's that has been open for registration since year, leave empty to skip (YYYY) ")
     if tmyear != "":
-        tmyear = int(tmyear)
-        tmmonth = int(raw_input("\nOnly check tm's that has been open for registration since month (MM) "))
-        tmday = int(raw_input("\nOnly check tm's that has been open for registration since day (DD) "))
+        tmmonth = enterint("\nOnly check tm's that has been open for registration since month (MM) ")
+        tmday = enterint("\nOnly check tm's that has been open for registration since day (DD) ")
 
     tmpar = list()
     timeoutlist = list()
@@ -810,7 +810,7 @@ def inviter(choicelist, invitenum):
                 groupinv = "http://www.chess.com/groups/invite_members?id=15896"
                 infile = "Invite Lists/Star Trek: The Dominion"
                 alrfile = "Invite Lists/Star Trek: The Dominion already invited"
-                msglist = (("2", "http://4.bp.blogspot.com/_KcFkeN0I6po/SxKzhR0mUCI/AAAAAAAAEbE/jcE4_kPJu6Q/s1600/7of9.jpg"), ("1", "/newline/newlinePuzzles, Riddles, Chess!!!/newline/newlineThe largest Star Trek themed group on chess.com wants you, /name, for the grand Dominions /nation contingent/newline/newlineWith over 700 members we run vote chess, team matches, doubles chess and an in-house members league. Join now, and together we will impose order on this galaxy!!!/newline/newline"), ("2", "http://d1lalstwiwz2br.cloudfront.net/images_users/tiny_mce/RobinKarlsson/phpiGxzYM.jpeg"), ("1", "/newline/newlineA chess game is divided into three stages:/newlinethe first, when you hope you have the advantage/newlinethe second, when you believe you have an advantage/newlineand the third, when you know you’re going to lose!/newline/newline"), ("3", "https://www.youtube.com/watch?v=JKPISUSOjiw"))
+                msglist = (("2", "http://4.bp.blogspot.com/_KcFkeN0I6po/SxKzhR0mUCI/AAAAAAAAEbE/jcE4_kPJu6Q/s1600/7of9.jpg"), ("1", "/newline/newlinePuzzles, Riddles, Chess!!!/newline/newlineThe largest Star Trek themed group on chess.com wants you, /name, for the grand Dominions /nation contingent/newline/newlineWith over 900 members we run vote chess, team matches, doubles chess and an in-house members league. Join now, and together we will impose order on this galaxy!!!/newline/newline"), ("2", "http://d1lalstwiwz2br.cloudfront.net/images_users/tiny_mce/RobinKarlsson/phpiGxzYM.jpeg"), ("1", "/newline/newlineA chess game is divided into three stages:/newlinethe first, when you hope you have the advantage/newlinethe second, when you believe you have an advantage/newlineand the third, when you know youre going to lose!/newline/newline"), ("3", "https://www.youtube.com/watch?v=JKPISUSOjiw"))
 
             elif choice5 == "2": #Karemma Ministry of Trade
                 countryalt = ""
@@ -1323,8 +1323,8 @@ def inviter(choicelist, invitenum):
                 msglist = (("2", "http://www.bullshift.net/data/images/2013/10/tumblr-m0ocvrknvb1qzrlhgo2-r1-500.gif"), ("1", "/newline/newlineWelcome, /name, to Stargate Command!!!/newline/newline"), ("2", "http://www.stargate-sg1-solutions.com/screencaps/AOT/23%20Under%20Siege/slides/AOT23180.jpg"), ("1", "/newline/newlineThe SGC base acts as the secure ground station for all Stargate activities. It is typically commanded by a Major General and is staffed by subject matter experts and military support personnel, several elite special operations teams, and several SG teams, including SG-1. Follow through through the Stargate, as we explore the universe of Chess.com. We will see many wonders,encounter friends and foes,and play brilliant chess in spectacular matches..../newlineand maybe even play some stargate golf, if time allow ;))/newline/newline"), ("3", "https://www.youtube.com/watch?v=MUBQLcKvcfI"))
 
             memtinv = remove_doublets(infile, "")
-            memalrinv = remove_doublets(alrfile, "")
-            memtinv = [x for x in memtinv if x not in memalrinv]
+            #memalrinv = remove_doublets(alrfile, "")
+            #memtinv = [x for x in memtinv if x not in memalrinv]
 
             already_picked = list()
             if invitenum2 > len(memtinv):
@@ -2138,8 +2138,8 @@ def tlstcreator():
     while choice1 not in (["n"]):
         tlst = list()
         url1 = raw_input("\nPaste the url here: ") + "&page="
-        start1 = int(raw_input("\nEnter pagenumber to start on: "))
-        stop1 = int(raw_input("\nEnter pagenumber to end on: "))
+        start1 = enterint("\nEnter pagenumber to start on: ")
+        stop1 = enterint("\nEnter pagenumber to end on: ")
 
         while start1 <= stop1:
             tlst.append(url1 + str(start1))
@@ -2444,7 +2444,7 @@ while pathway in (["y"]):
                 ichoice = raw_input("\nwhat values would you like to compare?\n 1. tm's participated in\n 2. points won\n 3. points lost\n 4. ongoing games\n 5. timeouts\nYour choice: ")
             ichoice = int(ichoice)
 
-            with open(flist[int(raw_input("\nnumber of the older file ")) - 1], "rb") as f:
+            with open(flist[enterint("\nnumber of the older file: ") - 1], "rb") as f:
                 csvreader = csv.reader(f, delimiter = " ")
                 for row in csvreader:
                     if row[0] == "Member name (those who fill your requirements)":
@@ -2452,7 +2452,7 @@ while pathway in (["y"]):
                     memlist.append((row[0], row[ichoice]))
 
             memlist2 = list()
-            with open(flist[int(raw_input("number of the new file ")) - 1], "rb") as f:
+            with open(flist[enterint("number of the new file: ") - 1], "rb") as f:
                 csvreader = csv.reader(f, delimiter = " ")
                 for row in csvreader:
                     if row[0] == "Member name (those who fill your requirements)":
@@ -2709,7 +2709,7 @@ while pathway in (["y"]):
                 placeholder2.write(prlst)
 
     elif flow == "42":
-        os.system("shutdown -h now")
+        "none"
 
     pathway = ""
     while pathway not in (["y", "n"]):
