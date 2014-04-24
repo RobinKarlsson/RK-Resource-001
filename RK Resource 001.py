@@ -2137,7 +2137,10 @@ def tlstcreator():
     choice1 = ""
     while choice1 not in (["n"]):
         tlst = list()
-        url1 = raw_input("\nPaste the url here: ") + "&page="
+        url1 = raw_input("\nPaste the url here: ")
+        if "&page=" in url1:
+            url1 = url1[0: url1.index("&page=")]
+        url1 = url1 + "&page="
         start1 = enterint("\nEnter pagenumber to start on: ")
         stop1 = enterint("\nEnter pagenumber to end on: ")
 
