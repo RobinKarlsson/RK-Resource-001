@@ -2754,7 +2754,6 @@ while pathway in (["y"]):
         targetname = targetname.replace(" ", "-").lower()
 
         mtchlist = gettmopdata(targetname)
-        tmoplist = list()
         winssdic = dict()
         losedic = dict()
         drawdic = dict()
@@ -2778,9 +2777,9 @@ while pathway in (["y"]):
                 else:
                     drawdic[tm[2]] = 1
 
-        print "Opponent     Won    Lost    Draw"
+        print "\n\n\nOpponent    Won    Lost    Draw    Total"
         for opteam in set(winssdic.keys())|set(losedic.keys())|set(drawdic.keys()):
-            print opteam, winssdic.get(opteam, 0), losedic.get(opteam, 0), drawdic.get(opteam, 0)
+            print opteam, winssdic.get(opteam, 0), losedic.get(opteam, 0), drawdic.get(opteam, 0), winssdic.get(opteam, 0) + losedic.get(opteam, 0) + drawdic.get(opteam, 0)
 
     pathway = ""
     while pathway not in (["y", "n"]):
