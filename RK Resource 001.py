@@ -271,22 +271,44 @@ def com3(xxxxxxxxxxxxxx, xxxxxxxxxxxxx, xxxxxxxxxxxxxxxx, xxxxxxxxxxxxxxxxxxx):
 tmban = set(['bijayees1234', 'freaky25', 'Quack-Peep', 'ADOKA', 'redneck7-1-1990', 'falkon26', 'dryan43', 'mcwelch101', 'TasmanianTiger', 'lennyjane18', 'jeremybloom', '143abhi', 'Sawblade24'])
 domban = set(['okinawaoly', 'rubenhasratyan', 'kohai', 'swarmflow', 'Backer1', 'mitchthebuyer', 'Gelnon', 'Phaethonas', 'CaptainPike', 'Stormbringer', 'Steve212000', 'doctorstorm', 'dogs10099', 'chessmaster010l'])
 
-def gettmlinks(targetname):
-    linklist = list()
+def gettmopdata(targetname):
     browser = mecbrowser("")
+    linklist = gettmlinklist(targetname, browser)
 
-    browser, response = mecopner(browser, "http://www.chess.com/groups/matches/" + targetname + "?show_all_current=1")
-    soup = BeautifulSoup(response)
-    souplinks = re.findall("/groups/team_match(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", str(soup.find_all("a")))
-    for link in souplinks:
-        linklist.append("http://www.chess.com" + link)
+    linkarchive = linklist.pop(-1)
+    mtchlist = list()
+    pointer = 1
+    while True:
+        browser, response = mecopner(browser, str(linkarchive) + "&page=" + str(pointer))
+        soup = BeautifulSoup(response)
+        soupbrake = str(soup.find_all(class_ = "next-on"))
 
-    pointerlist = (0, 1, 2)
-    for pointer in pointerlist:
-        del linklist[-1]
+        evenmtch = soup.find_all(class_ = "even")
+        mtchlist = resource01(evenmtch, mtchlist)
+
+        oddmtch = soup.find_all(class_ = "odd")
+        mtchlist = resource01(oddmtch, mtchlist)
+
+        if soupbrake == "[]":
+            break
+        pointer += 1
+    return mtchlist
+
+def resource01(evenmtch, mtchlist):
+    ctrl = False
+    for element in evenmtch:
+        if ctrl == True:
+            mtchlist.append(str(element.text.encode("utf8")).split("\n"))
+        ctrl = True
+    return mtchlist
+
+def gettmlinks(targetname):
+    browser = mecbrowser("")
+    linklist = gettmlinklist(targetname, browser)
 
     linkarchive = linklist.pop(-1)
     pointer = 1
+
     while True:
         browser, response = mecopner(browser, str(linkarchive) + "&page=" + str(pointer))
         soup = BeautifulSoup(response)
@@ -1322,8 +1344,8 @@ def inviter(choicelist, invitenum):
                 alrfile = "Invite Lists/Stargate Command already invited"
                 msglist = (("2", "http://www.bullshift.net/data/images/2013/10/tumblr-m0ocvrknvb1qzrlhgo2-r1-500.gif"), ("1", "/newline/newlineWelcome, /name, to Stargate Command!!!/newline/newline"), ("2", "http://www.stargate-sg1-solutions.com/screencaps/AOT/23%20Under%20Siege/slides/AOT23180.jpg"), ("1", "/newline/newlineThe SGC base acts as the secure ground station for all Stargate activities. It is typically commanded by a Major General and is staffed by subject matter experts and military support personnel, several elite special operations teams, and several SG teams, including SG-1. Follow through through the Stargate, as we explore the universe of Chess.com. We will see many wonders,encounter friends and foes,and play brilliant chess in spectacular matches..../newlineand maybe even play some stargate golf, if time allow ;))/newline/newline"), ("3", "https://www.youtube.com/watch?v=MUBQLcKvcfI"))
 
-            memtinv = remove_doublets(infile, "")
-            #memalrinv = remove_doublets(alrfile, "")
+            memtinv = remove_doublets(infile)
+            #memalrinv = remove_doublets(alrfile)
             #memtinv = [x for x in memtinv if x not in memalrinv]
 
             already_picked = list()
@@ -1467,7 +1489,8 @@ def misc1(sortedlines2):
     sortedlines2 = streplacer(str(sortedlines2), (["'", ""], ["set(", ""], [")", ""], ["(", ""], ["[", ""], ["]", ""]))
     return sortedlines2
 
-def remove_doublets(filename, target):
+def remove_doublets(filename):
+    target = ""
     if os.path.isfile(filename) is True:
         if os.stat(filename).st_size > 0:
             for target in csv.reader(open(filename, "rb")):
@@ -1606,6 +1629,20 @@ def makefolder(flst):
     for folder in flst:
         if not os.path.exists(folder):
             os.makedirs(folder)
+
+def gettmlinklist(targetname, browser):
+    linklist = list()
+
+    browser, response = mecopner(browser, "http://www.chess.com/groups/matches/" + targetname + "?show_all_current=1")
+    soup = BeautifulSoup(response)
+    souplinks = re.findall("/groups/team_match(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", str(soup.find_all("a")))
+    for link in souplinks:
+        linklist.append("http://www.chess.com" + link)
+
+    pointerlist = (0, 1, 2)
+    for pointer in pointerlist:
+        del linklist[-1]
+    return linklist
 
 def sellogin(Username, Password, browser):
     browser.get("https://www.chess.com/login")
@@ -2118,12 +2155,12 @@ def file_or_input(mult, fdiag1, fdiag2, idiag1, idiag2):
 
         while list1 not in flist:
             list1 = raw_input(fdiag1)
-        list1 = remove_doublets(list1, "")
+        list1 = remove_doublets(list1)
 
         if mult == True:
             while list2 not in flist:
                 list2 = raw_input(fdiag2)
-            list2 = remove_doublets(list2, "")
+            list2 = remove_doublets(list2)
 
     elif choice == "1":
         list1 = streplacer(raw_input(idiag1), ([" ", ""], ["(", ""], [")", ""], ["]", ""], ["[", ""], ["'", ""])).split(",")
@@ -2482,7 +2519,7 @@ while pathway in (["y"]):
         while preexlist not in flist:
             preexlist = raw_input("\nFull name of the file containing your invites list: ")
 
-        un4 = set(remove_doublets(preexlist, ""))
+        un4 = set(remove_doublets(preexlist))
         un4 = memremoverf(un4)
         un4 = un4.difference(domban)
         un4 = misc1(un4)
@@ -2712,7 +2749,38 @@ while pathway in (["y"]):
                 placeholder2.write(prlst)
 
     elif flow == "42":
-        "none"
+        targetnameorg = raw_input("\n\n\nName of the group you wish to check: ")
+        targetname = re.sub(r"[^a-z A-Z 0-9]","", targetnameorg)
+        targetname = targetname.replace(" ", "-").lower()
+
+        mtchlist = gettmopdata(targetname)
+        tmoplist = list()
+        winssdic = dict()
+        losedic = dict()
+        drawdic = dict()
+
+        for tm in mtchlist:
+            if tm[5] == "Won":
+                if tm[2] in winssdic:
+                    winssdic[tm[2]] += 1
+                else:
+                    winssdic[tm[2]] = 1
+
+            elif tm[5] == "Lost":
+                if tm[2] in losedic:
+                    losedic[tm[2]] += 1
+                else:
+                    losedic[tm[2]] = 1
+
+            elif tm[5] == "Draw":
+                if tm[2] in drawdic:
+                    drawdic[tm[2]] += 1
+                else:
+                    drawdic[tm[2]] = 1
+
+        print "Opponent     Won    Lost    Draw"
+        for opteam in set(winssdic.keys())|set(losedic.keys())|set(drawdic.keys()):
+            print opteam, winssdic.get(opteam, 0), losedic.get(opteam, 0), drawdic.get(opteam, 0)
 
     pathway = ""
     while pathway not in (["y", "n"]):
