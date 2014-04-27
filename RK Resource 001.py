@@ -2777,7 +2777,7 @@ while pathway in (["y"]):
                 else:
                     drawdic[tm[2]] = 1
 
-        print "\n\n\nOpponent    Won    Lost    Draw    Total"
+        print "\n\n\nOpponent    Won    Lost    Draw    Total\n"
         for opteam in set(winssdic.keys())|set(losedic.keys())|set(drawdic.keys()):
             print opteam, winssdic.get(opteam, 0), losedic.get(opteam, 0), drawdic.get(opteam, 0), winssdic.get(opteam, 0) + losedic.get(opteam, 0) + drawdic.get(opteam, 0)
 
