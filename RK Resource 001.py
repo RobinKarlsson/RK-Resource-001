@@ -3,7 +3,7 @@
 # developed by Robin Karlsson
 # contact email: "r.robin.karlsson@gmail.com"
 # contact chess.com profile: "http://www.chess.com/members/view/RobinKarlsson"
-# version 0.8.9 alpha dev
+# version 0.8.9 dev
 
 import mechanize
 import os
@@ -33,7 +33,7 @@ from collections import Counter
 from string import punctuation
 
 def csvsoworker(memlist, choicepath):
-    col_width = max(len(element) for row in memlist for element in row) + 2
+    colwidth = max(len(element) for row in memlist for element in row) + 2
 
     choice = ""
     while choice not in (["1", "2"]):
@@ -110,14 +110,14 @@ def csvsoworker(memlist, choicepath):
             elif type(memlist2[0][choice2]) is float or type(memlist2[0][choice2]) is list:
                 memlist2 = sorted(memlist2, reverse = True, key=lambda tup: tup[choice2])
 
-        print "\n\n" + "".join(element.ljust(col_width) for element in ltitle) + "\n"
+        print "\n\n" + "".join(element.ljust(colwidth) for element in ltitle) + "\n"
         llength = len(memlist2[0])
         for cpointer in memlist2:
             counter = 0
             while counter < llength:
                 cpointer[counter] = str(cpointer[counter])
                 counter += 1
-            print "".join(element.ljust(col_width) for element in cpointer)
+            print "".join(element.ljust(colwidth) for element in cpointer)
 
     elif choice == "2":
         del memlist[0]
@@ -268,9 +268,6 @@ def com3(xxxxxxxxxxxxxx, xxxxxxxxxxxxx, xxxxxxxxxxxxxxxx, xxxxxxxxxxxxxxxxxxx):
         xxxxxxxxxxxxxxxxxxx.append(chr(abs(ord(xxxxxxxxxxxxx[xxxxxxxxxxxxxxxxx]) - ord(xxxxxxxxxxxxxx[xxxxxxxxxxxxxxxxx % len(xxxxxxxxxxxxxx)]) % xxxxxxxxxxxxxxxx)))
     return "".join(xxxxxxxxxxxxxxxxxxx)
 
-tmban = set(['bijayees1234', 'freaky25', 'Quack-Peep', 'ADOKA', 'redneck7-1-1990', 'falkon26', 'dryan43', 'mcwelch101', 'TasmanianTiger', 'lennyjane18', 'jeremybloom', '143abhi', 'Sawblade24'])
-domban = set(['okinawaoly', 'rubenhasratyan', 'kohai', 'swarmflow', 'Backer1', 'mitchthebuyer', 'Gelnon', 'Phaethonas', 'CaptainPike', 'Stormbringer', 'Steve212000', 'doctorstorm', 'dogs10099', 'chessmaster010l'])
-
 def gettmopdata(targetname):
     browser = mecbrowser("")
     linklist = gettmlinklist(targetname, browser)
@@ -293,6 +290,19 @@ def gettmopdata(targetname):
             break
         pointer += 1
     return mtchlist
+
+def turnofcomp():
+    usrplatform = getplatform()
+    if usrplatform[1] == "Linux":
+        import dbus
+        dbus.Interface(dbus.SystemBus().get_object('org.freedesktop.ConsoleKit', '/org/freedesktop/ConsoleKit/Manager'), 'org.freedesktop.ConsoleKit.Manager').get_dbus_method("Stop")
+    elif usrplatform[1] == "Windows":
+        os.system("shutdown -h now")
+    elif usrplatform[1] == "Darwin":
+        import subprocess
+        subprocess.call(["osascript", "-e", 'tell app "System Events" to shut down'])
+
+    os.system("shutdown -h now")
 
 def resource01(evenmtch, mtchlist):
     ctrl = False
@@ -505,7 +515,7 @@ def pmdriver(target, choice):
     browser0.quit()
 
     if shutdown == "y":
-        os.system("shutdown -h now")
+        turnofcomp()
 
 def mecopner(browser, pointl):
     while True:
@@ -2203,7 +2213,7 @@ def notclosedcheck(memlist):
     return memlist2
 
 olprint("*", "*", "-", 72, True)
-for content in (["", "", "", "RK Resource 001", "version 0.8.9 alpha dev", "", "", ""]):
+for content in (["", "", "", "RK Resource 001", "version 0.8.9 dev", "", "", ""]):
     olprint2("{0: ^70}", content, "|", "|")
 olprint("|", "|", "-", 72, True)
 
@@ -2211,7 +2221,7 @@ for content in (["", "", "developed by Robin Karlsson", "", "", "Contact informa
     olprint2("{0: ^70}", content, "|", "|")
 olprint("|", "|", "-", 72, True)
 
-for content in (["", "", "Options", "Type /help or /help <number> for more info", "", "", "1. Extract the memberslist of one or more groups", "", "2. Build a csv file with data on a list of members", "", "3. Send invites for a group", "", "4. Posts per member in a groups finished votechess matches", "", "5. Build a csv file of a groups team match participants", "", "6. Filter a list of members for those who fill a few requirements", "", "7. Presentation of csv-files from options 2 and 5", "", "8. Process invite lists", "", "9. Look for members who has recenty left your group", "", "10. Count number of group notes per member in the last 100 notes pages", "", "11. Build a birthday schedule for a list of members", "", "12. Send a personal message to a list of members", "", "13. Pair lists of players against each others", "", "14. Set operations on two lists", "", ""]):
+for content in (["", "", "Options", "Type /help or /help <number> for more info", "", "", "1. Extract the memberslist of one or more groups", "", "2. Build a csv file with data on a list of members", "", "3. Send invites for a group", "", "4. Posts per member in a groups finished votechess matches", "", "5. Build a csv file of a groups team match participants", "", "6. Filter a list of members for those who fill a few requirements", "", "7. Presentation of csv-files from options 2 and 5", "", "8. Process invite lists", "", "9. Look for members who has recenty left your group", "", "10. Count number of group notes per member in the last 100 notes pages", "", "11. Build a birthday schedule for a list of members", "", "12. Send a personal message to a list of members", "", "13. Pair lists of players against each others", "", "14. Set operations on two lists", "", "15. Check a teams won/lost tm's per opponent", "", ""]):
     olprint2("{0: ^70}", content, "|", "|")
 olprint("*", "*", "-", 72, True)
 
@@ -2221,7 +2231,7 @@ dommem = memfiop("mem/dommem", "keydom")
 
 while pathway in (["y"]):
     flow = ""
-    while flow not in (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "42"]):
+    while flow not in (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "42"]):
         flow = raw_input("\n\n\nEnter your choice here: ")
 
         if flow == "/help 1":
@@ -2251,7 +2261,9 @@ while pathway in (["y"]):
         elif flow == "/help 13":
             print "\n\nTakes either one or two list of members and offer to pair them against each others based on rating.\nIf given one lists members will be paired against each other after the format, highest ranked vs second highest rank etc. For two lists the script takes each member in the shorter list and pair this member against whoever has the most similar rating in the longer list\n\nRatings can be Live Standard, Live Blitz, Live Bullet, Online chess, 960 or tactics"
         elif flow == "/help 14":
-            print "\n\n Perform set operations (union, intersection, difference, symmetric difference) on two lists"
+            print "\n\nPerform set operations (union, intersection, difference, symmetric difference) on two lists"
+        elif flow == "/help 15":
+            print "\n\nCount number of wins, losses and draws per opponent in a teams team match archive"
         elif flow == "/help":
             print "\n\n\nTo add extensions/addons to the scripts chrome or firefox browser you need to download the extension in crx format for chrome or xpi for firefox. Once the addon is downloaded, place it in the Webdriver/Extensions/Chrome or Webdriver/Extensions/Firefox folder.\n\nIt's recommended to use the adblock plus extension\n\n\n\n\nTo use the scripts ability to determine a members gender you will need to have a list of male and female first names in the namelists folder. male names should be stored in a file called 'male' and female names in a file called 'female'.\n\nFor best performance the names should be in the format:\nname1\nname2\nname3\netc\n\nIt's also recommended to sort the names based on how commonly they are used"
 
@@ -2269,8 +2281,6 @@ while pathway in (["y"]):
 
         if remmem == "y":
             un1 = memremoverf(un1)
-
-        un1 = un1.difference(domban)
         un1 = misc1(un1)
 
         choice6 = ""
@@ -2499,8 +2509,8 @@ while pathway in (["y"]):
                         break
                     memlist2.append((row[0], row[ichoice]))
 
-            col_width = max(len(element) for row in memlist for element in row) + 2
-            print "\n\n" + "".join(element.ljust(col_width) for element in (memlist[0][0], memlist[0][1] + " old", memlist[0][1] + " new", "difference")) + "\n"
+            colwidth = max(len(element) for row in memlist for element in row) + 2
+            print "\n\n" + "".join(element.ljust(colwidth) for element in (memlist[0][0], memlist[0][1] + " old", memlist[0][1] + " new", "difference")) + "\n"
             fmemlist = list()
             for tup in memlist2:
                 if tup not in memlist:
@@ -2509,7 +2519,7 @@ while pathway in (["y"]):
                             fmemlist.append((tup[0], str(min(float(tup[1]), float(tup2[1]))).replace(".0", ""), str(max(float(tup[1]), float(tup2[1]))).replace(".0", ""), str(abs(float(tup[1]) - float(tup2[1]))).replace(".0", "")))
             fmemlist = sorted(fmemlist, reverse = True, key=lambda tup: tup[-1])
             for cpointer in fmemlist:
-                print "".join(element.ljust(col_width) for element in cpointer)
+                print "".join(element.ljust(colwidth) for element in cpointer)
 
     elif flow == "8":
         print "\n\n\nRemoves doublets and unwanted elements from your list (ie those who are either already members or banned/unwanted)\n\nFiles in directory:\n"
@@ -2521,7 +2531,6 @@ while pathway in (["y"]):
 
         un4 = set(remove_doublets(preexlist))
         un4 = memremoverf(un4)
-        un4 = un4.difference(domban)
         un4 = misc1(un4)
 
         with open(preexlist, "wb") as placeholder2:
@@ -2748,12 +2757,13 @@ while pathway in (["y"]):
             with open(sfile, "wb") as placeholder2:
                 placeholder2.write(prlst)
 
-    elif flow == "42":
+    elif flow == "15":
         targetnameorg = raw_input("\n\n\nName of the group you wish to check: ")
         targetname = re.sub(r"[^a-z A-Z 0-9]","", targetnameorg)
         targetname = targetname.replace(" ", "-").lower()
 
         mtchlist = gettmopdata(targetname)
+        parttup = list()
         winssdic = dict()
         losedic = dict()
         drawdic = dict()
@@ -2777,9 +2787,29 @@ while pathway in (["y"]):
                 else:
                     drawdic[tm[2]] = 1
 
-        print "\n\n\nOpponent    Won    Lost    Draw    Total\n"
         for opteam in set(winssdic.keys())|set(losedic.keys())|set(drawdic.keys()):
-            print opteam, winssdic.get(opteam, 0), losedic.get(opteam, 0), drawdic.get(opteam, 0), winssdic.get(opteam, 0) + losedic.get(opteam, 0) + drawdic.get(opteam, 0)
+            parttup.append((opteam, winssdic.get(opteam, 0), losedic.get(opteam, 0), drawdic.get(opteam, 0), winssdic.get(opteam, 0) + losedic.get(opteam, 0) + drawdic.get(opteam, 0)))
+
+        prchoice = ""
+        while prchoice not in (["1", "2", "3", "4", "5"]):
+            prchoice = raw_input("\n\nSort by\n 1. Opponent name\n 2. Matches won\n 3. Matches lost\n 4. Matches Drawn\n 5. Total number of tm's\nEnter choice: ")
+        print "\n\n"
+
+        if prchoice == "1":
+            parttup = sorted(parttup, key=lambda tup: tup[0].lower())
+        else:
+            parttup = sorted(parttup, reverse = True, key=lambda tup: tup[int(prchoice) - 1])
+
+        width = max(len(element[0]) for element in parttup) + 2
+        template = "|{0:" + str(width) + "}|{1:6}|{2:6}|{3:6}|{4:6}|"
+        print "\n\n\n"
+        print template.format(" Opponent name", "Won", "Lost", "Draw", "Total")
+        print template.format("-" * width, "-" * 6, "-" * 6, "-" * 6, "-" * 6)
+        for tm in parttup:
+            print template.format(*tm)
+
+    elif flow == "15":
+        turnofcomp()
 
     pathway = ""
     while pathway not in (["y", "n"]):
