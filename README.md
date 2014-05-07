@@ -178,3 +178,7 @@ Ratings can be Live Standard, Live Blitz, Live Bullet, Online chess, 960 or tact
 
 
  14) Perform set operations on two lists (union, intersection, difference, symmetric difference)
+
+
+
+ 15) Count number of wins, losses and draws per opponent in a teams team match archive
