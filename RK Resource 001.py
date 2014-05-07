@@ -31,9 +31,10 @@ from operator import itemgetter
 from collections import OrderedDict
 from collections import Counter
 from string import punctuation
+supusr = True
 
 def csvsoworker(memlist, choicepath):
-    colwidth = max(len(element) for row in memlist for element in row) + 2
+    colwidth = max(len(element.decode("UTF-8")) for row in memlist for element in row) + 2
 
     choice = ""
     while choice not in (["1", "2"]):
@@ -106,9 +107,9 @@ def csvsoworker(memlist, choicepath):
                     element[choice2] = [int(subelem) for subelem in element[choice2]]
 
             if type(memlist2[0][choice2]) is str:
-                memlist2 = sorted(memlist2, key=lambda tup: tup[0].lower())
+                memlist2 = sorted(memlist2, key = lambda tup: tup[0].lower())
             elif type(memlist2[0][choice2]) is float or type(memlist2[0][choice2]) is list:
-                memlist2 = sorted(memlist2, reverse = True, key=lambda tup: tup[choice2])
+                memlist2 = sorted(memlist2, reverse = True, key = lambda tup: tup[choice2])
 
         print "\n\n" + "".join(element.ljust(colwidth) for element in ltitle) + "\n"
         llength = len(memlist2[0])
@@ -190,11 +191,15 @@ def pickbrowser(browserchoice, adext):
                             fopt.add_extension(os.path.abspath("Webdriver/Extensions/Firefox/" + fname))
                             if "adblock" in fname:
                                 handle = True
-                        except:
+                        except Exception, errormsg:
+                            if supusr is True:
+                                print repr(errormsg)
                             print "Failed to load " + os.path.abspath("Webdriver/Extensions/Firefox/" + fname)
             try:
                 browser = webdriver.Firefox(fopt)
-            except:
+            except Exception, errormsg:
+                if supusr is True:
+                    print repr(errormsg)
                 print "\n\nFailed to initiate Firefox with addons, reverting to standard\n\n"
                 browser = webdriver.Firefox()
             break
@@ -208,7 +213,9 @@ def pickbrowser(browserchoice, adext):
                             copt.add_extension(os.path.abspath("Webdriver/Extensions/Chrome/" + fname))
                             if "adblock" in fname:
                                 handle = True
-                        except:
+                        except Exception, errormsg:
+                            if supusr is True:
+                                print repr(errormsg)
                             print "Failed to load " + os.path.abspath("Webdriver/Extensions/Chrome/" + fname)
 
             if usrplatform[1] == "Linux":
@@ -216,7 +223,9 @@ def pickbrowser(browserchoice, adext):
                 os.environ["webdriver.chrome.driver"] = chromepath
                 try:
                     browser = webdriver.Chrome(chromepath, chrome_options = copt)
-                except:
+                except Exception, errormsg:
+                    if supusr is True:
+                        print repr(errormsg)
                     print "\n\nFailed to initiate Chrome with extensions, reverting to standard\n\n"
                     browser = webdriver.Chrome(chromepath)
                 break
@@ -487,7 +496,9 @@ def pmdriver(target, choice):
         try:
             WebDriverWait(browser0, 10).until(EC.presence_of_element_located((By.ID, "c15")))
             browser0.find_element_by_name("c15").send_keys(subject)
-        except:
+        except Exception, errormsg:
+            if supusr is True:
+                print repr(errormsg)
             continue
 
         while True:
@@ -499,7 +510,9 @@ def pmdriver(target, choice):
 
                 browser0.find_element_by_id("c16").click()
                 break
-            except:
+            except Exception, errormsg:
+                if supusr is True:
+                    print repr(errormsg)
                 print "\n\nRetrying " + membername2
 
                 while True:
@@ -508,7 +521,9 @@ def pmdriver(target, choice):
                         WebDriverWait(browser0, 10).until(EC.presence_of_element_located((By.ID, "c15")))
                         browser0.find_element_by_name("c15").send_keys(subject)
                         break
-                    except:
+                    except Exception, errormsg:
+                        if supusr is True:
+                            print repr(errormsg)
                         print "retrying"
 
         time.sleep(sleeptime)
@@ -522,7 +537,9 @@ def mecopner(browser, pointl):
         try:
             response = browser.open(pointl)
             break
-        except:
+        except Exception, errormsg:
+            if supusr is True:
+                print repr(errormsg)
             print "something went wrong, reopening " + pointl
             time.sleep(1)
     return browser, response
@@ -1422,7 +1439,9 @@ def inviter(choicelist, invitenum):
                         browser2.find_element_by_id("c18").click()
                         break
 
-                    except:
+                    except Exception, errormsg:
+                        if supusr is True:
+                            print repr(errormsg)
                         print "\n\nRetrying " + member + " " + invgroup + "!!!\n\n"
                         while True:
                             browser2.get(groupinv)
@@ -1430,7 +1449,9 @@ def inviter(choicelist, invitenum):
                                 WebDriverWait(browser2, 5).until(EC.presence_of_element_located((By.ID, "c15")))
                                 browser2.find_element_by_name("c15").send_keys(member)
                                 break
-                            except:
+                            except Exception, errormsg:
+                                if supusr is True:
+                                    print repr(errormsg)
                                 print "retrying"
 
             updinvlist = set(memtinv).difference(set(memint))
@@ -1466,7 +1487,9 @@ def filtmcemsg(msglist, browser, name, country, browserchoice):
                     browser.find_element_by_id("photourl").send_keys(content[1])
                     browser.find_element_by_id("insert").click()
                     break
-                except:
+                except Exception, errormsg:
+                    if supusr is True:
+                        print repr(errormsg)
                     print "\n\nrefreshing page\n\n"
                     browser.refresh()
 
@@ -1549,7 +1572,7 @@ def pairsorter(browser, target, choice):
             rating = tacratingchecker(soup)
 
         partup.append([mem, int(rating)])
-    return sorted(partup, reverse = True, key=lambda tup: tup[1])
+    return sorted(partup, reverse = True, key = lambda tup: tup[1])
 
 def olprint(startc, endc, inchar, endn, nline):
     x = 0
@@ -1933,7 +1956,9 @@ def memberprocesser(silent, browser, target, minrat, maxrat, mingames, minwinrat
                     continue
 
             passmem.append(targetx)
-        except:
+        except Exception, errormsg:
+            if supusr is True:
+                print repr(errormsg)
             print "\n\nskipped " + targetx + "\n\n"
     return passmem
 
@@ -2517,7 +2542,7 @@ while pathway in (["y"]):
                     for tup2 in memlist:
                         if tup[tup.index(tup[0])] in tup2 and max(float(tup[1]), float(tup2[1])) != 0.0:
                             fmemlist.append((tup[0], str(min(float(tup[1]), float(tup2[1]))).replace(".0", ""), str(max(float(tup[1]), float(tup2[1]))).replace(".0", ""), str(abs(float(tup[1]) - float(tup2[1]))).replace(".0", "")))
-            fmemlist = sorted(fmemlist, reverse = True, key=lambda tup: tup[-1])
+            fmemlist = sorted(fmemlist, reverse = True, key = lambda tup: tup[-1])
             for cpointer in fmemlist:
                 print "".join(element.ljust(colwidth) for element in cpointer)
 
@@ -2787,8 +2812,13 @@ while pathway in (["y"]):
                 else:
                     drawdic[tm[2]] = 1
 
+        width = 0
         for opteam in set(winssdic.keys())|set(losedic.keys())|set(drawdic.keys()):
+            oplen = len(opteam.decode("UTF-8"))
+            if oplen > width:
+                width = oplen
             parttup.append((opteam, winssdic.get(opteam, 0), losedic.get(opteam, 0), drawdic.get(opteam, 0), winssdic.get(opteam, 0) + losedic.get(opteam, 0) + drawdic.get(opteam, 0)))
+        width += 2
 
         prchoice = ""
         while prchoice not in (["1", "2", "3", "4", "5"]):
@@ -2796,19 +2826,16 @@ while pathway in (["y"]):
         print "\n\n"
 
         if prchoice == "1":
-            parttup = sorted(parttup, key=lambda tup: tup[0].lower())
+            parttup = sorted(parttup, key = lambda tup: tup[0].lower())
         else:
-            parttup = sorted(parttup, reverse = True, key=lambda tup: tup[int(prchoice) - 1])
+            parttup = sorted(parttup, reverse = True, key = lambda tup: tup[int(prchoice) - 1])
 
-        width = max(len(element[0]) for element in parttup) + 2
         template = "|{0:" + str(width) + "}|{1:6}|{2:6}|{3:6}|{4:6}|"
-        print "\n\n\n"
-        print template.format(" Opponent name", "Won", "Lost", "Draw", "Total")
-        print template.format("-" * width, "-" * 6, "-" * 6, "-" * 6, "-" * 6)
+        print "\n\n\n" + template.format(" Opponent name", "Won", "Lost", "Draw", "Total") + "\n" + template.format("-" * width, "-" * 6, "-" * 6, "-" * 6, "-" * 6)
         for tm in parttup:
-            print template.format(*tm)
+            print template.format(tm[0], tm[1], tm[2], tm[3], tm[4])
 
-    elif flow == "15":
+    elif flow == "42":
         turnofcomp()
 
     pathway = ""
