@@ -304,7 +304,7 @@ def turnofcomp():
     usrplatform = getplatform()
     if usrplatform[1] == "Linux":
         import dbus
-        dbus.Interface(dbus.SystemBus().get_object('org.freedesktop.ConsoleKit', '/org/freedesktop/ConsoleKit/Manager'), 'org.freedesktop.ConsoleKit.Manager').get_dbus_method("Stop")
+        dbus.Interface(dbus.SystemBus().get_object('org.freedesktop.ConsoleKit', '/org/freedesktop/ConsoleKit/Manager'), 'org.freedesktop.ConsoleKit.Manager').get_dbus_method("Stop")()
     elif usrplatform[1] == "Windows":
         os.system("shutdown -h now")
     elif usrplatform[1] == "Darwin":
