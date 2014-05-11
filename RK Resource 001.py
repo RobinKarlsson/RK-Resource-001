@@ -31,7 +31,7 @@ from operator import itemgetter
 from collections import OrderedDict
 from collections import Counter
 from string import punctuation
-supusr = False
+supusr = True
 
 def csvsoworker(memlist, choicepath):
     colwidth = max(len(element.decode("UTF-8")) for row in memlist for element in row) + 2
@@ -302,14 +302,25 @@ def gettmopdata(targetname):
 
 def turnofcomp():
     usrplatform = getplatform()
+
     if usrplatform[1] == "Linux":
-        import dbus
-        dbus.Interface(dbus.SystemBus().get_object('org.freedesktop.ConsoleKit', '/org/freedesktop/ConsoleKit/Manager'), 'org.freedesktop.ConsoleKit.Manager').get_dbus_method("Stop")()
+        try:
+            import dbus
+            dbus.Interface(dbus.SystemBus().get_object('org.freedesktop.ConsoleKit', '/org/freedesktop/ConsoleKit/Manager'), 'org.freedesktop.ConsoleKit.Manager').get_dbus_method("Stop")()
+        except Exception, errormsg:
+            if supusr is True:
+                print repr(errormsg)
+
     elif usrplatform[1] == "Windows":
         os.system("shutdown -h now")
+
     elif usrplatform[1] == "Darwin":
-        import subprocess
-        subprocess.call(["osascript", "-e", 'tell app "System Events" to shut down'])
+        try:
+            import subprocess
+            subprocess.call(["osascript", "-e", 'tell app "System Events" to shut down'])
+        except Exception, errormsg:
+            if supusr is True:
+                print repr(errormsg)
 
     os.system("shutdown -h now")
 
