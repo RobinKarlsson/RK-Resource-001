@@ -306,7 +306,14 @@ def turnofcomp():
     if usrplatform[1] == "Linux":
         try:
             import dbus
-            dbus.Interface(dbus.SystemBus().get_object('org.freedesktop.ConsoleKit', '/org/freedesktop/ConsoleKit/Manager'), 'org.freedesktop.ConsoleKit.Manager').get_dbus_method("Stop")()
+            dbus.Interface(dbus.SystemBus().get_object("org.freedesktop.ConsoleKit", "/org/freedesktop/ConsoleKit/Manager"), "org.freedesktop.ConsoleKit.Manager").get_dbus_method("Stop")() #ConsoleKit
+        except Exception, errormsg:
+            if supusr is True:
+                print repr(errormsg)
+
+        try:
+            import dbus
+            dbus.Interface(dbus.SystemBus().sys_bus.get_object("org.freedesktop.Hal", "/org/freedesktop/Hal/devices/computer"), "org.freedesktop.Hal.Device.SystemPowerManagement")() #HAL
         except Exception, errormsg:
             if supusr is True:
                 print repr(errormsg)
@@ -1971,6 +1978,7 @@ def memberprocesser(silent, browser, target, minrat, maxrat, mingames, minwinrat
             if supusr is True:
                 print repr(errormsg)
             print "\n\nskipped " + targetx + "\n\n"
+            continue
     return passmem
 
 def namechecker(soup):
