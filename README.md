@@ -120,6 +120,10 @@ This data can be presented and sorted using option 7 in the main script
 
 - Max online chess rating
 
+- Min 960 chess rating
+
+- Max 960 chess rating
+
 - Last online
 
 - Member Since
