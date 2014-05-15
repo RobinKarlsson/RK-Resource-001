@@ -304,15 +304,14 @@ def turnofcomp():
     usrplatform = getplatform()
 
     if usrplatform[1] == "Linux":
+        import dbus
         try:
-            import dbus
             dbus.Interface(dbus.SystemBus().get_object("org.freedesktop.ConsoleKit", "/org/freedesktop/ConsoleKit/Manager"), "org.freedesktop.ConsoleKit.Manager").get_dbus_method("Stop")() #ConsoleKit
         except Exception, errormsg:
             if supusr is True:
                 print repr(errormsg)
 
         try:
-            import dbus
             dbus.Interface(dbus.SystemBus().sys_bus.get_object("org.freedesktop.Hal", "/org/freedesktop/Hal/devices/computer"), "org.freedesktop.Hal.Device.SystemPowerManagement")() #HAL
         except Exception, errormsg:
             if supusr is True:
@@ -802,7 +801,7 @@ def inviter(choicelist, invitenum):
     invinf = "no"
     if choicelist[0] == "42":
         invinf = "yes"
-        choicelist = (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16"])
+        choicelist = (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17"])
 
     elif choicelist[0] == "84":
         choicelist = list()
@@ -810,7 +809,7 @@ def inviter(choicelist, invitenum):
         block = ""
         while block not in (["n"]):
             tempval = ""
-            while tempval not in (["1", "2", "3", "4", "5", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16"]):
+            while tempval not in (["1", "2", "3", "4", "5", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17"]):
                 tempval = raw_input("Group number: ")
             choicelist.append(tempval)
             block = raw_input("Add another group? (y/n) ")
@@ -1117,13 +1116,13 @@ def inviter(choicelist, invitenum):
                 countryalt = "international water"
                 msglist = (("1", "Welcome to the Systems Commonwealth flagship, the Andromeda Ascendant, high guard recruit /name. As a human hailing from the geographical block that constituted /nation in the 21st century you have been selected for, if you choose to accept, special service onboard this Glorious Heritage-class heavy cruiser. As a crewmember of the Andromeda you will be taking part in rescue missions, map distant starsystems and conduct first contact missions with alien civilizations uneducated in the fine art of chess./newline/newline"), ("2", "http://www.sciforums.com/attachment.php?attachmentid=4853"), ("1", "/newline/newlineConstructed in CY 9768 Andromeda Ascendant is the tenth Glorious Heritage-class heavy cruiser, High Guard ship of the line, built by the Systems Commonwealth. And as such she is one of the bright stars of the High Guard fleet, capable of high-endurance, independent operations. Glorious Heritage-class ships are often called upon to perform disaster relief and refugee support operations due to their spacious interiors and ability to ferry large quantities of emergency supplies and additional personnel. They are also the preferred platform for first contact missions, given their formidable combat capabilities and their ability to operate without a battlegroup - often critical to assuring potential Commonwealth members that the High Guard comes in peace./newline/newline"), ("3", "http://www.youtube.com/watch?v=Y8uE-HXASuE"))
 
-            elif choice5 == "9": #Family Guy
-                minrat = 1300
+            elif choice5 == "9": #Tholian Assembly
+                minrat = ""
                 maxrat = ""
-                minranrat = ""
+                minranrat = 1600
                 maxranrat = ""
-                mingames = 50
-                minwinrat = 0.33
+                mingames = ""
+                minwinrat = ""
                 lastloginyear = lonl[0]
                 lastloginmonth = lonl[1]
                 lastloginday = lonl[2]
@@ -1144,12 +1143,12 @@ def inviter(choicelist, invitenum):
                 avatarch = "n"
                 heritage = ""
                 memgender = ""
-                invgroup = "to Family Guy"
-                infile = "Invite Lists/Family Guy"
-                alrfile = "Invite Lists/Family Guy already invited"
-                groupinv = "http://www.chess.com/groups/invite_members?id=14966"
-                countryalt = "International water"
-                msglist = (("1", "Welcome /name to the most awesome Family Guy fan club on chess.com... This is for everyone who likes family guy no matter if you're an alien or terran, from /nation or atlantis, a fan of Brian or Peter, we are all welcome./newline/newline"), ("2", "http://digitaljournal.com/img/1/4/8/8/6/8/i/5/8/6/o/family_guy.jpg"), ("1", "/newline/newlineWe are a happy bunch of people who like to come together and talk about our favorite FG episodes or jokes, recent events in the series and maybe even play a little bit of chess every now and then, to pass the time :))/newline/newline"), ("3", "http://www.youtube.com/watch?v=LhnRHOYRncc"))
+                invgroup = "to the Tholian Assembly"
+                infile = "Invite Lists/Tholian Assembly"
+                alrfile = "Invite Lists/Tholian Assembly already invited"
+                groupinv = "http://www.chess.com/groups/invite_members?id=29722"
+                countryalt = "uncharted territories"
+                msglist = (("2", "http://img4.wikia.nocookie.net/__cb20110905051618/memoryalpha/en/images/4/48/Tholian%2C_2155.jpg"), ("1", "/newline/newlineHey /name, I have heard that you like to play 960 chess. If that's the case I think you will love this new, elite 960 groups!/newline"), ("2", "http://i33.fastpic.ru/big/2013/0412/1c/d51339e321c2ca257d770294b1dbff1c.jpg"), ("1", "/newlineWe will be playing in exciting team matches, participate in group tournaments and most of all, have fun...... ;))/newlineSo join now, lend your talent to the Tholian Assembly and the name /name of /nation will forever be remembered throughout the vast expanse of the milky way/newline"), ("3", "http://www.youtube.com/watch?v=EEOqZsKAmCg"))
 
             elif choice5 == "10": #Space 1999
                 countryalt = ""
@@ -1388,6 +1387,40 @@ def inviter(choicelist, invitenum):
                 infile = "Invite Lists/Stargate Command"
                 alrfile = "Invite Lists/Stargate Command already invited"
                 msglist = (("2", "http://www.bullshift.net/data/images/2013/10/tumblr-m0ocvrknvb1qzrlhgo2-r1-500.gif"), ("1", "/newline/newlineWelcome, /name, to Stargate Command!!!/newline/newline"), ("2", "http://www.stargate-sg1-solutions.com/screencaps/AOT/23%20Under%20Siege/slides/AOT23180.jpg"), ("1", "/newline/newlineThe SGC base acts as the secure ground station for all Stargate activities. It is typically commanded by a Major General and is staffed by subject matter experts and military support personnel, several elite special operations teams, and several SG teams, including SG-1. Follow through through the Stargate, as we explore the universe of Chess.com. We will see many wonders,encounter friends and foes,and play brilliant chess in spectacular matches..../newlineand maybe even play some stargate golf, if time allow ;))/newline/newline"), ("3", "https://www.youtube.com/watch?v=MUBQLcKvcfI"))
+
+            elif choice5 == "17": #Family Guy
+                minrat = 1300
+                maxrat = ""
+                minranrat = ""
+                maxranrat = ""
+                mingames = 50
+                minwinrat = 0.33
+                lastloginyear = lonl[0]
+                lastloginmonth = lonl[1]
+                lastloginday = lonl[2]
+                membersinceyear = msin[0]
+                membersincemonth = msin[1]
+                membersinceday = msin[2]
+                youngeryear = ""
+                youngermonth = ""
+                youngerday = ""
+                olderyear = ""
+                oldermonth = ""
+                olderday = ""
+                timemax = 10
+                maxgroup = ""
+                mingroup = ""
+                timovchoicemin = ""
+                timovchoicemax = ""
+                avatarch = "n"
+                heritage = ""
+                memgender = ""
+                invgroup = "to Family Guy"
+                infile = "Invite Lists/Family Guy"
+                alrfile = "Invite Lists/Family Guy already invited"
+                groupinv = "http://www.chess.com/groups/invite_members?id=14966"
+                countryalt = "International water"
+                msglist = (("1", "Welcome /name to the most awesome Family Guy fan club on chess.com... This is for everyone who likes family guy no matter if you're an alien or terran, from /nation or atlantis, a fan of Brian or Peter, we are all welcome./newline/newline"), ("2", "http://digitaljournal.com/img/1/4/8/8/6/8/i/5/8/6/o/family_guy.jpg"), ("1", "/newline/newlineWe are a happy bunch of people who like to come together and talk about our favorite FG episodes or jokes, recent events in the series and maybe even play a little bit of chess every now and then, to pass the time :))/newline/newline"), ("3", "http://www.youtube.com/watch?v=LhnRHOYRncc"))
 
             memtinv = remove_doublets(infile)
             #memalrinv = remove_doublets(alrfile)
@@ -2349,8 +2382,8 @@ while pathway in (["y"]):
 
     elif flow == "3":
         choice5 = ""
-        while choice5 not in (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "42", "84", "168"]):
-            choice5 = raw_input("\n\nWhich group would you like to send invites for?\n\n    Dominion affiliated groups:\n 1. Star Trek: The Dominion\n 2. Karemma Commerce Ministry\n 3. The Breen Confederacy\n 4. The Cardassian Empire\n 5. Death Star III\n\n    Non Dominion groups:\n\n 6. Jungle Team\n 7. Legio XIII Gemina\n 8. Andromeda\n 9. Family Guy\n 10. Space 1999\n 11. Space 2099\n 12. Chess Star Resort\n 13. Magnus Carlsen group\n 14. October\n 15. Knights of the Realm\n 16. Stargate Command\n\n 42. endless loop that goes through all the groups, indefinitely\n 84. Create you own custom infinite loop from the supported groups\n 168. Send invites for another group\n\nEnter choice here: ")
+        while choice5 not in (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "42", "84", "168"]):
+            choice5 = raw_input("\n\nWhich group would you like to send invites for?\n\n    Dominion affiliated groups:\n 1. Star Trek: The Dominion\n 2. Karemma Commerce Ministry\n 3. The Breen Confederacy\n 4. The Cardassian Empire\n 5. Death Star III\n\n    Non Dominion groups:\n\n 6. Jungle Team\n 7. Legio XIII Gemina\n 8. Andromeda\n 9. Tholian Assembly\n 10. Space 1999\n 11. Space 2099\n 12. Chess Star Resort\n 13. Magnus Carlsen group\n 14. October\n 15. Knights of the Realm\n 16. Stargate Command\n 17. Family Guy\n\n 42. endless loop that goes through all the groups, indefinitely\n 84. Create you own custom infinite loop from the supported groups\n 168. Send invites for another group\n\nEnter choice here: ")
         inviter(([choice5]), 200)
 
     elif flow == "4":
