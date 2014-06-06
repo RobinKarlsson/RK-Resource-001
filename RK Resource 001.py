@@ -31,7 +31,7 @@ from operator import itemgetter
 from collections import OrderedDict
 from collections import Counter
 from string import punctuation
-supusr = True
+supusr = False
 
 def csvsoworker(memlist, choicepath):
     colwidth = max(len(element.decode("UTF-8")) for row in memlist for element in row) + 2
@@ -373,7 +373,7 @@ def birthdsorter(birthdaylist):
 
 def getvclinks(yourside):
     linklist = list()
-    yourside = re.sub(r"[^a-z A-Z 0-9]","", yourside)
+    yourside = re.sub(r"[^a-z A-Z 0-9 -]","", yourside)
     yourside = yourside.replace(" ", "-").lower()
     browser = mecbrowser("")
 
@@ -446,7 +446,7 @@ def pmdriver(target, choice):
 
     shutdown = ""
     while shutdown not in (["y", "n"]):
-        shutdown = raw_input("\n\nShut down computer when complete (requires elevated privileges)? (y/n) ")
+        shutdown = raw_input("\n\nShut down computer when complete (might require elevated privileges)? (y/n) ")
 
     choice2 = ""
     while choice2 not in (["y", "n"]):
@@ -763,10 +763,12 @@ def selbrowch():
     return browserchoice
 
 def inviter(choicelist, invitenum):
+    customgroup = False
     choice2 = ""
     while choice2 not in (["y", "n"]):
-        choice2 = raw_input("\n\nOnly invite those who fill a few requirements? (y/n) ")
+        choice2 = raw_input("\n\nOnly invite those who fill a few requirements (only names from the standard list will be affected)? (y/n) ")
 
+    customgroup = False
     country = ""
     if choicelist[0] == "168":
         invgroup = ""
@@ -775,9 +777,11 @@ def inviter(choicelist, invitenum):
 
         groupinv = raw_input("\nid of the group you want to send invites for: ")
         groupinv = "http://www.chess.com/groups/invite_members?id=" + groupinv
-        infile = raw_input("name of the file containing your invites list: ")
-        infile = "Invite Lists/" + infile
-        alrfile = infile + " already invited"
+        usedfile = raw_input("name of the file containing your invites list: ")
+        usedfile = "Invite Lists/" + usedfile
+        alrfile = usedfile + " already invited"
+        standardlst = True
+        customgroup = True
 
         print "\n\n\n\nsupported commands, will be replaced with each members respective info\n /name - members name or username (if name is unavailable)\n /nation - members nation of origin\n /newline - pagebreak\n\n\n"
         msglist = list()
@@ -827,6 +831,8 @@ def inviter(choicelist, invitenum):
 
     lonl = [int(elem) for elem in str(date.today() - timedelta(days = 3)).split("-")]
     msin = [int(elem) for elem in str(date.today() - timedelta(days = 60)).split("-")]
+    import datetime
+    weekday = datetime.datetime.today().weekday()
 
     redo = "yes"
     counter = 1
@@ -875,8 +881,11 @@ def inviter(choicelist, invitenum):
                 invgroup = "to The Dominion"
                 groupinv = "http://www.chess.com/groups/invite_members?id=15896"
                 infile = "Invite Lists/Star Trek: The Dominion"
+                priofile = "Invite Lists/Star Trek: The Dominion priority"
+                leftfile = "Invite Lists/Star Trek: The Dominion members who has left"
                 alrfile = "Invite Lists/Star Trek: The Dominion already invited"
-                msglist = (("2", "http://4.bp.blogspot.com/_KcFkeN0I6po/SxKzhR0mUCI/AAAAAAAAEbE/jcE4_kPJu6Q/s1600/7of9.jpg"), ("1", "/newline/newlinePuzzles, Riddles, Chess!!!/newline/newlineThe largest Star Trek themed group on chess.com wants you, /name, for the grand Dominions /nation contingent/newline/newlineWith over 900 members we run vote chess, team matches, doubles chess and an in-house members league. Join now, and together we will impose order on this galaxy!!!/newline/newline"), ("2", "http://d1lalstwiwz2br.cloudfront.net/images_users/tiny_mce/RobinKarlsson/phpiGxzYM.jpeg"), ("1", "/newline/newlineA chess game is divided into three stages:/newlinethe first, when you hope you have the advantage/newlinethe second, when you believe you have an advantage/newlineand the third, when you know youre going to lose!/newline/newline"), ("3", "https://www.youtube.com/watch?v=JKPISUSOjiw"))
+                msglistleft = ()
+                msgliststand = (("2", "http://4.bp.blogspot.com/_KcFkeN0I6po/SxKzhR0mUCI/AAAAAAAAEbE/jcE4_kPJu6Q/s1600/7of9.jpg"), ("1", "/newline/newlinePuzzles, Riddles, Chess!!!/newline/newlineThe largest Star Trek themed group on chess.com wants you, /name, for the grand Dominions /nation contingent/newline/newlineWith over 900 members we run vote chess, team matches, doubles chess and an in-house members league. Join now, and together we will impose order on this galaxy!!!/newline/newline"), ("2", "http://d1lalstwiwz2br.cloudfront.net/images_users/tiny_mce/RobinKarlsson/phpiGxzYM.jpeg"), ("1", "/newline/newlineA chess game is divided into three stages:/newlinethe first, when you hope you have the advantage/newlinethe second, when you believe you have an advantage/newlineand the third, when you know youre going to lose!/newline/newline"), ("3", "https://www.youtube.com/watch?v=JKPISUSOjiw"))
 
             elif choice5 == "2": #Karemma Ministry of Trade
                 countryalt = ""
@@ -903,14 +912,17 @@ def inviter(choicelist, invitenum):
                 mingroup = ""
                 timovchoicemin = ""
                 timovchoicemax = ""
-                avatarch = ""
+                avatarch = "n"
                 heritage = ""
                 memgender = ""
                 invgroup = "to The Karemma"
                 groupinv = "http://www.chess.com/groups/invite_members?id=26088"
                 infile = "Invite Lists/Karemma Commerse Ministry"
+                priofile = "Invite Lists/Karemma Commerse Ministry priority"
+                leftfile = "Invite Lists/Karemma Commerse Ministry members who has left"
                 alrfile = "Invite Lists/Karemma Commerse Ministry already invited"
-                msglist = (("1", "Hello /name. Welcome to the Karemma Commerce Ministry, the most influential trading organization of the gamma quadrant./newline"), ("2", "http://static1.wikia.nocookie.net/__cb20050911110619/memoryalpha/en/images/a/ab/Karemma_starship.jpg"), ("1", "/newlineThe Karemma are the merchants of the Dominion, responsible for the absolute majority of transportation and mercantile establishments throughout the gamma quadrant. And as the organization that negotiates trade agreements for this proud and powerful race, the Karemma Commerse Ministry power are rivaled only by the Founders/newline/newlineSo join us, and together we will see profits rise above our wildest expectations/newline"), ("3", "http://www.youtube.com/watch?v=FvGZzzNLnBY"))
+                msglistleft = ()
+                msgliststand = (("1", "Hello /name. Welcome to the Karemma Commerce Ministry, the most influential trading organization of the gamma quadrant./newline"), ("2", "http://static1.wikia.nocookie.net/__cb20050911110619/memoryalpha/en/images/a/ab/Karemma_starship.jpg"), ("1", "/newlineThe Karemma are the merchants of the Dominion, responsible for the absolute majority of transportation and mercantile establishments throughout the gamma quadrant. And as the organization that negotiates trade agreements for this proud and powerful race, the Karemma Commerse Ministry power are rivaled only by the Founders/newline/newlineSo join us, and together we will see profits rise above our wildest expectations/newline"), ("3", "http://www.youtube.com/watch?v=FvGZzzNLnBY"))
 
             elif choice5 == "3": #The Breen Confederacy
                 countryalt = ""
@@ -943,8 +955,11 @@ def inviter(choicelist, invitenum):
                 invgroup = "to The Breen Confederacy"
                 groupinv = "http://www.chess.com/groups/invite_members?id=21974"
                 infile = "Invite Lists/The Breen Confederacy"
+                priofile = "Invite Lists/The Breen Confederacy priority"
+                leftfile = "Invite Lists/The Breen Confederacy members who has left"
                 alrfile = "Invite Lists/The Breen Confederacy already invited"
-                msglist = (("1", "Welcome, /name, to the grand Breen Confederacy's /nation contingent. An elite group aligned with the Dominion, specialising in votechess and thematic matches./newline/newline"), ("2", "http://images1.wikia.nocookie.net/__cb20061013002747/stexpanded/images/e/e4/BreenShip.jpg"), ("1", '/newline    "Never turn your back on a Breen"/newline/newline        -A Romulan saying/newline'), ("3", "http://www.youtube.com/watch?v=j2rH2Uh2MWs"))
+                msglistleft = ()
+                msgliststand = (("1", "Welcome, /name, to the grand Breen Confederacy's /nation contingent. An elite group aligned with the Dominion, specialising in votechess and thematic matches./newline/newline"), ("2", "http://images1.wikia.nocookie.net/__cb20061013002747/stexpanded/images/e/e4/BreenShip.jpg"), ("1", '/newline    "Never turn your back on a Breen"/newline/newline        -A Romulan saying/newline'), ("3", "http://www.youtube.com/watch?v=j2rH2Uh2MWs"))
 
             elif choice5 == "4": #The Cardassian Empire
                 countryalt = ""
@@ -976,9 +991,12 @@ def inviter(choicelist, invitenum):
                 memgender = ""
                 invgroup = "to The Cardassian Empire"
                 infile = "Invite Lists/The Cardassian Empire"
+                priofile = "Invite Lists/The Cardassian Empire priority"
+                leftfile = "Invite Lists/The Cardassian Empire members who has left"
                 alrfile = "Invite Lists/The Cardassian Empire already invited"
                 groupinv = "http://www.chess.com/groups/invite_members?id=20126"
-                msglist = (("1", "Welcome, /name, to the Cardassian Empire, the strongest power in the Alpha Quadrant/newline/newline"), ("2", "http://static1.wikia.nocookie.net/__cb20061230121459/memoryalpha/en/images/2/24/Cardassia.jpg"), ("1", "/newline/newlineWelcome to our Capital world, Cardassia Prime, headed by our esteemed leader Gul Dukat. Our military might as well as inteliigence is SUPREME!/newline/newlineSo come and join us, and relish in our phenomenal victories!/newline/newline"), ("3", "http://www.youtube.com/watch?v=GiyXGQk_pc0"))
+                msglistleft = ()
+                msgliststand = (("1", "Welcome, /name, to the Cardassian Empire, the strongest power in the Alpha Quadrant/newline/newline"), ("2", "http://static1.wikia.nocookie.net/__cb20061230121459/memoryalpha/en/images/2/24/Cardassia.jpg"), ("1", "/newline/newlineWelcome to our Capital world, Cardassia Prime, headed by our esteemed leader Gul Dukat. Our military might as well as inteliigence is SUPREME!/newline/newlineSo come and join us, and relish in our phenomenal victories!/newline/newline"), ("3", "http://www.youtube.com/watch?v=GiyXGQk_pc0"))
 
             elif choice5 == "5": #Death Star III
                 countryalt = ""
@@ -1010,9 +1028,12 @@ def inviter(choicelist, invitenum):
                 memgender = ""
                 invgroup = "to Death Star III"
                 infile = "Invite Lists/Death Star III"
+                priofile = "Invite Lists/Death Star III priority"
+                leftfile = "Invite Lists/Death Star III members who has left"
                 alrfile = "Invite Lists/Death Star III already invited"
                 groupinv = "http://www.chess.com/groups/invite_members?id=17618"
-                msglist = (("1", "Hello /name. Welcome to the Death Star, a Dynamically Dangerous Spacestation and Superweapon capable of Destroying an Entire Planet with its Powerful Superlaser../newline/newline"), ("2", "http://loyalkng.com/wp-content/uploads/2009/05/deathstarfiring2.jpg"), ("1", "/newlineThe Death Star has a crew of 265,675, as well as 52,276 gunners, 607,360 troops, 30,984 stormtroopers, and 180,216 pilots Its hangars contain assault shuttles, blastboats, Strike cruisers, land vehicles, support ships, and 7,293 TIE Fighters. It is protected by 10,000 turbolaser batteries, 2,600 Ion Cannons, and 768 Tractor Beam projectors./newline/newlineWelcome To Our Leader, Darth Vader :) Join us and together we will rule this galaxy!!!!/newline/newline"), ("3", "http://www.youtube.com/watch?v=4ImO0ST1WkM"))
+                msglistleft = ()
+                msgliststand = (("1", "Hello /name. Welcome to the Death Star, a Dynamically Dangerous Spacestation and Superweapon capable of Destroying an Entire Planet with its Powerful Superlaser../newline/newline"), ("2", "http://loyalkng.com/wp-content/uploads/2009/05/deathstarfiring2.jpg"), ("1", "/newlineThe Death Star has a crew of 265,675, as well as 52,276 gunners, 607,360 troops, 30,984 stormtroopers, and 180,216 pilots Its hangars contain assault shuttles, blastboats, Strike cruisers, land vehicles, support ships, and 7,293 TIE Fighters. It is protected by 10,000 turbolaser batteries, 2,600 Ion Cannons, and 768 Tractor Beam projectors./newline/newlineWelcome To Our Leader, Darth Vader :) Join us and together we will rule this galaxy!!!!/newline/newline"), ("3", "http://www.youtube.com/watch?v=4ImO0ST1WkM"))
 
             elif choice5 == "6": #Jungle Team
                 minrat = 1300
@@ -1043,10 +1064,13 @@ def inviter(choicelist, invitenum):
                 memgender = ""
                 invgroup = "to Jungle Team"
                 infile = "Invite Lists/Jungle Team"
+                priofile = "Invite Lists/Jungle Team priority"
+                leftfile = "Invite Lists/Jungle Team members who has left"
                 alrfile = "Invite Lists/Jungle Team already invited"
                 groupinv = "http://www.chess.com/groups/invite_members?id=17050"
                 countryalt = "the outskirts of our Roman empire"
-                msglist = (("1", "I invite you /name "), ("2", "http://d1lalstwiwz2br.cloudfront.net/images_users/tiny_mce/Teo_/phpIKXtlr.gif"), ("1", " to join the jungle team....have fun.....play teammatches and tournaments.... come and take a look/newline"), ("3", "http://www.youtube.com/watch?v=o1tj2zJ2Wvg"))
+                msglistleft = ()
+                msgliststand = (("1", "I invite you /name "), ("2", "http://d1lalstwiwz2br.cloudfront.net/images_users/tiny_mce/Teo_/phpIKXtlr.gif"), ("1", " to join the jungle team....have fun.....play teammatches and tournaments.... come and take a look/newline"), ("3", "http://www.youtube.com/watch?v=o1tj2zJ2Wvg"))
 
             elif choice5 == "7": #Legio XIII Gemina
                 minrat = 1300
@@ -1077,10 +1101,13 @@ def inviter(choicelist, invitenum):
                 memgender = ""
                 invgroup = "to Legio XIII Gemina"
                 infile = "Invite Lists/Legio XIII Gemina"
+                priofile = "Invite Lists/Legio XIII Gemina priority"
+                leftfile = "Invite Lists/Legio XIII Gemina members who has left"
                 alrfile = "Invite Lists/Legio XIII Gemina already invited"
                 groupinv = "http://www.chess.com/groups/invite_members?id=22596"
                 countryalt = "the outskirts of our Roman empire"
-                msglist = (("1", "Augustus needs you, triarii /name, for the reconstituted legio XIII gemina. As a veteran of the disbanded 13th legion you have proven your worth in battle, and once more your skills are needed in defence against the barbarian hordes roaming /nation/newlineThis is your true destiny, will you answer the call of Rome and once more march toward victories that shall be legend!! Forever etching the name /name in history/newline/newline"), ("2", "http://3219a2.medialib.glogster.com/jessicaann77/media/bd/bdab41001c3686ad707a2050c9a41ba876e06939/xslegionrecruiting.jpg"), ("1", "/newline/newlinein 41 BC emperor Augustus reconstituted the thirteenth legion (dispanded 45 BC, following the final battle of Munda) to deal with the rebellion of Sextus Pompeius in Sicily./newlineThe legion thus acquired the cognomen Gemina (twin), after being reinforced with veteran legionnaries from other legions following the war against Mark Antony and the battle of Actium/newline"), ("3", "http://www.youtube.com/watch?v=kFmDt_E3WbU"))
+                msglistleft = ()
+                msgliststand = (("1", "Augustus needs you, triarii /name, for the reconstituted legio XIII gemina. As a veteran of the disbanded 13th legion you have proven your worth in battle, and once more your skills are needed in defence against the barbarian hordes roaming /nation/newlineThis is your true destiny, will you answer the call of Rome and once more march toward victories that shall be legend!! Forever etching the name /name in history/newline/newline"), ("2", "http://3219a2.medialib.glogster.com/jessicaann77/media/bd/bdab41001c3686ad707a2050c9a41ba876e06939/xslegionrecruiting.jpg"), ("1", "/newline/newlinein 41 BC emperor Augustus reconstituted the thirteenth legion (dispanded 45 BC, following the final battle of Munda) to deal with the rebellion of Sextus Pompeius in Sicily./newlineThe legion thus acquired the cognomen Gemina (twin), after being reinforced with veteran legionnaries from other legions following the war against Mark Antony and the battle of Actium/newline"), ("3", "http://www.youtube.com/watch?v=kFmDt_E3WbU"))
 
             elif choice5 == "8": #Andromeda
                 minrat = 1300
@@ -1111,10 +1138,13 @@ def inviter(choicelist, invitenum):
                 memgender = ""
                 invgroup = "to Andromeda"
                 infile = "Invite Lists/Andromeda"
+                priofile = "Invite Lists/Andromeda priority"
+                leftfile = "Invite Lists/Andromeda members who has left"
                 alrfile = "Invite Lists/Andromeda already invited"
                 groupinv = "http://www.chess.com/groups/invite_members?id=21262"
                 countryalt = "international water"
-                msglist = (("1", "Welcome to the Systems Commonwealth flagship, the Andromeda Ascendant, high guard recruit /name. As a human hailing from the geographical block that constituted /nation in the 21st century you have been selected for, if you choose to accept, special service onboard this Glorious Heritage-class heavy cruiser. As a crewmember of the Andromeda you will be taking part in rescue missions, map distant starsystems and conduct first contact missions with alien civilizations uneducated in the fine art of chess./newline/newline"), ("2", "http://www.sciforums.com/attachment.php?attachmentid=4853"), ("1", "/newline/newlineConstructed in CY 9768 Andromeda Ascendant is the tenth Glorious Heritage-class heavy cruiser, High Guard ship of the line, built by the Systems Commonwealth. And as such she is one of the bright stars of the High Guard fleet, capable of high-endurance, independent operations. Glorious Heritage-class ships are often called upon to perform disaster relief and refugee support operations due to their spacious interiors and ability to ferry large quantities of emergency supplies and additional personnel. They are also the preferred platform for first contact missions, given their formidable combat capabilities and their ability to operate without a battlegroup - often critical to assuring potential Commonwealth members that the High Guard comes in peace./newline/newline"), ("3", "http://www.youtube.com/watch?v=Y8uE-HXASuE"))
+                msglistleft = ()
+                msgliststand = (("1", "Welcome to the Systems Commonwealth flagship, the Andromeda Ascendant, high guard recruit /name. As a human hailing from the geographical block that constituted /nation in the 21st century you have been selected for, if you choose to accept, special service onboard this Glorious Heritage-class heavy cruiser. As a crewmember of the Andromeda you will be taking part in rescue missions, map distant starsystems and conduct first contact missions with alien civilizations uneducated in the fine art of chess./newline/newline"), ("2", "http://www.sciforums.com/attachment.php?attachmentid=4853"), ("1", "/newline/newlineConstructed in CY 9768 Andromeda Ascendant is the tenth Glorious Heritage-class heavy cruiser, High Guard ship of the line, built by the Systems Commonwealth. And as such she is one of the bright stars of the High Guard fleet, capable of high-endurance, independent operations. Glorious Heritage-class ships are often called upon to perform disaster relief and refugee support operations due to their spacious interiors and ability to ferry large quantities of emergency supplies and additional personnel. They are also the preferred platform for first contact missions, given their formidable combat capabilities and their ability to operate without a battlegroup - often critical to assuring potential Commonwealth members that the High Guard comes in peace./newline/newline"), ("3", "http://www.youtube.com/watch?v=Y8uE-HXASuE"))
 
             elif choice5 == "9": #Tholian Assembly
                 minrat = ""
@@ -1145,10 +1175,13 @@ def inviter(choicelist, invitenum):
                 memgender = ""
                 invgroup = "to the Tholian Assembly"
                 infile = "Invite Lists/Tholian Assembly"
+                priofile = "Invite Lists/Tholian Assembly priority"
+                leftfile = "Invite Lists/Tholian Assembly members who has left"
                 alrfile = "Invite Lists/Tholian Assembly already invited"
                 groupinv = "http://www.chess.com/groups/invite_members?id=29722"
                 countryalt = "uncharted territories"
-                msglist = (("2", "http://img4.wikia.nocookie.net/__cb20110905051618/memoryalpha/en/images/4/48/Tholian%2C_2155.jpg"), ("1", "/newline/newlineHey /name, I have heard that you like to play 960 chess. If that's the case I think you will love this new, elite 960 groups!/newline"), ("2", "http://i33.fastpic.ru/big/2013/0412/1c/d51339e321c2ca257d770294b1dbff1c.jpg"), ("1", "/newlineWe will be playing in exciting team matches, participate in group tournaments and most of all, have fun...... ;))/newlineSo join now, lend your talent to the Tholian Assembly and the name /name of /nation will forever be remembered throughout the vast expanse of the milky way/newline"), ("3", "http://www.youtube.com/watch?v=EEOqZsKAmCg"))
+                msglistleft = ()
+                msgliststand = (("2", "http://img4.wikia.nocookie.net/__cb20110905051618/memoryalpha/en/images/4/48/Tholian%2C_2155.jpg"), ("1", "/newline/newlineHey /name, I see you like to play 960 chess. I think you would love this new, elite 960 group!/newline"), ("2", "http://i33.fastpic.ru/big/2013/0412/1c/d51339e321c2ca257d770294b1dbff1c.jpg"), ("1", "/newlineWe will be playing in exciting team matches, participate in group tournaments and most of all, have fun...... ;))/newlineSo join now, lend your talent to the Tholian Assembly and the name /name of /nation will forever be remembered throughout the vast expanse of the milky way/newline"), ("3", "http://www.youtube.com/watch?v=EEOqZsKAmCg"))
 
             elif choice5 == "10": #Space 1999
                 countryalt = ""
@@ -1180,9 +1213,12 @@ def inviter(choicelist, invitenum):
                 memgender = ""
                 invgroup = "to Space 1999"
                 infile = "Invite Lists/Space 1999"
+                priofile = "Invite Lists/Space 1999 priority"
+                leftfile = "Invite Lists/Space 1999 members who has left"
                 alrfile = "Invite Lists/Space 1999 already invited"
                 groupinv = "http://www.chess.com/groups/invite_members?id=26614"
-                msglist = (("2", "http://th07.deviantart.net/fs70/PRE/f/2011/331/8/2/moonbase_alpha_next_generation_by_heavy_fantasy-d4hg1v4.jpg"), ("1", "/newline/newlineWe want you, /name, for this rogue moons /nation settlement./newline/newline"), ("2", "http://upload.wikimedia.org/wikipedia/en/3/39/Space1999_Year1_Title.jpg"), ("1", "/newline/newlinePrimarily a scientific research station, Moonbase Alpha houses 311 personnel including scientists, astronauts, medical personnel, and security officers./newlineSpace: 1999: Nuclear waste from Earth, which was stored on the Moon's far side, explodes in a catastrophic accident on 13 September 1999, knocking the Moon out of orbit and sending it, and the 311 inhabitants of Moonbase Alpha, hurtling uncontrollably into space/newlineWATCH CLOSELY:))"), ("3", "http://www.youtube.com/watch?v=8WZW4groJro"))
+                msglistleft = ()
+                msgliststand = (("2", "http://th07.deviantart.net/fs70/PRE/f/2011/331/8/2/moonbase_alpha_next_generation_by_heavy_fantasy-d4hg1v4.jpg"), ("1", "/newline/newlineWe want you, /name, for this rogue moons /nation settlement./newline/newline"), ("2", "http://upload.wikimedia.org/wikipedia/en/3/39/Space1999_Year1_Title.jpg"), ("1", "/newline/newlinePrimarily a scientific research station, Moonbase Alpha houses 311 personnel including scientists, astronauts, medical personnel, and security officers./newlineSpace: 1999: Nuclear waste from Earth, which was stored on the Moon's far side, explodes in a catastrophic accident on 13 September 1999, knocking the Moon out of orbit and sending it, and the 311 inhabitants of Moonbase Alpha, hurtling uncontrollably into space/newlineWATCH CLOSELY:))"), ("3", "http://www.youtube.com/watch?v=8WZW4groJro"))
 
             elif choice5 == "11": #Space 2099
                 countryalt = ""
@@ -1214,9 +1250,12 @@ def inviter(choicelist, invitenum):
                 memgender = ""
                 invgroup = "to Space 2099"
                 infile = "Invite Lists/Space 2099"
+                priofile = "Invite Lists/Space 2099 priority"
+                leftfile = "Invite Lists/Space 2099 members who has left"
                 alrfile = "Invite Lists/Space 2099 already invited"
                 groupinv = "http://www.chess.com/groups/invite_members?id=26624"
-                msglist = (("2", "http://th07.deviantart.net/fs70/PRE/f/2011/331/8/2/moonbase_alpha_next_generation_by_heavy_fantasy-d4hg1v4.jpg"), ("1", "/newline/newlineWe want you, /name, for this rogue moons /nation settlement./newline"), ("2", "http://www.thescifiworld.net/img/interviews/space2099_08-big.jpg"), ("1", "/newlinePrimarily a scientific research station, Moonbase Alpha houses 311 personnel including scientists, astronauts, medical personnel, and security officers./newlineSpace: 1999: Nuclear waste from Earth, which was stored on the Moon's far side, explodes in a catastrophic accident on 13 September 1999, knocking the Moon out of orbit and sending it, and the 311 inhabitants of Moonbase Alpha, hurtling uncontrollably into space/newlineWATCH CLOSELY:))"), ("3", "http://www.youtube.com/watch?v=8WZW4groJro"))
+                msglistleft = ()
+                msgliststand = (("2", "http://th07.deviantart.net/fs70/PRE/f/2011/331/8/2/moonbase_alpha_next_generation_by_heavy_fantasy-d4hg1v4.jpg"), ("1", "/newline/newlineWe want you, /name, for this rogue moons /nation settlement./newline"), ("2", "http://www.thescifiworld.net/img/interviews/space2099_08-big.jpg"), ("1", "/newlinePrimarily a scientific research station, Moonbase Alpha houses 311 personnel including scientists, astronauts, medical personnel, and security officers./newlineSpace: 1999: Nuclear waste from Earth, which was stored on the Moon's far side, explodes in a catastrophic accident on 13 September 1999, knocking the Moon out of orbit and sending it, and the 311 inhabitants of Moonbase Alpha, hurtling uncontrollably into space/newlineWATCH CLOSELY:))"), ("3", "http://www.youtube.com/watch?v=8WZW4groJro"))
 
             elif choice5 == "12": #Chess Star Resort
                 countryalt = "the International kingdom of Atlantis"
@@ -1248,9 +1287,12 @@ def inviter(choicelist, invitenum):
                 memgender = ""
                 invgroup = "to CSR"
                 infile = "Invite Lists/CSR"
+                priofile = "Invite Lists/CSR priority"
+                leftfile = "Invite Lists/CSR members who has left"
                 alrfile = "Invite Lists/CSR already invited"
                 groupinv = "http://www.chess.com/groups/invite_members?id=18514"
-                msglist = (("2", "http://files.chesscomfiles.com/images_users/tiny_mce/Pepra/knightmoves.gif"), ("1", "/newline/newlineWelcome, /name, to Chess Star Resort. The one and only luxury 5 star hotel resort on chess.com/newlineJoin us, and experience all our activities firsthand... puzzles... team matches... tournaments and much much more/newline"), ("2", "http://www.washingtonpost.com/rf/image_606w/2010-2019/WashingtonPost/2013/10/18/Travel/Images/SALAMANDER20111382132477.jpg"), ("1", "/newlineCSR has since its founding just over a year ago housed some of the greatest chess players from many nations, including /nation. But without the great /name in our ranks, this hold little value/newline"), ("3", "http://www.youtube.com/watch?v=6_SqDur3IvQ"))
+                msglistleft = ()
+                msgliststand = (("2", "http://files.chesscomfiles.com/images_users/tiny_mce/Pepra/knightmoves.gif"), ("1", "/newline/newlineWelcome, /name, to Chess Star Resort. The one and only luxury 5 star hotel resort on chess.com/newlineJoin us, and experience all our activities firsthand... puzzles... team matches... tournaments and much much more/newline"), ("2", "http://www.washingtonpost.com/rf/image_606w/2010-2019/WashingtonPost/2013/10/18/Travel/Images/SALAMANDER20111382132477.jpg"), ("1", "/newlineCSR has since its founding just over a year ago housed some of the greatest chess players from many nations, including /nation. But without the great /name in our ranks, this hold little value/newline"), ("3", "http://www.youtube.com/watch?v=6_SqDur3IvQ"))
 
             elif choice5 == "13": #Magnus Carlsen group
                 countryalt = ""
@@ -1282,9 +1324,12 @@ def inviter(choicelist, invitenum):
                 memgender = ""
                 invgroup = "to the Magnus Carlsen group"
                 infile = "Invite Lists/The Magnus Carlsen Group"
+                priofile = "Invite Lists/The Magnus Carlsen Group priority"
+                leftfile = "Invite Lists/The Magnus Carlsen Group members who has left"
                 alrfile = "Invite Lists/The Magnus Carlsen Group already invited"
                 groupinv = "http://www.chess.com/groups/invite_members?id=19744"
-                msglist = (("2", "http://kevinthegerbil.com/images/blonde_chess.jpg"), ("1", "/newline/newlineWelcome /name to the Magnus Carlsen group. Magnus Carlsen was the third youngest GM in history at an age of 13 years, 4 months, 27 days! He has become the highest rated player in history before he reached 25 (years old) and he is on his way to becoming the world champion. He may also become the first person to reach and ELO of 3000. This is a group where we discuss his games and himself. We find out his strategies and then use them to win team matches and become the best in chess.com just like Magnus did!/newline"), ("3", "http://www.youtube.com/watch?v=ZD0Z0CwRDJw"))
+                msglistleft = ()
+                msgliststand = (("2", "http://kevinthegerbil.com/images/blonde_chess.jpg"), ("1", "/newline/newlineWelcome /name to the Magnus Carlsen group. Magnus Carlsen was the third youngest GM in history at an age of 13 years, 4 months, 27 days! He has become the highest rated player in history before he reached 25 (years old) and he is on his way to becoming the world champion. He may also become the first person to reach and ELO of 3000. This is a group where we discuss his games and himself. We find out his strategies and then use them to win team matches and become the best in chess.com just like Magnus did!/newline"), ("3", "http://www.youtube.com/watch?v=ZD0Z0CwRDJw"))
 
             elif choice5 == "14": #October
                 countryalt = ""
@@ -1311,16 +1356,19 @@ def inviter(choicelist, invitenum):
                 mingroup = ""
                 timovchoicemin = ""
                 timovchoicemax = ""
-                avatarch = ""
+                avatarch = "n"
                 heritage = ""
                 memgender = ""
                 invgroup = "to October"
                 groupinv = "http://www.chess.com/groups/invite_members?id=11977"
                 infile = "Invite Lists/October"
+                priofile = "Invite Lists/October priority"
+                leftfile = "Invite Lists/October members who has left"
                 alrfile = "Invite Lists/October already invited"
-                msglist = (("2", "http://img0.joyreactor.com/pics/post/comics-chess-soldier-577272.jpeg"), ("1", "/newlinePuzzles, Riddles, Chess!!!/newline/newlineWinter is coming! and October wants you, /name, for this elite, high rated and fun-loving chess group/newline"), ("2", "http://kevinthegerbil.com/images/blonde_chess.jpg"), ("3", "http://www.youtube.com/watch?v=6_SqDur3IvQ"))
+                msglistleft = ()
+                msgliststand = (("2", "http://img0.joyreactor.com/pics/post/comics-chess-soldier-577272.jpeg"), ("1", "/newlinePuzzles, Riddles, Chess!!!/newline/newlineWinter is coming! and October wants you, /name, for this elite, high rated and fun-loving chess group/newline"), ("2", "http://kevinthegerbil.com/images/blonde_chess.jpg"), ("3", "http://www.youtube.com/watch?v=6_SqDur3IvQ"))
 
-            elif choice5 == "15": #Knights of the Realm
+            elif choice5 == "15" and weekday <= 4: #Knights of the Realm
                 countryalt = "the uncharted territories"
                 minrat = 1400
                 maxrat = ""
@@ -1351,8 +1399,11 @@ def inviter(choicelist, invitenum):
                 invgroup = "to Knights of the Realm"
                 groupinv = "http://www.chess.com/groups/invite_members?id=23260"
                 infile = "Invite Lists/Knights of the Realm"
+                priofile = "Invite Lists/Knights of the Realm priority"
+                leftfile = "Invite Lists/Knights of the Realm members who has left"
                 alrfile = "Invite Lists/Knights of the Realm already invited"
-                msglist = (("2", "http://d1lalstwiwz2br.cloudfront.net/images_users/tiny_mce/thee_black_knight/phpUJ1yFu.gif"), ("1", "/newline/newlineWelcome to the Knights of the Realm, squire /name of /nation. The Knights set up fair team matches, vote chess matches, 960 matches and inhouse tournaments (Jousts). By fair matches, we mean that each individual game, has less than a 100 point rating difference./newline/newlineWe also have an analysis Department to post games in, and have them analyized, or maybe help to analyze the games of others. There is plenty of information to improve your game in the forums, and other interesting things./newline/newline/Lord Robin Karlsson/newline"), ("3", "http://www.youtube.com/watch?v=QMy6xsvxSfg"))
+                msglistleft = ()
+                msgliststand = (("2", "http://d1lalstwiwz2br.cloudfront.net/images_users/tiny_mce/thee_black_knight/phpUJ1yFu.gif"), ("1", "/newline/newlineWelcome to the Knights of the Realm, squire /name of /nation. The Knights set up fair team matches, vote chess matches, 960 matches and inhouse tournaments (Jousts). By fair matches, we mean that each individual game, has less than a 100 point rating difference./newline/newlineWe also have an analysis Department to post games in, and have them analyized, or maybe help to analyze the games of others. There is plenty of information to improve your game in the forums, and other interesting things./newline/newline/Lord Robin Karlsson/newline"), ("3", "http://www.youtube.com/watch?v=QMy6xsvxSfg"))
 
             elif choice5 == "16": #Stargate Command
                 countryalt = ""
@@ -1385,8 +1436,11 @@ def inviter(choicelist, invitenum):
                 invgroup = "to Stargate Command"
                 groupinv = "http://www.chess.com/groups/invite_members?id=21212"
                 infile = "Invite Lists/Stargate Command"
+                priofile = "Invite Lists/Stargate Command priority"
+                leftfile = "Invite Lists/Stargate Command members who has left"
                 alrfile = "Invite Lists/Stargate Command already invited"
-                msglist = (("2", "http://www.bullshift.net/data/images/2013/10/tumblr-m0ocvrknvb1qzrlhgo2-r1-500.gif"), ("1", "/newline/newlineWelcome, /name, to Stargate Command!!!/newline/newline"), ("2", "http://www.stargate-sg1-solutions.com/screencaps/AOT/23%20Under%20Siege/slides/AOT23180.jpg"), ("1", "/newline/newlineThe SGC base acts as the secure ground station for all Stargate activities. It is typically commanded by a Major General and is staffed by subject matter experts and military support personnel, several elite special operations teams, and several SG teams, including SG-1. Follow through through the Stargate, as we explore the universe of Chess.com. We will see many wonders,encounter friends and foes,and play brilliant chess in spectacular matches..../newlineand maybe even play some stargate golf, if time allow ;))/newline/newline"), ("3", "https://www.youtube.com/watch?v=MUBQLcKvcfI"))
+                msglistleft = ()
+                msgliststand = (("2", "http://www.bullshift.net/data/images/2013/10/tumblr-m0ocvrknvb1qzrlhgo2-r1-500.gif"), ("1", "/newline/newlineWelcome, /name, to Stargate Command!!!/newline/newline"), ("2", "http://www.stargate-sg1-solutions.com/screencaps/AOT/23%20Under%20Siege/slides/AOT23180.jpg"), ("1", "/newline/newlineThe SGC base acts as the secure ground station for all Stargate activities. It is typically commanded by a Major General and is staffed by subject matter experts and military support personnel, several elite special operations teams, and several SG teams, including SG-1. Follow through through the Stargate, as we explore the universe of Chess.com. We will see many wonders,encounter friends and foes,and play brilliant chess in spectacular matches..../newlineand maybe even play some stargate golf, if time allow ;))/newline/newline"), ("3", "https://www.youtube.com/watch?v=MUBQLcKvcfI"))
 
             elif choice5 == "17": #Family Guy
                 minrat = 1300
@@ -1417,14 +1471,44 @@ def inviter(choicelist, invitenum):
                 memgender = ""
                 invgroup = "to Family Guy"
                 infile = "Invite Lists/Family Guy"
+                priofile = "Invite Lists/Family Guy priority"
+                leftfile = "Invite Lists/Family Guy members who has left"
                 alrfile = "Invite Lists/Family Guy already invited"
                 groupinv = "http://www.chess.com/groups/invite_members?id=14966"
                 countryalt = "International water"
-                msglist = (("1", "Welcome /name to the most awesome Family Guy fan club on chess.com... This is for everyone who likes family guy no matter if you're an alien or terran, from /nation or atlantis, a fan of Brian or Peter, we are all welcome./newline/newline"), ("2", "http://digitaljournal.com/img/1/4/8/8/6/8/i/5/8/6/o/family_guy.jpg"), ("1", "/newline/newlineWe are a happy bunch of people who like to come together and talk about our favorite FG episodes or jokes, recent events in the series and maybe even play a little bit of chess every now and then, to pass the time :))/newline/newline"), ("3", "http://www.youtube.com/watch?v=LhnRHOYRncc"))
+                msglistleft = ()
+                msgliststand = (("1", "Welcome /name to the most awesome Family Guy fan club on chess.com... This is for everyone who likes family guy no matter if you're an alien or terran, from /nation or atlantis, a fan of Brian or Peter, we are all welcome./newline/newline"), ("2", "http://digitaljournal.com/img/1/4/8/8/6/8/i/5/8/6/o/family_guy.jpg"), ("1", "/newline/newlineWe are a happy bunch of people who like to come together and talk about our favorite FG episodes or jokes, recent events in the series and maybe even play a little bit of chess every now and then, to pass the time :))/newline/newline"), ("3", "http://www.youtube.com/watch?v=LhnRHOYRncc"))
+            memalrinv = remove_doublets(alrfile)
 
-            memtinv = remove_doublets(infile)
-            #memalrinv = remove_doublets(alrfile)
-            #memtinv = [x for x in memtinv if x not in memalrinv]
+            if customgroup == False:
+                usedfile = priofile
+                memtinv = remove_doublets(priofile)
+                priolst = True
+                deserterlst = False
+                standardlst = False
+
+                if len(memtinv) == 0:
+                    memtinv = remove_doublets(leftfile)
+                    deserterlst = True
+                    priolst = False
+                    usedfile = leftfile
+
+                if len(memtinv) == 0:
+                    memtinv = remove_doublets(infile)
+                    usedfile = infile
+                    standardlst = True
+                    invfilter = True
+                    deserterlst = False
+                    memtinv = [x for x in memtinv if x not in memalrinv]
+
+            elif customgroup == True:
+                memtinv = remove_doublets(usedfile)
+                memtinv = [x for x in memtinv if x not in memalrinv]
+
+            if priolst == True or standardlst == True:
+                msglist = msgliststand
+            elif deserterlst == True:
+                msglist = msglistleft
 
             already_picked = list()
             if invitenum2 > len(memtinv):
@@ -1437,7 +1521,7 @@ def inviter(choicelist, invitenum):
                     already_picked.append(picked)
 
             for member in already_picked:
-                if choice2 == "y":
+                if choice2 == "y" and standardlst == True:
                     try:
                         passmemfil = memberprocesser(True, browser1, ([member]), minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat)
                     except UnboundLocalError:
@@ -1509,7 +1593,7 @@ def inviter(choicelist, invitenum):
             updinvlist = misc1(updinvlist)
             memint = misc1(memint)
 
-            with open(infile, "wb") as placeholder2:
+            with open(usedfile, "wb") as placeholder2:
                 placeholder2.write(updinvlist)
 
             if len(memint) != 0:
@@ -1755,8 +1839,13 @@ def vcman(vclinklist, yourside):
     parmemvc = Counter()
     for vcmatch in vclinklist:
         movelist = list()
-        browser3.get(vcmatch)
-        WebDriverWait(browser3, 10).until(EC.presence_of_element_located((By.ID, "c33")))
+        while True:
+            try:
+                browser3.get(vcmatch)
+                WebDriverWait(browser3, 10).until(EC.presence_of_element_located((By.ID, "c33")))
+                break
+            except:
+                print "\n\nReopening " + vcmatch + "\n\n"
         browser3.find_element_by_id("c33").click()
         time.sleep(2)
 
@@ -2170,63 +2259,29 @@ def birthlister(soup):
             birthday = ""
     return birthday
 
-def memremoverf(un1):
-    pointer = ""
-    while pointer != "n":
-        while pointer not in (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", ""]):
-            pointer = raw_input("\nChose group to filter out\n 1. Star Trek: The Dominion\n 2. The Breen Confederacy\n 3. The Cardassian Empire\n 4. Death Star III\n 5. Karemma\n 6. Space 1999\n 7. Space 2099\n 8. Andromeda\n 9. Legio XIII Gemina\n 10. Utopia\n 11. Space Angels\n 12. Chess!\n 13. Carpe Diem\n 14. Chess Star Resort\n 15. Jungle Team\n 16. Family Guy\nYour choice: ")
+def memremoverf(inlist, logincookie):
+    targetID = str(enterint("\n\nID of the group you want to filter out: "))
+    targetlist = list()
+    templst = list()
+    choice = ""
+    while choice not in (["1", "2"]):
+        choice = raw_input("\nCollect this groups memberslist from\n 1. Manage members pages (requires login)\n 2. New member pages\nEnter choice: ")
 
-        if pointer == "1":
-            un1 = un1.difference(dommem)
+    if choice == "1":
+        target = "http://www.chess.com/groups/managemembers?id=" + targetID + "&page="
+        if logincookie == "":
+            logincookie = login()
+    elif choice == "2":
+        target = "http://www.chess.com/groups/membersearch?allnew=1&id=" + targetID + "&page="
 
-        elif pointer == "2":
-            un1 = un1.difference(memfiop("mem/breenmem", "keybreen"))
+    counter = 1
+    while counter <= 100:
+        templst.append(target + str(counter))
+        counter += 1
+    targetlist.append(templst)
 
-        elif pointer == "3":
-            un1 = un1.difference(memfiop("mem/carmem", "keycarda"))
-
-        elif pointer == "4":
-            un1 = un1.difference(memfiop("mem/deathmem", "keydeath"))
-
-        elif pointer == "5":
-            un1 = un1.difference(memfiop("mem/karemma", "keykar"))
-
-        elif pointer == "6":
-            un1 = un1.difference(memfiop("mem/1999", "key1999"))
-
-        elif pointer == "7":
-            un1 = un1.difference(memfiop("mem/2099", "key2099"))
-
-        elif pointer == "8":
-            un1 = un1.difference(memfiop("mem/andromeda", "keyandromeda"))
-
-        elif pointer == "9":
-            un1 = un1.difference(memfiop("mem/legio", "keylegio"))
-
-        elif pointer == "10":
-            un1 = un1.difference(memfiop("mem/utopia", "keyutopia"))
-
-        elif pointer == "11":
-            un1 = un1.difference(memfiop("mem/angelmem", "keyangel"))
-
-        elif pointer == "12":
-            un1 = un1.difference(memfiop("mem/chessmem", "keyChess"))
-
-        elif pointer == "13":
-            un1 = un1.difference(memfiop("mem/CarpeDiemmem", "keyCD"))
-
-        elif pointer == "14":
-            un1 = un1.difference(memfiop("mem/CSR", "keyCSR"))
-
-        elif pointer == "15":
-            un1 = un1.difference(memfiop("mem/Jungle Team", "keyJT"))
-
-        elif pointer == "16":
-            un1 = un1.difference(memfiop("mem/Family Guy", "keyFG"))
-
-        while pointer not in (["y", "n"]):
-            pointer = raw_input("Filter out members from another group? (y/n)")
-    return un1
+    filtmem = set(spider(targetlist, logincookie, True))
+    return inlist.difference(filtmem)
 
 def file_or_input(mult, fdiag1, fdiag2, idiag1, idiag2):
     list1 = ""
@@ -2298,7 +2353,7 @@ for content in (["", "", "developed by Robin Karlsson", "", "", "Contact informa
     olprint2("{0: ^70}", content, "|", "|")
 olprint("|", "|", "-", 72, True)
 
-for content in (["", "", "Options", "Type /help or /help <number> for more info", "", "", "1. Extract the memberslist of one or more groups", "", "2. Build a csv file with data on a list of members", "", "3. Send invites for a group", "", "4. Posts per member in a groups finished votechess matches", "", "5. Build a csv file of a groups team match participants", "", "6. Filter a list of members for those who fill a few requirements", "", "7. Presentation of csv-files from options 2 and 5", "", "8. Process invite lists", "", "9. Look for members who has recenty left your group", "", "10. Count number of group notes per member in the last 100 notes pages", "", "11. Build a birthday schedule for a list of members", "", "12. Send a personal message to a list of members", "", "13. Pair lists of players against each others", "", "14. Set operations on two lists", "", "15. Check a teams won/lost tm's per opponent", "", ""]):
+for content in (["", "", "Options", "Type /help or /help <number> for more info", "", "", "1. Extract the memberslist of one or more groups", "", "2. Build a csv file with data on a list of members", "", "3. Send invites for a group", "", "4. Posts per member in a groups finished votechess matches", "", "5. Build a csv file of a groups team match participants", "", "6. Filter a list of members for those who fill a few requirements", "", "7. Presentation of csv-files from options 2 and 5", "", "8. Temporary disabled", "", "9. Look for members who has recenty left your group", "", "10. Count number of group notes per member in the last 100 notes pages", "", "11. Build a birthday schedule for a list of members", "", "12. Send a personal message to a list of members", "", "13. Pair lists of players against each others", "", "14. Set operations on two lists", "", "15. Check a teams won/lost tm's per opponent", "", "16. Delete all group notes in a group", "", ""]):
     olprint2("{0: ^70}", content, "|", "|")
 olprint("*", "*", "-", 72, True)
 
@@ -2308,7 +2363,7 @@ dommem = memfiop("mem/dommem", "keydom")
 
 while pathway in (["y"]):
     flow = ""
-    while flow not in (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "42"]):
+    while flow not in (["1", "2", "3", "4", "5", "6", "7", "9", "10", "11", "12", "13", "14", "15", "16", "42"]):
         flow = raw_input("\n\n\nEnter your choice here: ")
 
         if flow == "/help 1":
@@ -2325,8 +2380,6 @@ while pathway in (["y"]):
             print "\n\nTakes a comma seperated list of members and sort out those who doesn't fill a few criterias regarding:\n\n Min online chess rating\n Max online chess rating\n Last online\n Member Since\n Older than (if birthdate is available on members profile)\n Younger than (if birthdate is available on members profile)\n Min number of groups member may be in\n Max number of groups member may be in\n Timeout-ratio\n Time per move\n If they have a custom avatar\n Gender, determined by comparing the members name to a list of male and female names"
         elif flow == "/help 7":
             print "\n\nPresentation of csv files from option 2 and 5. Can present data from the csv files sorted by any column, compare two csv files from option 5 to see what has changed or return the username of each member in the file and present it as a comma seperated list"
-        elif flow == "/help 8":
-            print "\n\nRemoves doublets from a textfile and has the option to remove those who are members of a specific group"
         elif flow == "/help 9":
             print "\n\nAt first run the script builds a list of members who are currently in your group.\nAt future runs the script will build a new memberslist of your group, look for members who are in the memberslist compiled during the last run but not in the latest run.\nRemoves those who has had their accounts closed or changed their names and print the result, which is the members who has left your group in the timeperiod between two runs\n\nRequires the script to log in to and you to be an admin of the group that's checked, to access the manage members page"
         elif flow == "/help 10":
@@ -2341,6 +2394,8 @@ while pathway in (["y"]):
             print "\n\nPerform set operations (union, intersection, difference, symmetric difference) on two lists"
         elif flow == "/help 15":
             print "\n\nCount number of wins, losses and draws per opponent in a teams team match archive"
+        elif flow == "/help 16":
+            print "\n\nDeletes all group notes from a specified group\n\nRequires login and admin privilege to access and delete notes"
         elif flow == "/help":
             print "\n\n\nTo add extensions/addons to the scripts chrome or firefox browser you need to download the extension in crx format for chrome or xpi for firefox. Once the addon is downloaded, place it in the Webdriver/Extensions/Chrome or Webdriver/Extensions/Firefox folder.\n\nIt's recommended to use the adblock plus extension\n\n\n\n\nTo use the scripts ability to determine a members gender you will need to have a list of male and female first names in the namelists folder. male names should be stored in a file called 'male' and female names in a file called 'female'.\n\nFor best performance the names should be in the format:\nname1\nname2\nname3\netc\n\nIt's also recommended to sort the names based on how commonly they are used"
 
@@ -2357,7 +2412,7 @@ while pathway in (["y"]):
             remmem = raw_input("\n\nFilter out members of a group? (y/n) ")
 
         if remmem == "y":
-            un1 = memremoverf(un1)
+            un1 = memremoverf(un1, logincookie)
         un1 = misc1(un1)
 
         choice6 = ""
@@ -2399,7 +2454,7 @@ while pathway in (["y"]):
         while pathtm not in (["1", "2"]):
             pathtm = raw_input(" 1. Check all tm's for a group\n 2. Check a single tm\nYour choice: ")
         targetnameorg = raw_input("\n\n\nName of the group you wish to check: ")
-        targetname = re.sub(r"[^a-z A-Z 0-9]","", targetnameorg)
+        targetname = re.sub(r"[^a-z A-Z 0-9 -]","", targetnameorg)
         targetname = targetname.replace(" ", "-").lower()
 
         if pathtm == "1":
@@ -2427,42 +2482,31 @@ while pathway in (["y"]):
             for pointer in set(tmparcount.keys())|set(winssdic.keys())|set(losedic.keys())|set(tmtimeoutcount.keys()):
                 joined[pointer] = (float(tmparcount.get(pointer, 0))/10 + (float(tmparcount.get(pointer, 0))*2 - float(winssdic.get(pointer, 0)) - float(losedic.get(pointer, 0)))*5/4 + float(winssdic.get(pointer, 0)) - float(losedic.get(pointer, 0)) - tmtimeoutcount.get(pointer, 0)*3, tmparcount.get(pointer, 0), winssdic.get(pointer, 0), losedic.get(pointer, 0), tmtimeoutcount.get(pointer, 0))
 
-            csvwriter.writerow(("Member name", "tm's participated in", "points won", "points lost", "ongoing games", "timeouts", "win ratio"))
+            csvwriter.writerow(("Member name", "tm's participated in", "points won", "points lost", "ongoing games", "timeouts", "win ratio", "timeout ratio"))
 
+            timeoutnum = 0
+            ptswon = 0
+            ptslost = 0
             for key, value in sorted(joined.items(), key = itemgetter(1), reverse = True):
+                gamesplaid = value[3] + value[2]
+
                 try:
-                    winrat = value[2] / (value[3] + value[2])
+                    winrat = value[2] / gamesplaid
                 except ZeroDivisionError:
                     winrat = 0
-                csvwriter.writerow((key, value[1], value[2], value[3], value[1]*2 - value[2] - value[3], value[4], winrat))
+                try:
+                    timerat = value[4] / gamesplaid
+                except ZeroDivisionError:
+                    timerat = 0
 
-            choicetm = ""
-            while choicetm not in (["y", "n"]):
-                choicetm = raw_input("continue to remove those who dosn't fill your requirements? (y/n) ")
+                csvwriter.writerow((key, value[1], value[2], value[3], value[1]*2 - value[2] - value[3], value[4], winrat, timerat))
+                timeoutnum += value[4]
+                ptswon += value[2]
+                ptslost += value[3]
 
-            if choicetm == "y":
-                membernamelist = list()
-                browser = mecbrowser("")
-                for key in joined:
-                    membernamelist.append(key)
-
-                minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat = memprmenu()
-                passmembers = memberprocesser(False, browser, membernamelist, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat)
-                joined2 = dict()
-                membernamelist = list()
-                for key in joined:
-                    if key in passmembers:
-                        joined2[key] = joined[key]
-
-                csvwriter.writerow(("Member name (those who fill your requirements)", "tm's participated in", "points won", "points lost", "ongoing games", "timeouts", "win ratio"))
-
-                for key, value in sorted(joined2.items(), key = itemgetter(1), reverse = True):
-                    try:
-                        winrat = value[2] / (value[3] + value[2])
-                    except ZeroDivisionError:
-                        winrat = 0
-                    csvwriter.writerow((key, value[1], value[2], value[3], value[1]*2 - value[2] - value[3], value[4], winrat))
             outputfile.close()
+            print "\n\n\nTimeouts per player (number of timeouts (" + str(timeoutnum) + ") / number of players (" + str(len(joined)) + ")): " + str((timeoutnum + 0.0) / len(joined))
+            print "Group points won ratio (points won (" + str(ptswon).replace(".0", "") + ") / total number of points (" + str(ptslost + ptswon).replace(".0", "") + ")): " + str((ptswon + 0.0) / (ptslost + ptswon)) + "\n\n"
 
         elif pathtm == "2":
             maxtmrat = int(raw_input("\n\nGet members with a timeout-ratio above: ").replace("%", ""))
@@ -2539,25 +2583,10 @@ while pathway in (["y"]):
             with open(flist[int(choice1) - 1], "rb") as f:
                 csvreader = csv.reader(f, delimiter = " ")
                 if choicepath == "1":
-                    choice5 = ""
-                    while choice5 not in (["1", "2"]):
-                        choice5 = raw_input("\n\nWhat part of the csv-file do you wish to inspect?\n 1. everyone who has ever plaid for said group\n 2. those who fill your requirements\n\nYour choice, young padawan? ")
-
-                    if choice5 == "1":
-                        for row in csvreader:
-                            if row[0] == "Member name (those who fill your requirements)":
-                                break
-                            memlist.append(row)
-
-                    elif choice5 == "2":
-                        recorder = ""
-                        for row in csvreader:
-                            if row[0] == "Member name (those who fill your requirements)":
-                                recorder = "yy"
-                                row[0] = "Member name"
-
-                            if recorder == "yy":
-                                memlist.append(row)
+                    for row in csvreader:
+                        if row[0] == "Member name (those who fill your requirements)":
+                            break
+                        memlist.append(row)
 
                 elif choicepath == "2":
                     for row in csvreader:
@@ -2599,29 +2628,17 @@ while pathway in (["y"]):
                 print "".join(element.ljust(colwidth) for element in cpointer)
 
     elif flow == "8":
-        print "\n\n\nRemoves doublets and unwanted elements from your list (ie those who are either already members or banned/unwanted)\n\nFiles in directory:\n"
-        flist = fnamenot(([".csv", ".py", ".pyc", ".log", "~"]), ".")
-
-        preexlist = ""
-        while preexlist not in flist:
-            preexlist = raw_input("\nFull name of the file containing your invites list: ")
-
-        un4 = set(remove_doublets(preexlist))
-        un4 = memremoverf(un4)
-        un4 = misc1(un4)
-
-        with open(preexlist, "wb") as placeholder2:
-            placeholder2.write(un4)
+        "placeholder"
 
     elif flow == "9":
         choiceorg = ""
-        while choiceorg not in (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "42", "168"]):
-            choiceorg = raw_input("\nWhich group do you wish to check?\n 1. Star Trek: The Dominion\n 2. The Breen Confederacy\n 3. The Cardassian Empire\n 4. Death Star III\n 5. Karemma Ministry of Trade\n 6. Space 1999\n 7. Space 2099\n 8. Andromeda\n 9. legio XIII gemina\n 10. The Majestical Utopia\n 11. Space Angels\n 12. Chess!\n 13. Carpe Diem\n 14. CSR\n 15. Family Guy\n 16. Jungle Team\n\n 42. Check groups 1-10, 14-16\n 168. Check another group\n\nYour choice: ")
+        while choiceorg not in (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "42", "168"]):
+            choiceorg = raw_input("\nWhich group do you wish to check?\n 1. Star Trek: The Dominion\n 2. The Breen Confederacy\n 3. The Cardassian Empire\n 4. Death Star III\n 5. Karemma Ministry of Trade\n 6. Space 1999\n 7. Space 2099\n 8. Andromeda\n 9. legio XIII gemina\n 10. The Majestical Utopia\n 11. Space Angels\n 12. Chess!\n 13. Carpe Diem\n 14. CSR\n 15. Family Guy\n 16. Jungle Team\n\n 42. Check groups 1, 2, 4-9, 14-21\n 168. Check another group\n\nYour choice: ")
         print "\n\nWe will start by extracting the latest memberslist for your group\n"
         logincookie = login()
 
         if choiceorg == "42":
-            choiceorg = (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "14", "15", "16"])
+            choiceorg = (["1", "2", "4", "5", "6", "7", "8", "9", "14", "15", "16", "17", "18", "19", "20", "21"])
         else:
             choiceorg = ([choiceorg])
 
@@ -2690,17 +2707,36 @@ while pathway in (["y"]):
                 memlist = nineworker("Jungle Team", "17050", logincookie, "keyJT")
                 group = "Jungle Team"
 
+            elif choice == "17":
+                memlist = nineworker("October", "11977", logincookie, "keyOct")
+                group = "October"
+
+            elif choice == "18":
+                memlist = nineworker("The Magnus Carlsen Group", "19744", logincookie, "keyMC")
+                group = "The Magnus Carlsen Group"
+
+            elif choice == "19":
+                memlist = nineworker("Stargate Command", "21212", logincookie, "keySGC")
+                group = "Stargate Command"
+
+            elif choice == "20":
+                memlist = nineworker("KNIGHTS of the REALM", "23260", logincookie, "keyKnights")
+                group = "KNIGHTS of the REALM"
+
+            elif choice == "21":
+                memlist = nineworker("Tholian Assembly", "29722", logincookie, "keyTA")
+                group = "Tholian Assembly"
+
             elif choice == "168":
                 group = raw_input("Name of group to check: ")
                 groupid = raw_input("Groups id: ")
                 memlist = nineworker(group, groupid, logincookie, "Custom")
-                
 
             print "\n\nMembers who are no longer in " + group + ": " + streplacer(str(memlist), (["'", ""], ["[", ""], ["]", ""]))
 
     elif flow == "10":
         grcheck = raw_input("group to check: ")
-        grcheck = re.sub(r"[^a-z A-Z 0-9]","", grcheck)
+        grcheck = re.sub(r"[^a-z A-Z 0-9 -]","", grcheck)
         grcheck = grcheck.replace(" ", "-").lower()
         grcheck = "http://www.chess.com/groups/notes/" + grcheck + "?page="
         logincookie = login()
@@ -2836,7 +2872,7 @@ while pathway in (["y"]):
 
     elif flow == "15":
         targetnameorg = raw_input("\n\n\nName of the group you wish to check: ")
-        targetname = re.sub(r"[^a-z A-Z 0-9]","", targetnameorg)
+        targetname = re.sub(r"[^a-z A-Z 0-9 -]","", targetnameorg)
         targetname = targetname.replace(" ", "-").lower()
 
         mtchlist = gettmopdata(targetname)
@@ -2887,8 +2923,41 @@ while pathway in (["y"]):
         for tm in parttup:
             print template.format(tm[0], tm[1], tm[2], tm[3], tm[4])
 
+    elif flow == "16":
+        gname = re.sub(r"[^a-z A-Z 0-9 -]","", raw_input("\n\nName of target group: ")).replace(" ", "-").lower()
+        counter = 1
+        sleeptime = enterint("Time to wait between between deletes (4 seconds recommended): ")
+        if sleeptime == "":
+            sleeptime = 5
+        shutdown = ""
+        while shutdown not in (["y", "n"]):
+            shutdown = raw_input("\nShut down computer when complete (might require elevated privileges)? (y/n) ")
+
+        browserchoice = selbrowch()
+        Username = raw_input("\n\nUsername: ")
+        Password = raw_input("Password: ")
+        browser, handle = pickbrowser(browserchoice, True)
+        browser = sellogin(Username, Password, browser)
+
+        while True:
+            browser.get("http://www.chess.com/groups/notes/" + gname)
+            time.sleep(sleeptime)
+            try:
+                browser.find_element_by_css_selector("a.red").click()
+                browser.switch_to_alert().accept()
+                counter = 1
+            except:
+                counter += 1
+                if counter == 10:
+                    print "\n\nDone!!!\n\n"
+                    break
+        browser.quit()
+
+        if shutdown == "y":
+            turnofcomp()
+
     elif flow == "42":
-        turnofcomp()
+        "None"
 
     pathway = ""
     while pathway not in (["y", "n"]):
