@@ -150,7 +150,7 @@ This data can be presented and sorted using option 7 in the main script
 
 
 
- 8) Removes doublets from a textfile and has the option to remove those who are members of a specific group                     
+ 8) Temporary disabled                    
 
 
  9) At first run the script builds a list of members who are currently in your group.
@@ -186,3 +186,7 @@ Ratings can be Live Standard, Live Blitz, Live Bullet, Online chess, 960 or tact
 
 
  15) Count number of wins, losses and draws per opponent in a teams team match archive
+
+
+
+ 16) Delete all group notes in a group
