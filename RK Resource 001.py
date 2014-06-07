@@ -31,7 +31,7 @@ from operator import itemgetter
 from collections import OrderedDict
 from collections import Counter
 from string import punctuation
-supusr = False
+supusr = True
 
 def csvsoworker(memlist, choicepath):
     colwidth = max(len(element.decode("UTF-8")) for row in memlist for element in row) + 2
@@ -1829,6 +1829,7 @@ def olprint2(tlen, middle, right, left):
     print left
 
 def vcman(vclinklist, yourside):
+    numgames = len(vclinklist)
     browserchoice = selbrowch()
     browser3, handle = pickbrowser(browserchoice, True)
     browser3 = sellogin(raw_input("Username: "), raw_input("Password: "), browser3)
@@ -1837,7 +1838,11 @@ def vcman(vclinklist, yourside):
     browser1 = mecbrowser(logincookie)
 
     parmemvc = Counter()
+    oldnames = ([yourside])
     for vcmatch in vclinklist:
+        print "\n\nChecking match number " + str(vclinklist.index(vcmatch)) + " of " + str(numgames) + "\n\n"
+        skipmatch = False
+        counter = 0
         movelist = list()
         while True:
             try:
@@ -1845,7 +1850,14 @@ def vcman(vclinklist, yourside):
                 WebDriverWait(browser3, 10).until(EC.presence_of_element_located((By.ID, "c33")))
                 break
             except:
+                counter += 1
+                if counter == 10:
+                    skipmatch = True
+                    break
                 print "\n\nReopening " + vcmatch + "\n\n"
+        if skipmatch == True:
+            print "\n\n\nFailed to load page and therefore skipped the match,  " + vcmatch + "\n\n\n"
+            continue
         browser3.find_element_by_id("c33").click()
         time.sleep(2)
 
@@ -1863,14 +1875,22 @@ def vcman(vclinklist, yourside):
         vcelem = browser3.find_elements_by_partial_link_text('')
 
         while yourside not in yourpos:
-            yoursidechoice = ""
-            while yoursidechoice not in (["1", "2"]):
-                yoursidechoice = raw_input("\n\nCan't find your group in one of the games. Please specify which group is yours\n  1. " + yourpos[0] + "\n  2. " + yourpos[1] + "\nYour group is number: ")
 
-            if yoursidechoice == "1":
+            if yourpos[0] in oldnames:
                 yourside = yourpos[0]
-            if yoursidechoice == "2":
+            elif yourpos[1] in oldnames:
                 yourside = yourpos[1]
+
+            else:
+                yoursidechoice = ""
+                while yoursidechoice not in (["1", "2"]):
+                    yoursidechoice = raw_input("\n\nCan't find your group in one of the games. Please specify which group is yours\n  1. " + yourpos[0] + "\n  2. " + yourpos[1] + "\nYour group is number: ")
+
+                    if yoursidechoice == "1":
+                        yourside = yourpos[0]
+                    if yoursidechoice == "2":
+                        yourside = yourpos[1]
+                    oldnames.append(yourside)
 
         if boardpos == "false":
             if str(yourpos[0]).replace('<span class="playername">', "").replace("</span>", "") == yourside:
