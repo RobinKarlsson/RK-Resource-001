@@ -31,7 +31,7 @@ from operator import itemgetter
 from collections import OrderedDict
 from collections import Counter
 from string import punctuation
-supusr = False
+supusr = True
 
 def csvsoworker(memlist, choicepath):
     colwidth = max(len(element.decode("UTF-8")) for row in memlist for element in row) + 2
@@ -1488,7 +1488,7 @@ def inviter(choicelist, invitenum):
                 msglistleft = ""
                 msgliststand = "Messages/Invite Messages/Family Guy Standard message"
 
-                memalrinv = remove_doublets(alrfile)
+            memalrinv = remove_doublets(alrfile)
 
             if customgroup == False:
                 usedfile = priofile
@@ -1506,6 +1506,7 @@ def inviter(choicelist, invitenum):
                 if len(memtinv) == 0:
                     memtinv = remove_doublets(infile)
                     usedfile = infile
+                    memtinv = [x for x in memtinv if x not in memalrinv]
                     standardlst = True
                     invfilter = True
                     deserterlst = False
@@ -1516,8 +1517,6 @@ def inviter(choicelist, invitenum):
 
             if priolst == True or standardlst == True:
                 msglist = msgfileopen(msgliststand)
-                if standardlst == True:
-                    memtinv = [x for x in memtinv if x not in memalrinv]
             elif deserterlst == True:
                 msglist = msgfileopen(msglistleft)
 
