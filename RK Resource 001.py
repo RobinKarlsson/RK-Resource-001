@@ -1509,7 +1509,6 @@ def inviter(choicelist, invitenum):
                     standardlst = True
                     invfilter = True
                     deserterlst = False
-                    memtinv = [x for x in memtinv if x not in memalrinv]
 
             elif customgroup == True:
                 memtinv = remove_doublets(usedfile)
@@ -1517,6 +1516,8 @@ def inviter(choicelist, invitenum):
 
             if priolst == True or standardlst == True:
                 msglist = msgfileopen(msgliststand)
+                if standardlst == True:
+                    memtinv = [x for x in memtinv if x not in memalrinv]
             elif deserterlst == True:
                 msglist = msgfileopen(msglistleft)
 
