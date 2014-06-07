@@ -31,7 +31,7 @@ from operator import itemgetter
 from collections import OrderedDict
 from collections import Counter
 from string import punctuation
-supusr = False
+supusr = True
 
 def csvsoworker(memlist, choicepath):
     colwidth = max(len(element.decode("UTF-8")) for row in memlist for element in row) + 2
@@ -419,18 +419,27 @@ def pmdriver(target, choice):
     print "\n\n\n\nsupported commands, will be replaced with each members respective info\n /name - members name or username (if name is unavailable)\n /nation - members nation of origin\n /newline - pagebreak\n\n\n"
     subjectorg = raw_input("subject line: ")
     msglist = list()
-    choicepm = "y"
-    while choicepm == "y":
-        while choicepm not in(["1", "2"]):
-            choicepm = raw_input("\n\nAdd a snippet containing\n 1. Text\n 2. Image\nYour choice: ")
-        if choicepm == "1":
-            text = raw_input("Enter the text: ")
-        elif choicepm == "2":
-            text = raw_input("Enter url of the image: ")
-        msglist.append((choicepm, text))
+    msgchoice = ""
+    while msgchoice not in (["1", "2"]):
+        msgchoice = raw_input("\nGet the message from\n 1. File in the Messages folder\n 2. Input\nEnter choice: ")
 
-        while choicepm not in (["y", "n"]):
-            choicepm = raw_input("add another snippet? (y/n) ")
+    if msgchoice == "1":
+        msgfile = raw_input("\nName of the file containing your invites message: ")
+        msglist = msgfileopen("Messages/" + msgfile)
+
+    elif msgchoice == "2":
+        choicepm = "y"
+        while choicepm == "y":
+            while choicepm not in(["1", "2"]):
+                choicepm = raw_input("\n\nAdd a snippet containing\n 1. Text\n 2. Image\nYour choice: ")
+            if choicepm == "1":
+                text = raw_input("Enter the text: ")
+            elif choicepm == "2":
+                text = raw_input("Enter url of the image: ")
+            msglist.append((choicepm, text))
+
+            while choicepm not in (["y", "n"]):
+                choicepm = raw_input("add another snippet? (y/n) ")
 
     nnation = raw_input("If member nation is International, use this instead: ")
 
