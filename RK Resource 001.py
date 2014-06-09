@@ -2159,11 +2159,11 @@ while pathway in (["y"]):
 
     elif flow == "9":
         while flow not in (["1", "2"]):
-            flow = raw_input("Would you like to\n 1. Check existing groups\n 2. Add a new group\nMake your choice, young padawan: ")
+            flow = raw_input("\n\nWould you like to\n 1. Check existing groups\n 2. Add a new group\nMake your choice, young padawan: ")
 
         if flow == "2":
             name = raw_input("\n\nGroup name: ")
-            Key = raw_input("Encryption ket: ")
+            Key = raw_input("Encryption key: ")
 
             invconpath = "Invite Lists/Config/" + name + ".ini"
             if os.path.isfile(invconpath) is True:
