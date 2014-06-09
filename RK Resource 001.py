@@ -425,7 +425,7 @@ def pmdriver(target, choice):
 
     if msgchoice == "1":
         msgfile = raw_input("\nName of the file containing your invites message: ")
-        msglist = msgfileopen("Messages/" + msgfile)
+        msglist = fileopen("Messages/" + msgfile, True)
 
     elif msgchoice == "2":
         choicepm = "y"
@@ -461,6 +461,10 @@ def pmdriver(target, choice):
     while choice2 not in (["y", "n"]):
         choice2 = raw_input("\nSort out those who dont fill a few requirements? (y/n) ")
 
+    noadmins = ""
+    while noadmins not in (["y", "n"]):
+        noadmins = raw_input("\nInclude admins? (y/n) ")
+
     Username = raw_input("\n\n\nUsername: ")
     Password = raw_input("Password: ")
 
@@ -468,16 +472,19 @@ def pmdriver(target, choice):
     browser0 = sellogin(Username, Password, browser0)
 
     logincookie = browser0.get_cookies()
+    browser1 = mecbrowser(logincookie)
 
     if choice == "1":
-        memtpm = spider(target, logincookie, False)
+        memtpm = spider(target, False, browser1)
+        if noadmins == "n":
+            superadmins, admins = getadmins(getgrouphome(target, browser1), browser1)
+            memtpm = memtpm.difference(superadmins + admins)
     elif choice == "2":
         memtpm = target
 
     if choice2 == "y":
         minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat = memprmenu()
 
-    browser1 = mecbrowser(logincookie)
     print "\n\n"
 
     counter = 1
@@ -513,7 +520,7 @@ def pmdriver(target, choice):
 
         subject = streplacer(subjectorg, (["/name", name.strip()], ["/nation", country.strip()], ["/newline", "\n"]))
 
-        for link in soup.find_all("a", href=True):
+        for link in soup.find_all("a", href = True):
             if link.text == "Send a Message":
                 memlink = link["href"]
                 browser0.get("http://www.chess.com" + memlink)
@@ -580,7 +587,7 @@ def nineworker(infile, inid, logincookie, key):
         target.append("http://www.chess.com/groups/managemembers?id=" + inid + "&page=" + str(counter))
         counter += 1
 
-    un = spider([target], logincookie, True)
+    un = spider([target], True, mecbrowser(logincookie))
 
     for member in memlistorg:
         if member not in un:
@@ -715,9 +722,7 @@ def tmparchecker(pagelist, targetname):
             placeholder = list()
     return tmpar, timeoutlist, winssdic, losedic
 
-def spider(target, logincookie, silent):
-    browser = mecbrowser(logincookie)
-
+def spider(target, silent, browser):
     usrlist = list()
     for tlst in target:
         for pointer in tlst:
@@ -771,857 +776,54 @@ def selbrowch():
         browserchoice = raw_input("Which browser do you want to use\n 1. Firefox\n 2. Chrome\n 3. PhantomJS\n 4. Internet Explorer\nYour choice: ")
     return browserchoice
 
-def inviter(choicelist, invitenum):
-    customgroup = False
-    choice2 = ""
-    while choice2 not in (["y", "n"]):
-        choice2 = raw_input("\n\nOnly invite those who fill a few requirements (only names from the standard list will be affected)? (y/n) ")
+def createfileifmissing(filename):
+    if os.path.isfile(filename) is False:
+        open(filename, "wb").close()
 
-    customgroup = False
-    country = ""
-    if choicelist[0] == "168":
-        invgroup = ""
-        if choice2 == "y":
-            minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat = memprmenu()
+def createconfig(name, ID):
+    with open("Invite Lists/Config/" + name + ".ini", "wb") as setupfile:
+        setupfile.write("What to use if members nation is set to International==\nMin online chess rating==\nMax online chess rating==\nMin 960 chess rating==\nMax 960 chess rating==\nMin online chess games plaid==\nMin online chess win-ratio==\nLast logged in within days==\nMember on chess.com for days==\nBorn after date (YYYY-MM-DD)==\nBorn before date (YYYY-MM-DD)==\nMax timeout-ratio allowed==\nMax number of groups member can be in==\nMin number of groups member can be in==\nMin time/move (days-hours-minutes)==\nMax time/move (days-hours-minutes)==\nOnly invite those with a custom avatar (y/n)==\nMember should be from nation==\nGender (m/f)==\nLink to groups invite members page==http://www.chess.com/groups/invite_members?id=" + ID + "\nFile containing the main invites list==Invite Lists/" + name + "\nFile containing those who should receive priority invites (circumvents filter)==Invite Lists/" + name + " priority\nInvites file for those who has left the group==Invite Lists/" + name + " members who has left\nFile containing those who has received an invite==Invite Lists/" + name + " already invited\nFile containing your invites message for members who has left your group==Messages/Invite Messages/" + name + " Deserters Message\nFile containing your invites message for standard and priority invites lists==Messages/Invite Messages/" + name + " Standard Message")
+    createfileifmissing("Messages/Invite Messages/" + name + " Standard Message")
+    createfileifmissing("Messages/Invite Messages/" + name + " Deserters Message")
+    createfileifmissing("Invite Lists/" + name + " already invited")
+    createfileifmissing("Invite Lists/" + name + " members who has left")
+    createfileifmissing("Invite Lists/" + name + " priority")
+    createfileifmissing("Invite Lists/" + name)
 
-        groupinv = raw_input("\nid of the group you want to send invites for: ")
-        groupinv = "http://www.chess.com/groups/invite_members?id=" + groupinv
-        usedfile = raw_input("name of the file containing your invites list: ")
-        usedfile = "Invite Lists/" + usedfile
-        alrfile = usedfile + " already invited"
-        standardlst = True
-        customgroup = True
+def configopen(filename, forinvites):
+    if os.path.isfile(filename) is True:
+        if os.stat(filename).st_size > 0:
+            with open(filename, "rb") as rowlist:
+                condic = {}
 
-        msgchoice = ""
-        while msgchoice not in (["1", "2"]):
-            msgchoice = raw_input("\nGet the invites message from\n 1. File in the Messages/Invite Messages folder\n 2. Input\nEnter choice: ")
+                for line in rowlist:
+                    data = line.split("==")
+                    value = data[1].replace("\n", "")
+                    try:
+                        value = int(value)
+                    except ValueError:
+                        try:
+                            value = float(value)
+                        except ValueError:
+                            "nothing"
+                    condic[data[0]] = value
+                return condic
+        else:
+            sys.exit("\n\nThe file " + filename + " is empty!!!\n\n")
+    else:
+        sys.exit("\n\n" + filename + " doesn't exist!!!\n\n")
 
-        if msgchoice == "1":
-            msgfile = raw_input("\nName of the file containing your invites message: ")
-            msglist = msgfileopen("Messages/Invite Messages/" + msgfile)
-
-        elif msgchoice == "2":
-            print "\n\n\n\nsupported commands, will be replaced with each members respective info\n /name - members name or username (if name is unavailable)\n /nation - members nation of origin\n /newline - pagebreak\n\n\n"
-            msglist = list()
-            choice = "y"
-            while choice == "y":
-                while choice not in(["1", "2", "3"]):
-                    choice = raw_input("\n\nAdd a snippet containing\n 1. Text\n 2. Image\n 3. Video\nYour choice: ")
-
-                if choice == "1":
-                    text = raw_input("Enter the text: ")
-                elif choice == "2":
-                    text = raw_input("Enter url of the image: ")
-                elif choice == "3":
-                    text = raw_input("Enter url of the video: ")
-                msglist.append((choice, text))
-
-                while choice not in (["y", "n"]):
-                    choice = raw_input("add another snippet? (y/n) ")
-        countryalt = raw_input("If member nation is International, use this instead: ")
-
-    invinf = "no"
-    if choicelist[0] == "42":
-        invinf = "yes"
-        choicelist = (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17"])
-
-    elif choicelist[0] == "84":
-        choicelist = list()
-        invinf = "yes"
-        block = ""
-        while block not in (["n"]):
-            tempval = ""
-            while tempval not in (["1", "2", "3", "4", "5", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17"]):
-                tempval = raw_input("Group number: ")
-            choicelist.append(tempval)
-            block = raw_input("Add another group? (y/n) ")
-
-    browserchoice = selbrowch()
-
-    Username = raw_input("\n\n\nUsername: ")
-    Password = raw_input("Password: ")
-
-    browser2, handle = pickbrowser(browserchoice, True)
-    browser2 = sellogin(Username, Password, browser2)
-
-    logincookie = browser2.get_cookies()
-    browser1 = mecbrowser(logincookie)
-
-    lonl = [int(elem) for elem in str(date.today() - timedelta(days = 3)).split("-")]
-    msin = [int(elem) for elem in str(date.today() - timedelta(days = 60)).split("-")]
-    import datetime
-    weekday = datetime.datetime.today().weekday()
-
-    redo = "yes"
+def getfilelist(path, endswith):
+    lst = list()
     counter = 1
-    while redo == "yes":
-        for choice5 in choicelist:
-            if browserchoice == "1":
-                counter += 1
-                counted = "y"
-                if counter > 70:
-                    browser2.quit()
-                    browser2, handle = pickbrowser(browserchoice, True)
-                    browser2 = sellogin(Username, Password, browser2)
-                    counter = 1
-
-            invitenum2 = invitenum
-            memint = list()
-
-            if choice5 == "1": #Star Trek: The Dominion
-                countryalt = ""
-                minrat = 1300
-                maxrat = ""
-                minranrat = ""
-                maxranrat = ""
-                mingames = 20
-                minwinrat = 0.33
-                lastloginyear = lonl[0]
-                lastloginmonth = lonl[1]
-                lastloginday = lonl[2]
-                membersinceyear = msin[0]
-                membersincemonth = msin[1]
-                membersinceday = msin[2]
-                youngeryear = ""
-                youngermonth = ""
-                youngerday = ""
-                olderyear = ""
-                oldermonth = ""
-                olderday = ""
-                timemax = 10
-                maxgroup = ""
-                mingroup = ""
-                timovchoicemin = ""
-                timovchoicemax = ""
-                avatarch = "y"
-                heritage = ""
-                memgender = ""
-                invgroup = "to The Dominion"
-                groupinv = "http://www.chess.com/groups/invite_members?id=15896"
-                infile = "Invite Lists/Star Trek: The Dominion"
-                priofile = "Invite Lists/Star Trek: The Dominion priority"
-                leftfile = "Invite Lists/Star Trek: The Dominion members who has left"
-                alrfile = "Invite Lists/Star Trek: The Dominion already invited"
-                msglistleft = ""
-                msgliststand = "Messages/Invite Messages/Star Trek: The Dominion Standard message"
-
-            elif choice5 == "2": #Karemma Ministry of Trade
-                countryalt = ""
-                minrat = 1700
-                maxrat = ""
-                minranrat = ""
-                maxranrat = ""
-                mingames = 80
-                minwinrat = 0.5
-                lastloginyear = lonl[0]
-                lastloginmonth = lonl[1]
-                lastloginday = lonl[2]
-                membersinceyear = msin[0]
-                membersincemonth = msin[1]
-                membersinceday = msin[2]
-                youngeryear = ""
-                youngermonth = ""
-                youngerday = ""
-                olderyear = ""
-                oldermonth = ""
-                olderday = ""
-                timemax = 8
-                maxgroup = ""
-                mingroup = ""
-                timovchoicemin = ""
-                timovchoicemax = ""
-                avatarch = "n"
-                heritage = ""
-                memgender = ""
-                invgroup = "to The Karemma"
-                groupinv = "http://www.chess.com/groups/invite_members?id=26088"
-                infile = "Invite Lists/Karemma Commerse Ministry"
-                priofile = "Invite Lists/Karemma Commerse Ministry priority"
-                leftfile = "Invite Lists/Karemma Commerse Ministry members who has left"
-                alrfile = "Invite Lists/Karemma Commerse Ministry already invited"
-                msglistleft = ""
-                msgliststand = "Messages/Invite Messages/Karemma Ministry of Trade Standard message"
-
-            elif choice5 == "3": #The Breen Confederacy
-                countryalt = ""
-                minrat = 1300
-                maxrat = ""
-                minranrat = ""
-                maxranrat = ""
-                mingames = 50
-                minwinrat = 0.33
-                lastloginyear = lonl[0]
-                lastloginmonth = lonl[1]
-                lastloginday = lonl[2]
-                membersinceyear = msin[0]
-                membersincemonth = msin[1]
-                membersinceday = msin[2]
-                youngeryear = ""
-                youngermonth = ""
-                youngerday = ""
-                olderyear = ""
-                oldermonth = ""
-                olderday = ""
-                timemax = 10
-                maxgroup = ""
-                mingroup = ""
-                timovchoicemin = ""
-                timovchoicemax = ""
-                avatarch = "y"
-                heritage = ""
-                memgender = ""
-                invgroup = "to The Breen Confederacy"
-                groupinv = "http://www.chess.com/groups/invite_members?id=21974"
-                infile = "Invite Lists/The Breen Confederacy"
-                priofile = "Invite Lists/The Breen Confederacy priority"
-                leftfile = "Invite Lists/The Breen Confederacy members who has left"
-                alrfile = "Invite Lists/The Breen Confederacy already invited"
-                msglistleft = ""
-                msgliststand = "Messages/Invite Messages/The Breen Confederacy Standard message"
-
-            elif choice5 == "4": #The Cardassian Empire
-                countryalt = ""
-                minrat = 1300
-                maxrat = ""
-                minranrat = ""
-                maxranrat = ""
-                mingames = 50
-                minwinrat = 0.33
-                lastloginyear = lonl[0]
-                lastloginmonth = lonl[1]
-                lastloginday = lonl[2]
-                membersinceyear = msin[0]
-                membersincemonth = msin[1]
-                membersinceday = msin[2]
-                youngeryear = ""
-                youngermonth = ""
-                youngerday = ""
-                olderyear = ""
-                oldermonth = ""
-                olderday = ""
-                timemax = 10
-                maxgroup = ""
-                mingroup = ""
-                timovchoicemin = ""
-                timovchoicemax = ""
-                avatarch = "y"
-                heritage = ""
-                memgender = ""
-                invgroup = "to The Cardassian Empire"
-                infile = "Invite Lists/The Cardassian Empire"
-                priofile = "Invite Lists/The Cardassian Empire priority"
-                leftfile = "Invite Lists/The Cardassian Empire members who has left"
-                alrfile = "Invite Lists/The Cardassian Empire already invited"
-                groupinv = "http://www.chess.com/groups/invite_members?id=20126"
-                msglistleft = ""
-                msgliststand = "Messages/Invite Messages/The Cardassian Empire Standard message"
-
-            elif choice5 == "5": #Death Star III
-                countryalt = ""
-                minrat = 1300
-                maxrat = ""
-                minranrat = ""
-                maxranrat = ""
-                mingames = 50
-                minwinrat = 0.33
-                lastloginyear = lonl[0]
-                lastloginmonth = lonl[1]
-                lastloginday = lonl[2]
-                membersinceyear = msin[0]
-                membersincemonth = msin[1]
-                membersinceday = msin[2]
-                youngeryear = ""
-                youngermonth = ""
-                youngerday = ""
-                olderyear = ""
-                oldermonth = ""
-                olderday = ""
-                timemax = 10
-                maxgroup = ""
-                mingroup = ""
-                timovchoicemin = ""
-                timovchoicemax = ""
-                avatarch = "y"
-                heritage = ""
-                memgender = ""
-                invgroup = "to Death Star III"
-                infile = "Invite Lists/Death Star III"
-                priofile = "Invite Lists/Death Star III priority"
-                leftfile = "Invite Lists/Death Star III members who has left"
-                alrfile = "Invite Lists/Death Star III already invited"
-                groupinv = "http://www.chess.com/groups/invite_members?id=17618"
-                msglistleft = ""
-                msgliststand = "Messages/Invite Messages/Death Star III Standard message"
-
-            elif choice5 == "6": #Jungle Team
-                minrat = 1300
-                maxrat = ""
-                mingames = ""
-                minranrat = ""
-                maxranrat = ""
-                minwinrat = 0.25
-                lastloginyear = lonl[0]
-                lastloginmonth = lonl[1]
-                lastloginday = lonl[2]
-                membersinceyear = msin[0]
-                membersincemonth = msin[1]
-                membersinceday = msin[2]
-                youngeryear = ""
-                youngermonth = ""
-                youngerday = ""
-                olderyear = ""
-                oldermonth = ""
-                olderday = ""
-                timemax = 15
-                maxgroup = ""
-                mingroup = ""
-                timovchoicemin = ""
-                timovchoicemax = ""
-                avatarch = "y"
-                heritage = ""
-                memgender = ""
-                invgroup = "to Jungle Team"
-                infile = "Invite Lists/Jungle Team"
-                priofile = "Invite Lists/Jungle Team priority"
-                leftfile = "Invite Lists/Jungle Team members who has left"
-                alrfile = "Invite Lists/Jungle Team already invited"
-                groupinv = "http://www.chess.com/groups/invite_members?id=17050"
-                countryalt = "the outskirts of our Roman empire"
-                msglistleft = ""
-                msgliststand = "Messages/Invite Messages/Jungle Team Standard message"
-
-            elif choice5 == "7": #Legio XIII Gemina
-                minrat = 1300
-                maxrat = ""
-                minranrat = ""
-                maxranrat = ""
-                mingames = 50
-                minwinrat = 0.33
-                lastloginyear = lonl[0]
-                lastloginmonth = lonl[1]
-                lastloginday = lonl[2]
-                membersinceyear = msin[0]
-                membersincemonth = msin[1]
-                membersinceday = msin[2]
-                youngeryear = ""
-                youngermonth = ""
-                youngerday = ""
-                olderyear = ""
-                oldermonth = ""
-                olderday = ""
-                timemax = 10
-                maxgroup = ""
-                mingroup = ""
-                timovchoicemin = ""
-                timovchoicemax = ""
-                avatarch = "y"
-                heritage = ""
-                memgender = ""
-                invgroup = "to Legio XIII Gemina"
-                infile = "Invite Lists/Legio XIII Gemina"
-                priofile = "Invite Lists/Legio XIII Gemina priority"
-                leftfile = "Invite Lists/Legio XIII Gemina members who has left"
-                alrfile = "Invite Lists/Legio XIII Gemina already invited"
-                groupinv = "http://www.chess.com/groups/invite_members?id=22596"
-                countryalt = "the outskirts of our Roman empire"
-                msglistleft = ""
-                msgliststand = "Messages/Invite Messages/Legio XIII Gemina Standard message"
-
-            elif choice5 == "8": #Andromeda
-                minrat = 1300
-                maxrat = ""
-                minranrat = ""
-                maxranrat = ""
-                mingames = 50
-                minwinrat = 0.33
-                lastloginyear = lonl[0]
-                lastloginmonth = lonl[1]
-                lastloginday = lonl[2]
-                membersinceyear = msin[0]
-                membersincemonth = msin[1]
-                membersinceday = msin[2]
-                youngeryear = ""
-                youngermonth = ""
-                youngerday = ""
-                olderyear = ""
-                oldermonth = ""
-                olderday = ""
-                timemax = 10
-                maxgroup = ""
-                mingroup = ""
-                timovchoicemin = ""
-                timovchoicemax = ""
-                avatarch = "y"
-                heritage = ""
-                memgender = ""
-                invgroup = "to Andromeda"
-                infile = "Invite Lists/Andromeda"
-                priofile = "Invite Lists/Andromeda priority"
-                leftfile = "Invite Lists/Andromeda members who has left"
-                alrfile = "Invite Lists/Andromeda already invited"
-                groupinv = "http://www.chess.com/groups/invite_members?id=21262"
-                countryalt = "international water"
-                msglistleft = ""
-                msgliststand = "Messages/Invite Messages/Andromeda Standard message"
-
-            elif choice5 == "9": #Tholian Assembly
-                minrat = ""
-                maxrat = ""
-                minranrat = 1600
-                maxranrat = ""
-                mingames = ""
-                minwinrat = ""
-                lastloginyear = lonl[0]
-                lastloginmonth = lonl[1]
-                lastloginday = lonl[2]
-                membersinceyear = msin[0]
-                membersincemonth = msin[1]
-                membersinceday = msin[2]
-                youngeryear = ""
-                youngermonth = ""
-                youngerday = ""
-                olderyear = ""
-                oldermonth = ""
-                olderday = ""
-                timemax = 10
-                maxgroup = ""
-                mingroup = ""
-                timovchoicemin = ""
-                timovchoicemax = ""
-                avatarch = "n"
-                heritage = ""
-                memgender = ""
-                invgroup = "to the Tholian Assembly"
-                infile = "Invite Lists/Tholian Assembly"
-                priofile = "Invite Lists/Tholian Assembly priority"
-                leftfile = "Invite Lists/Tholian Assembly members who has left"
-                alrfile = "Invite Lists/Tholian Assembly already invited"
-                groupinv = "http://www.chess.com/groups/invite_members?id=29722"
-                countryalt = "uncharted territories"
-                msglistleft = ""
-                msgliststand = "Messages/Invite Messages/Tholian Assembly Standard message"
-
-            elif choice5 == "10": #Space 1999
-                countryalt = ""
-                minrat = 1300
-                maxrat = ""
-                minranrat = ""
-                maxranrat = ""
-                mingames = 50
-                minwinrat = 0.33
-                lastloginyear = lonl[0]
-                lastloginmonth = lonl[1]
-                lastloginday = lonl[2]
-                membersinceyear = msin[0]
-                membersincemonth = msin[1]
-                membersinceday = msin[2]
-                youngeryear = ""
-                youngermonth = ""
-                youngerday = ""
-                olderyear = ""
-                oldermonth = ""
-                olderday = ""
-                timemax = 10
-                maxgroup = ""
-                mingroup = ""
-                timovchoicemin = ""
-                timovchoicemax = ""
-                avatarch = "y"
-                heritage = ""
-                memgender = ""
-                invgroup = "to Space 1999"
-                infile = "Invite Lists/Space 1999"
-                priofile = "Invite Lists/Space 1999 priority"
-                leftfile = "Invite Lists/Space 1999 members who has left"
-                alrfile = "Invite Lists/Space 1999 already invited"
-                groupinv = "http://www.chess.com/groups/invite_members?id=26614"
-                msglistleft = ""
-                msgliststand = "Messages/Invite Messages/Space 1999 Standard message"
-
-            elif choice5 == "11": #Space 2099
-                countryalt = ""
-                minrat = 1300
-                maxrat = ""
-                minranrat = ""
-                maxranrat = ""
-                mingames = 50
-                minwinrat = 0.33
-                lastloginyear = lonl[0]
-                lastloginmonth = lonl[1]
-                lastloginday = lonl[2]
-                membersinceyear = msin[0]
-                membersincemonth = msin[1]
-                membersinceday = msin[2]
-                youngeryear = ""
-                youngermonth = ""
-                youngerday = ""
-                olderyear = ""
-                oldermonth = ""
-                olderday = ""
-                timemax = 10
-                maxgroup = ""
-                mingroup = ""
-                timovchoicemin = ""
-                timovchoicemax = ""
-                avatarch = "y"
-                heritage = ""
-                memgender = ""
-                invgroup = "to Space 2099"
-                infile = "Invite Lists/Space 2099"
-                priofile = "Invite Lists/Space 2099 priority"
-                leftfile = "Invite Lists/Space 2099 members who has left"
-                alrfile = "Invite Lists/Space 2099 already invited"
-                groupinv = "http://www.chess.com/groups/invite_members?id=26624"
-                msglistleft = ""
-                msgliststand = "Messages/Invite Messages/Space 2099 Standard message"
-
-            elif choice5 == "12": #Chess Star Resort
-                countryalt = "the International kingdom of Atlantis"
-                minrat = 1300
-                maxrat = ""
-                minranrat = ""
-                maxranrat = ""
-                mingames = 50
-                minwinrat = 0.33
-                lastloginyear = lonl[0]
-                lastloginmonth = lonl[1]
-                lastloginday = lonl[2]
-                membersinceyear = msin[0]
-                membersincemonth = msin[1]
-                membersinceday = msin[2]
-                youngeryear = ""
-                youngermonth = ""
-                youngerday = ""
-                olderyear = ""
-                oldermonth = ""
-                olderday = ""
-                timemax = 10
-                maxgroup = ""
-                mingroup = ""
-                timovchoicemin = ""
-                timovchoicemax = ""
-                avatarch = "y"
-                heritage = ""
-                memgender = ""
-                invgroup = "to CSR"
-                infile = "Invite Lists/CSR"
-                priofile = "Invite Lists/CSR priority"
-                leftfile = "Invite Lists/CSR members who has left"
-                alrfile = "Invite Lists/CSR already invited"
-                groupinv = "http://www.chess.com/groups/invite_members?id=18514"
-                msglistleft = ""
-                msgliststand = "Messages/Invite Messages/Chess Star Resort Standard message"
-
-            elif choice5 == "13": #Magnus Carlsen group
-                countryalt = ""
-                minrat = ""
-                maxrat = ""
-                minranrat = ""
-                maxranrat = ""
-                mingames = 20
-                minwinrat = 0.25
-                lastloginyear = lonl[0]
-                lastloginmonth = lonl[1]
-                lastloginday = lonl[2]
-                membersinceyear = msin[0]
-                membersincemonth = msin[1]
-                membersinceday = msin[2]
-                youngeryear = ""
-                youngermonth = ""
-                youngerday = ""
-                olderyear = ""
-                oldermonth = ""
-                olderday = ""
-                timemax = 10
-                maxgroup = ""
-                mingroup = ""
-                timovchoicemin = ""
-                timovchoicemax = ""
-                avatarch = "y"
-                heritage = ""
-                memgender = ""
-                invgroup = "to the Magnus Carlsen group"
-                infile = "Invite Lists/The Magnus Carlsen Group"
-                priofile = "Invite Lists/The Magnus Carlsen Group priority"
-                leftfile = "Invite Lists/The Magnus Carlsen Group members who has left"
-                alrfile = "Invite Lists/The Magnus Carlsen Group already invited"
-                groupinv = "http://www.chess.com/groups/invite_members?id=19744"
-                msglistleft = ""
-                msgliststand = "Messages/Invite Messages/Magnus Carlsen group Standard message"
-
-            elif choice5 == "14": #October
-                countryalt = ""
-                minrat = 1900
-                maxrat = ""
-                minranrat = ""
-                maxranrat = ""
-                mingames = 20
-                minwinrat = 0.25
-                lastloginyear = lonl[0]
-                lastloginmonth = lonl[1]
-                lastloginday = lonl[2]
-                membersinceyear = msin[0]
-                membersincemonth = msin[1]
-                membersinceday = msin[2]
-                youngeryear = ""
-                youngermonth = ""
-                youngerday = ""
-                olderyear = ""
-                oldermonth = ""
-                olderday = ""
-                timemax = 10
-                maxgroup = ""
-                mingroup = ""
-                timovchoicemin = ""
-                timovchoicemax = ""
-                avatarch = "n"
-                heritage = ""
-                memgender = ""
-                invgroup = "to October"
-                groupinv = "http://www.chess.com/groups/invite_members?id=11977"
-                infile = "Invite Lists/October"
-                priofile = "Invite Lists/October priority"
-                leftfile = "Invite Lists/October members who has left"
-                alrfile = "Invite Lists/October already invited"
-                msglistleft = ""
-                msgliststand = "Messages/Invite Messages/October Standard message"
-
-            elif choice5 == "15": #Knights of the Realm
-                countryalt = "the uncharted territories"
-                minrat = 1400
-                maxrat = ""
-                minranrat = ""
-                maxranrat = ""
-                mingames = 40
-                minwinrat = 0.33
-                lastloginyear = lonl[0]
-                lastloginmonth = lonl[1]
-                lastloginday = lonl[2]
-                membersinceyear = msin[0]
-                membersincemonth = msin[1]
-                membersinceday = msin[2]
-                youngeryear = ""
-                youngermonth = ""
-                youngerday = ""
-                olderyear = ""
-                oldermonth = ""
-                olderday = ""
-                timemax = 10
-                maxgroup = ""
-                mingroup = ""
-                timovchoicemin = ""
-                timovchoicemax = ""
-                avatarch = "y"
-                heritage = ""
-                memgender = ""
-                invgroup = "to Knights of the Realm"
-                groupinv = "http://www.chess.com/groups/invite_members?id=23260"
-                infile = "Invite Lists/Knights of the Realm"
-                priofile = "Invite Lists/Knights of the Realm priority"
-                leftfile = "Invite Lists/Knights of the Realm members who has left"
-                alrfile = "Invite Lists/Knights of the Realm already invited"
-                msglistleft = ""
-                msgliststand = "Messages/Invite Messages/Knights of the Realm Standard message"
-
-            elif choice5 == "16": #Stargate Command
-                countryalt = ""
-                minrat = 1300
-                maxrat = ""
-                minranrat = ""
-                maxranrat = ""
-                mingames = 50
-                minwinrat = 0.25
-                lastloginyear = lonl[0]
-                lastloginmonth = lonl[1]
-                lastloginday = lonl[2]
-                membersinceyear = msin[0]
-                membersincemonth = msin[1]
-                membersinceday = msin[2]
-                youngeryear = ""
-                youngermonth = ""
-                youngerday = ""
-                olderyear = ""
-                oldermonth = ""
-                olderday = ""
-                timemax = 13
-                maxgroup = ""
-                mingroup = ""
-                timovchoicemin = ""
-                timovchoicemax = ""
-                avatarch = "y"
-                heritage = ""
-                memgender = ""
-                invgroup = "to Stargate Command"
-                groupinv = "http://www.chess.com/groups/invite_members?id=21212"
-                infile = "Invite Lists/Stargate Command"
-                priofile = "Invite Lists/Stargate Command priority"
-                leftfile = "Invite Lists/Stargate Command members who has left"
-                alrfile = "Invite Lists/Stargate Command already invited"
-                msglistleft = ""
-                msgliststand = "Messages/Invite Messages/Stargate Command Standard message"
-
-            elif choice5 == "17": #Family Guy
-                minrat = 1300
-                maxrat = ""
-                minranrat = ""
-                maxranrat = ""
-                mingames = 50
-                minwinrat = 0.33
-                lastloginyear = lonl[0]
-                lastloginmonth = lonl[1]
-                lastloginday = lonl[2]
-                membersinceyear = msin[0]
-                membersincemonth = msin[1]
-                membersinceday = msin[2]
-                youngeryear = ""
-                youngermonth = ""
-                youngerday = ""
-                olderyear = ""
-                oldermonth = ""
-                olderday = ""
-                timemax = 10
-                maxgroup = ""
-                mingroup = ""
-                timovchoicemin = ""
-                timovchoicemax = ""
-                avatarch = "n"
-                heritage = ""
-                memgender = ""
-                invgroup = "to Family Guy"
-                infile = "Invite Lists/Family Guy"
-                priofile = "Invite Lists/Family Guy priority"
-                leftfile = "Invite Lists/Family Guy members who has left"
-                alrfile = "Invite Lists/Family Guy already invited"
-                groupinv = "http://www.chess.com/groups/invite_members?id=14966"
-                countryalt = "International water"
-                msglistleft = ""
-                msgliststand = "Messages/Invite Messages/Family Guy Standard message"
-
-            memalrinv = remove_doublets(alrfile)
-
-            if customgroup == False:
-                usedfile = priofile
-                memtinv = remove_doublets(priofile)
-                priolst = True
-                deserterlst = False
-                standardlst = False
-
-                if len(memtinv) == 0:
-                    memtinv = remove_doublets(leftfile)
-                    deserterlst = True
-                    priolst = False
-                    usedfile = leftfile
-
-                if len(memtinv) == 0:
-                    memtinv = remove_doublets(infile)
-                    usedfile = infile
-                    memtinv = [x for x in memtinv if x not in memalrinv]
-                    standardlst = True
-                    invfilter = True
-                    deserterlst = False
-
-            elif customgroup == True:
-                memtinv = remove_doublets(usedfile)
-                memtinv = [x for x in memtinv if x not in memalrinv]
-
-            if priolst == True or standardlst == True:
-                msglist = msgfileopen(msgliststand)
-            elif deserterlst == True:
-                msglist = msgfileopen(msglistleft)
-
-            already_picked = list()
-            if invitenum2 > len(memtinv):
-                invitenum2 = len(memtinv)
-
-            while len(already_picked) < invitenum2:
-                picked = random.choice(memtinv)
-
-                if not picked in already_picked:
-                    already_picked.append(picked)
-
-            for member in already_picked:
-                if choice2 == "y" and standardlst == True:
-                    try:
-                        passmemfil = memberprocesser(True, browser1, ([member]), minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat)
-                    except UnboundLocalError:
-                        continue
-                    if member not in passmemfil:
-                        memtinv.remove(member)
-                        continue
-
-                if browserchoice == "1":
-                    if counted == "y":
-                        counted = ""
-                    else:
+    for files in os.walk(path):
+        for flst in files:
+            if type(flst) is list and len(flst) != 0:
+                for fname in flst:
+                    if fname.endswith(endswith):
+                        lst.append([counter, fname])
                         counter += 1
-                    if counter > 70:
-                        browser2.quit()
-                        browser2, handle = pickbrowser(browserchoice, True)
-                        browser2 = sellogin(Username, Password, browser2)
-                        counter = 1
-
-                browser1, response = mecopner(browser1, "http://www.chess.com/members/view/" + member)
-                soup = BeautifulSoup(response)
-
-                for placeholder in soup.find_all(class_ = "flag"):
-                    country = placeholder["title"]
-                if country == "International":
-                    country = countryalt
-
-                name = namechecker(soup)
-                if name == " ":
-                    name = member
-
-                browser2.get(groupinv)
-
-                try:
-                    WebDriverWait(browser2, 5).until(EC.presence_of_element_located((By.ID, "c15")))
-                    browser2.find_element_by_name("c15").send_keys(member)
-                except:
-                    break
-
-                while True:
-                    try:
-                        print "\nInviting " + member + " " + invgroup
-                        memint.append(member)
-
-                        browser2.switch_to_frame("tinymcewindow_ifr")
-                        browser2.find_element_by_id("tinymce").clear()
-                        browser2.switch_to_default_content()
-
-                        filtmcemsg(msglist, browser2, name, country, browserchoice)
-                        browser2.find_element_by_id("c18").click()
-                        break
-
-                    except Exception, errormsg:
-                        if supusr is True:
-                            print repr(errormsg)
-                        print "\n\nRetrying " + member + " " + invgroup + "!!!\n\n"
-                        while True:
-                            browser2.get(groupinv)
-                            try:
-                                WebDriverWait(browser2, 5).until(EC.presence_of_element_located((By.ID, "c15")))
-                                browser2.find_element_by_name("c15").send_keys(member)
-                                break
-                            except Exception, errormsg:
-                                if supusr is True:
-                                    print repr(errormsg)
-                                print "retrying"
-
-            updinvlist = set(memtinv).difference(set(memint))
-            updinvlist = misc1(updinvlist)
-            memint = misc1(memint)
-
-            with open(usedfile, "wb") as placeholder2:
-                placeholder2.write(updinvlist)
-
-            if len(memint) != 0:
-                with open(alrfile, "ab") as placeholder3:
-                    placeholder3.write(memint + ", ")
-
-        if invinf == "no":
-            browser2.quit()
-            redo = "no"
+    return lst
 
 def filtmcemsg(msglist, browser, name, country, browserchoice):
     for content in msglist:
@@ -1847,6 +1049,223 @@ def olprint2(tlen, middle, right, left):
     print tlen.format(middle),
     print left
 
+def inviter2(targetlist, endless):
+    invitenum = 120
+    choice2 = ""
+    while choice2 not in (["y", "n"]):
+        choice2 = raw_input("\n\nOnly invite those who fill a few requirements (only names from the standard list will be affected)? (y/n) ")
+
+    browserchoice = selbrowch()
+    Username = raw_input("\n\n\nUsername: ")
+    Password = raw_input("Password: ")
+    browser2, handle = pickbrowser(browserchoice, True)
+    browser2 = sellogin(Username, Password, browser2)
+    logincookie = browser2.get_cookies()
+    browser1 = mecbrowser(logincookie)
+
+    redo = True
+    counter = 1
+    while redo == True:
+        if endless == False:
+            redo = False
+
+        for target in targetlist:
+            target = target[1]
+            invgroup = target[0:-4]
+            if browserchoice == "1":
+                counter += 1
+                counted = "y"
+                if counter > 70:
+                    browser2.quit()
+                    browser2, handle = pickbrowser(browserchoice, True)
+                    browser2 = sellogin(Username, Password, browser2)
+                    counter = 1
+
+            condic = configopen("Invite Lists/Config/" + target, True)
+            invitenum2 = invitenum
+            memint = list()
+
+            countryalt = condic["What to use if members nation is set to International"]
+            minrat = condic["Min online chess rating"]
+            maxrat = condic["Max online chess rating"]
+            minranrat = condic["Min 960 chess rating"]
+            maxranrat = condic["Max 960 chess rating"]
+            mingames = condic["Min online chess games plaid"]
+            minwinrat = condic["Min online chess win-ratio"]
+            lastlogin = condic["Last logged in within days"]
+            if lastlogin != "":
+                lonl = [int(elem) for elem in str(date.today() - timedelta(days = lastlogin)).split("-")]
+                lastloginyear = lonl[0]
+                lastloginmonth = lonl[1]
+                lastloginday = lonl[2]
+            else:
+                lastloginyear = ""
+                lastloginmonth = ""
+                lastloginday = ""
+            membersince = condic["Member on chess.com for days"]
+            if membersince != "":
+                msin = [int(elem) for elem in str(date.today() - timedelta(days = membersince)).split("-")]
+                membersinceyear = msin[0]
+                membersincemonth = msin[1]
+                membersinceday = msin[2]
+            else:
+                membersinceyear = ""
+                membersincemonth = ""
+                membersinceday = ""
+            youngerthan = condic["Born after date (YYYY-MM-DD)"]
+            if youngerthan != "":
+                youngerthan = youngerthan.split("-")
+                youngeryear = int(youngerthan[0])
+                youngermonth = int(youngerthan[1])
+                youngerday = int(youngerthan[2])
+            else:
+                youngeryear = ""
+                youngermonth = ""
+                youngerday = ""
+            olderthan = condic["Born before date (YYYY-MM-DD)"]
+            if olderthan != "":
+                olderthan = olderthan.split("-")
+                olderyear = int(olderthan[0])
+                oldermonth = int(olderthan[1])
+                olderday = int(olderthan[2])
+            else:
+                olderyear = ""
+                oldermonth = ""
+                olderday = ""
+            timemax = condic["Max timeout-ratio allowed"]
+            maxgroup = condic["Max number of groups member can be in"]
+            mingroup = condic["Min number of groups member can be in"]
+            timovchoicemin = condic["Min time/move (days-hours-minutes)"]
+            timovchoicemax = condic["Max time/move (days-hours-minutes)"]
+            avatarch = condic["Only invite those with a custom avatar (y/n)"]
+            heritage = condic["Member should be from nation"]
+            memgender = condic["Gender (m/f)"]
+            groupinv = condic["Link to groups invite members page"]
+            infile = condic["File containing the main invites list"]
+            priofile = condic["File containing those who should receive priority invites (circumvents filter)"]
+            leftfile = condic["Invites file for those who has left the group"]
+            alrfile = condic["File containing those who has received an invite"]
+            msglistleft = condic["File containing your invites message for members who has left your group"]
+            msgliststand = condic["File containing your invites message for standard and priority invites lists"]
+
+            memalrinv = remove_doublets(alrfile)
+
+            usedfile = priofile
+            memtinv = remove_doublets(priofile)
+            priolst = True
+            deserterlst = False
+            standardlst = False
+
+            if len(memtinv) == 0:
+                memtinv = remove_doublets(leftfile)
+                deserterlst = True
+                priolst = False
+                usedfile = leftfile
+
+            if len(memtinv) == 0:
+                memtinv = remove_doublets(infile)
+                usedfile = infile
+                memtinv = [x for x in memtinv if x not in memalrinv]
+                standardlst = True
+                invfilter = True
+                deserterlst = False
+
+            if priolst == True or standardlst == True:
+                msglist = fileopen(msgliststand, True)
+            elif deserterlst == True:
+                msglist = fileopen(msglistleft, True)
+
+            already_picked = list()
+            if invitenum2 > len(memtinv):
+                invitenum2 = len(memtinv)
+
+            while len(already_picked) < invitenum2:
+                picked = random.choice(memtinv)
+
+                if not picked in already_picked:
+                    already_picked.append(picked)
+
+            for member in already_picked:
+                if choice2 == "y" and standardlst == True:
+                    try:
+                        passmemfil = memberprocesser(True, browser1, ([member]), minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat)
+                    except UnboundLocalError:
+                        continue
+                    if member not in passmemfil:
+                        memtinv.remove(member)
+                        continue
+
+                if browserchoice == "1":
+                    if counted == "y":
+                        counted = ""
+                    else:
+                        counter += 1
+                    if counter > 70:
+                        browser2.quit()
+                        browser2, handle = pickbrowser(browserchoice, True)
+                        browser2 = sellogin(Username, Password, browser2)
+                        counter = 1
+
+                browser1, response = mecopner(browser1, "http://www.chess.com/members/view/" + member)
+                soup = BeautifulSoup(response)
+
+                for placeholder in soup.find_all(class_ = "flag"):
+                    country = placeholder["title"]
+                if country == "International":
+                    country = countryalt
+
+                name = namechecker(soup)
+                if name == " ":
+                    name = member
+
+                browser2.get(groupinv)
+
+                try:
+                    WebDriverWait(browser2, 5).until(EC.presence_of_element_located((By.ID, "c15")))
+                    browser2.find_element_by_name("c15").send_keys(member)
+                except:
+                    break
+
+                while True:
+                    try:
+                        print "\nInviting " + member + " to " + invgroup
+                        memint.append(member)
+
+                        browser2.switch_to_frame("tinymcewindow_ifr")
+                        browser2.find_element_by_id("tinymce").clear()
+                        browser2.switch_to_default_content()
+
+                        filtmcemsg(msglist, browser2, name, country, browserchoice)
+                        browser2.find_element_by_id("c18").click()
+                        break
+
+                    except Exception, errormsg:
+                        if supusr is True:
+                            print repr(errormsg)
+                        print "\n\nRetrying " + member + " to " + invgroup + "!!!\n\n"
+                        while True:
+                            browser2.get(groupinv)
+                            try:
+                                WebDriverWait(browser2, 5).until(EC.presence_of_element_located((By.ID, "c15")))
+                                browser2.find_element_by_name("c15").send_keys(member)
+                                break
+                            except Exception, errormsg:
+                                if supusr is True:
+                                    print repr(errormsg)
+                                print "retrying"
+
+            updinvlist = set(memtinv).difference(set(memint))
+            updinvlist = misc1(updinvlist)
+            memint = misc1(memint)
+
+            with open(usedfile, "wb") as placeholder2:
+                placeholder2.write(updinvlist)
+
+            if len(memint) != 0:
+                with open(alrfile, "ab") as placeholder3:
+                    placeholder3.write(memint + ", ")
+    browser2.quit()
+
 def vcman(vclinklist, yourside):
     numgames = len(vclinklist)
     browserchoice = selbrowch()
@@ -1994,7 +1413,7 @@ def memfiop(fipath, kem):
         open(fipath, "wb").close
     return list()
 
-def msgfileopen(filename):
+def fileopen(filename, message):
     msglist = list()
     if os.path.isfile(filename) is True:
         if os.stat(filename).st_size > 0:
@@ -2007,7 +1426,10 @@ def msgfileopen(filename):
         open(filename, "wb").close()
         sys.exit("\n\n" + filename + " doesn't exist, it has now been created!!!\n\n")
 
-    return [(msglist[counter],msglist[counter + 1]) for counter in range(0, len(msglist), 2)]
+    if message == True:
+        return [(msglist[counter],msglist[counter + 1]) for counter in range(0, len(msglist), 2)]
+    else:
+        return msglist
 
 def memberprocesser(silent, browser, target, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat):
     target = streplacer(str(target), ([" ", ""], ["(", ""], [")", ""], ["]", ""], ["[", ""], ["'", ""])).split(",")
@@ -2334,7 +1756,7 @@ def memremoverf(inlist, logincookie):
         counter += 1
     targetlist.append(templst)
 
-    filtmem = set(spider(targetlist, logincookie, True))
+    filtmem = set(spider(targetlist, True, mecbrowser(logincookie)))
     return inlist.difference(filtmem)
 
 def file_or_input(mult, fdiag1, fdiag2, idiag1, idiag2):
@@ -2398,6 +1820,33 @@ def notclosedcheck(memlist):
             memlist2.append(mem)
     return memlist2
 
+def getgrouphome(targetlst, browser):
+    grouphomelist = list()
+    for target in targetlst:
+        browser, response = mecopner(browser, target[0])
+        for link in browser.links(url_regex="groups/home/"):
+            grouphomelist.append("http://www.chess.com" + link.url)
+    return list(set(grouphomelist))
+
+def getadmins(targetlst, browser):
+    adminlist = list()
+    superadminlist = list()
+    for link in targetlst:
+        browser, response = mecopner(browser, link)
+        soup = BeautifulSoup(response)
+
+        superadmins = soup.find_all(id = "c14")
+        for line in str(superadmins).split("\n"):
+            if '<li class="popUpMemberInfo popupTop" data-username="' in line:
+                superadminlist.append(line.replace('<li class="popUpMemberInfo popupTop" data-username="', "")[0:-2])
+
+        admins = soup.find_all(id = "c15")
+        for line in str(admins).split("\n"):
+            if '<li class="popUpMemberInfo popupTop" data-username="' in line:
+                adminlist.append(line.replace('<li class="popUpMemberInfo popupTop" data-username="', "")[0:-2])
+
+    return list(set(superadminlist)), list(set(adminlist))
+
 olprint("*", "*", "-", 72, True)
 for content in (["", "", "", "RK Resource 001", "version 0.8.9 dev", "", "", ""]):
     olprint2("{0: ^70}", content, "|", "|")
@@ -2412,7 +1861,7 @@ for content in (["", "", "Options", "Type /help or /help <number> for more info"
 olprint("*", "*", "-", 72, True)
 
 pathway = "y"
-makefolder((["mem", "Invite Lists", "namelists", "Webdriver", "Webdriver/Linux", "Webdriver/Mac", "Webdriver/Windows", "Webdriver/Linux/86", "Webdriver/Mac/86", "Webdriver/Windows/86", "Webdriver/Extensions", "Webdriver/Extensions/Chrome", "Webdriver/Extensions/Firefox", "Messages", "Messages/Invite Messages"]))
+makefolder((["mem", "Invite Lists", "Invite Lists/Config", "namelists", "Webdriver", "Webdriver/Linux", "Webdriver/Mac", "Webdriver/Windows", "Webdriver/Linux/86", "Webdriver/Mac/86", "Webdriver/Windows/86", "Webdriver/Extensions", "Webdriver/Extensions/Chrome", "Webdriver/Extensions/Firefox", "Messages", "Messages/Invite Messages"]))
 dommem = memfiop("mem/dommem", "keydom")
 
 while pathway in (["y"]):
@@ -2458,8 +1907,17 @@ while pathway in (["y"]):
         print "Locate the members list url of the group you wish to target.\n\n  example: http://www.chess.com/groups/membersearch?allnew=1&id=8893\n\nCopy the url.\n"
         target = tlstcreator()
 
+        noadmins = ""
+        while noadmins not in (["y", "n"]):
+            noadmins = raw_input("\nInclude admins? (y/n) ")
+
         logincookie = login()
-        un1 = set(spider(target, logincookie, False))
+        browser = mecbrowser(logincookie)
+        un1 = set(spider(target, False, browser))
+
+        if noadmins == "n":
+            superadmins, admins = getadmins(getgrouphome(target, browser), browser)
+            un1 = un1.difference(superadmins + admins)
 
         remmem = ""
         while remmem not in (["y", "n"]):
@@ -2490,10 +1948,26 @@ while pathway in (["y"]):
         getmeminfo(target, filename)
 
     elif flow == "3":
-        choice5 = ""
-        while choice5 not in (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "42", "84", "168"]):
-            choice5 = raw_input("\n\nWhich group would you like to send invites for?\n\n    Dominion affiliated groups:\n 1. Star Trek: The Dominion\n 2. Karemma Commerce Ministry\n 3. The Breen Confederacy\n 4. The Cardassian Empire\n 5. Death Star III\n\n    Non Dominion groups:\n\n 6. Jungle Team\n 7. Legio XIII Gemina\n 8. Andromeda\n 9. Tholian Assembly\n 10. Space 1999\n 11. Space 2099\n 12. Chess Star Resort\n 13. Magnus Carlsen group\n 14. October\n 15. Knights of the Realm\n 16. Stargate Command\n 17. Family Guy\n\n 42. endless loop that goes through all the groups, indefinitely\n 84. Create you own custom infinite loop from the supported groups\n 168. Send invites for another group\n\nEnter choice here: ")
-        inviter(([choice5]), 200)
+        while flow not in (["1", "2"]):
+            flow = raw_input("Would you like to\n 1. Send invites for an existing group\n 2. Add a new group\nMake your choice, young padawan: ")
+
+        if flow == "2":
+            name = raw_input("\n\nGroup name: ")
+            createconfig(name, str(enterint("Group ID: ")))
+            print "\n\nThe following files have been created\n\n  - /Messages/Invite Messages/" + name + " Standard Message (used to invite members from the standard and VIP invites lists)\n  - /Messages/Invite Messages/" + name + " Deserters Message (Used to reinvite those who have left " + name + ")\n  - Invite Lists/" + name + " (main invites list)\n  - Invite Lists/" + name + " priority (used for those whom you want to invite asap, circumvents any filters)\n  - Invite Lists/" + name + " members who has left (here you can place members who has left " + name + " to reinvite them using the invites message from /Messages/Invite Messages/" + name + " Deserters Message)\n  - Invite Lists/" + name + " already invited (stores the names of those who has received an invite from the script, members in this list wont receive an invite even if their names are in the standard invites list)\n\nTo use the inviter you need to first create a invites message for the script to use and put members whom you want to invite in the invites lists\nChanges to the filter used by " + name + " can be made by modifying the file Invite Lists/Config/" + name + "\n\n"
+            continue
+
+        inifilelist = getfilelist("Invite Lists/Config", ".ini")
+        print "\n\nwhich group would you like to send invites for?\n 0 Infinite loop over all groups"
+        for fname in inifilelist:
+            print "", fname[0], fname[1].replace(".ini", "")
+
+        invchoice = enterint("which group(s) would you like to send invites for? ")
+
+        if invchoice == 0:
+            inviter2(inifilelist, True)
+        else:
+            inviter2([inifilelist[invchoice - 1]], False)
 
     elif flow == "4":
         yourside = raw_input("Name of group to check: ")
