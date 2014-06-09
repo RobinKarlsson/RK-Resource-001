@@ -31,7 +31,7 @@ from operator import itemgetter
 from collections import OrderedDict
 from collections import Counter
 from string import punctuation
-supusr = False
+supusr = True
 
 def csvsoworker(memlist, choicepath):
     colwidth = max(len(element.decode("UTF-8")) for row in memlist for element in row) + 2
@@ -1049,7 +1049,7 @@ def olprint2(tlen, middle, right, left):
     print tlen.format(middle),
     print left
 
-def inviter2(targetlist, endless):
+def inviter(targetlist, endless):
     invitenum = 120
     choice2 = ""
     while choice2 not in (["y", "n"]):
@@ -1862,7 +1862,6 @@ olprint("*", "*", "-", 72, True)
 
 pathway = "y"
 makefolder((["Member Lists", "Invite Lists", "Invite Lists/Config", "namelists", "Webdriver", "Webdriver/Linux", "Webdriver/Mac", "Webdriver/Windows", "Webdriver/Linux/86", "Webdriver/Mac/86", "Webdriver/Windows/86", "Webdriver/Extensions", "Webdriver/Extensions/Chrome", "Webdriver/Extensions/Firefox", "Messages", "Messages/Invite Messages"]))
-dommem = memfiop("mem/dommem", "keydom")
 
 while pathway in (["y"]):
     flow = ""
@@ -1949,7 +1948,7 @@ while pathway in (["y"]):
 
     elif flow == "3":
         while flow not in (["1", "2"]):
-            flow = raw_input("Would you like to\n 1. Send invites for an existing group\n 2. Add a new group\nMake your choice, young padawan: ")
+            flow = raw_input("Would you like to\n 1. Send invites for existing groups\n 2. Add a new group\nMake your choice, young padawan: ")
 
         if flow == "2":
             name = raw_input("\n\nGroup name: ")
@@ -1965,9 +1964,9 @@ while pathway in (["y"]):
         invchoice = enterint("which group(s) would you like to send invites for? ")
 
         if invchoice == 0:
-            inviter2(inifilelist, True)
+            inviter(inifilelist, True)
         else:
-            inviter2([inifilelist[invchoice - 1]], False)
+            inviter([inifilelist[invchoice - 1]], False)
 
     elif flow == "4":
         yourside = raw_input("Name of group to check: ")
@@ -2159,6 +2158,25 @@ while pathway in (["y"]):
         "placeholder"
 
     elif flow == "9":
+        while flow not in (["1", "2"]):
+            flow = raw_input("Would you like to\n 1. Check existing groups\n 2. Add a new group\nMake your choice, young padawan: ")
+
+        if flow == "2":
+            name = raw_input("\n\nGroup name: ")
+            Key = raw_input("Encryption ket: ")
+
+            invconpath = "Invite Lists/Config/" + name + ".ini"
+            if os.path.isfile(invconpath) is True:
+                membersleftinvfile = configopen(invconpath, True)["Invites file for those who has left the group"]
+            else:
+                membersleftinvfile = "\nMembers who has left invites file (optional)==Invite Lists/" + name + " members who has left"
+
+            with open("Member Lists/Config/" + name + ".ini", "wb") as setupfile:
+                setupfile.write("Group ID==" + str(enterint("Group ID: ")) + "\nEncryption Key==" + Key + "\nMemberslist file==Member Lists/" + name + membersleftinvfile)
+
+            print "\n\nThe following files have been created\n\n  - /Messages/Invite Messages/" + name + " Standard Message (used to invite members from the standard and VIP invites lists)\n  - /Messages/Invite Messages/" + name + " Deserters Message (Used to reinvite those who have left " + name + ")\n  - Invite Lists/" + name + " (main invites list)\n  - Invite Lists/" + name + " priority (used for those whom you want to invite asap, circumvents any filters)\n  - Invite Lists/" + name + " members who has left (here you can place members who has left " + name + " to reinvite them using the invites message from /Messages/Invite Messages/" + name + " Deserters Message)\n  - Invite Lists/" + name + " already invited (stores the names of those who has received an invite from the script, members in this list wont receive an invite even if their names are in the standard invites list)\n\nTo use the inviter you need to first create a invites message for the script to use and put members whom you want to invite in the invites lists\nChanges to the filter used by " + name + " can be made by modifying the file Invite Lists/Config/" + name + "\n\n"
+            continue
+
         filelist = getfilelist("Member Lists", ".ini")
         print "\n\nWhich group do you wish to check?\n 0 Loop over all groups"
         for fname in filelist:
