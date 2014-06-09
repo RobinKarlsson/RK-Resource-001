@@ -31,7 +31,7 @@ from operator import itemgetter
 from collections import OrderedDict
 from collections import Counter
 from string import punctuation
-supusr = False
+supusr = True
 
 def csvsoworker(memlist, choicepath):
     colwidth = max(len(element.decode("UTF-8")) for row in memlist for element in row) + 2
@@ -580,7 +580,7 @@ def mecopner(browser, pointl):
 def nineworker(infile, inid, logincookie, key):
     memlist = list()
     target = list()
-    memlistorg = memfiop("mem/" + infile, key)
+    memlistorg = memfiop(infile, key)
 
     counter = 1
     while counter <= 100:
@@ -596,7 +596,7 @@ def nineworker(infile, inid, logincookie, key):
     if len(memlist) != 0:
         memlist = notclosedcheck(memlist)
 
-    with open("mem/" + infile, "wb") as placeholder:
+    with open(infile, "wb") as placeholder:
         placeholder.write(com2(key, str(un).replace("'", "").replace("[", "").replace("]", ""), 256, []))
     return memlist
 
@@ -2159,108 +2159,29 @@ while pathway in (["y"]):
         "placeholder"
 
     elif flow == "9":
-        choiceorg = ""
-        while choiceorg not in (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "42", "168"]):
-            choiceorg = raw_input("\nWhich group do you wish to check?\n 1. Star Trek: The Dominion\n 2. The Breen Confederacy\n 3. The Cardassian Empire\n 4. Death Star III\n 5. Karemma Ministry of Trade\n 6. Space 1999\n 7. Space 2099\n 8. Andromeda\n 9. legio XIII gemina\n 10. The Majestical Utopia\n 11. Space Angels\n 12. Chess!\n 13. Carpe Diem\n 14. CSR\n 15. Family Guy\n 16. Jungle Team\n\n 42. Check groups 1, 2, 4-9, 14-21\n 168. Check another group\n\nYour choice: ")
-        print "\n\nWe will start by extracting the latest memberslist for your group\n"
+        filelist = getfilelist("Member Lists", ".ini")
+        print "\n\nWhich group do you wish to check?\n 0 Loop over all groups"
+        for fname in filelist:
+            print "", fname[0], fname[1][0:-4]
+        choice = enterint("which group(s) would you like to process? ")
+
+        if choice == 0:
+            targetlst = filelist
+        else:
+            targetlst = [filelist[choice - 1]]
+
         logincookie = login()
 
-        if choiceorg == "42":
-            choiceorg = (["1", "2", "4", "5", "6", "7", "8", "9", "14", "15", "16", "17", "18", "19", "20", "21"])
-        else:
-            choiceorg = ([choiceorg])
+        for target in targetlst:
+            condic = configopen("Member Lists/Config/" + target[1], True)
+            memlist = nineworker(condic["Memberslist file"], str(condic["Group ID"]), logincookie, str(condic["Encryption Key"]))
 
-        for choice in choiceorg:
-            if choice == "1":
-                memlist = nineworker("dommem", "15896", logincookie, "keydom")
-                group = "the Dominion"
-
-            elif choice == "2":
-                memlist = nineworker("breenmem", "21974", logincookie, "keybreen")
-                group = "the Breen Confederacy"
-
-            elif choice == "3":
-                memlist = nineworker("carmem", "20126", logincookie, "keycarda")
-                group = "the Cardassian Empire"
-
-            elif choice == "4":
-                memlist = nineworker("deathmem", "17618", logincookie, "keydeath")
-                group = "Death Star III"
-
-            elif choice == "5":
-                memlist = nineworker("karemma", "26088", logincookie, "keykar")
-                group = "Karemma Ministry of Trade"
-
-            elif choice == "6":
-                memlist = nineworker("1999", "26614", logincookie, "key1999")
-                group = "Space 1999"
-
-            elif choice == "7":
-                memlist = nineworker("2099", "26624", logincookie, "key2099")
-                group = "Space 2099"
-
-            elif choice == "8":
-                memlist = nineworker("andromeda", "21262", logincookie, "keyandromeda")
-                group = "Andromeda"
-
-            elif choice == "9":
-                memlist = nineworker("legio", "22596", logincookie, "keylegio")
-                group = "Legio XIII Gemina"
-
-            elif choice == "10":
-                memlist = nineworker("utopia", "23674", logincookie, "keyutopia")
-                group = "Majestical Utopia"
-
-            elif choice == "11":
-                memlist = nineworker("angelmem", "18512", logincookie, "keyangel")
-                group = "Space Angels"
-
-            elif choice == "12":
-                memlist = nineworker("chessmem", "18810", logincookie, "keyChess")
-                group = "Chess!"
-
-            elif choice == "13":
-                memlist = nineworker("CarpeDiemmem", "14704", logincookie, "keyCD")
-                group = "Carpe Diem"
-
-            elif choice == "14":
-                memlist = nineworker("CSR", "18514", logincookie, "keyCSR")
-                group = "Chess Star Resort"
-
-            elif choice == "15":
-                memlist = nineworker("Family Guy", "14966", logincookie, "keyFG")
-                group = "Family Guy"
-
-            elif choice == "16":
-                memlist = nineworker("Jungle Team", "17050", logincookie, "keyJT")
-                group = "Jungle Team"
-
-            elif choice == "17":
-                memlist = nineworker("October", "11977", logincookie, "keyOct")
-                group = "October"
-
-            elif choice == "18":
-                memlist = nineworker("The Magnus Carlsen Group", "19744", logincookie, "keyMC")
-                group = "The Magnus Carlsen Group"
-
-            elif choice == "19":
-                memlist = nineworker("Stargate Command", "21212", logincookie, "keySGC")
-                group = "Stargate Command"
-
-            elif choice == "20":
-                memlist = nineworker("KNIGHTS of the REALM", "23260", logincookie, "keyKnights")
-                group = "KNIGHTS of the REALM"
-
-            elif choice == "21":
-                memlist = nineworker("Tholian Assembly", "29722", logincookie, "keyTA")
-                group = "Tholian Assembly"
-
-            elif choice == "168":
-                group = raw_input("Name of group to check: ")
-                groupid = raw_input("Groups id: ")
-                memlist = nineworker(group, groupid, logincookie, "Custom")
-
-            print "\n\nMembers who are no longer in " + group + ": " + streplacer(str(memlist), (["'", ""], ["[", ""], ["]", ""]))
+            deserters = streplacer(str(memlist), (["'", ""], ["[", ""], ["]", ""]))
+            print "\n\nMembers who are no longer in " + target[1][0:-4] + ": " + deserters
+            leftfile = condic["Members who has left invites file (optional)"]
+            if os.path.isfile(leftfile) is True:
+                with open(leftfile, "ab") as colfile:
+                    colfile.write(deserters + ", ")
 
     elif flow == "10":
         grcheck = raw_input("group to check: ")
