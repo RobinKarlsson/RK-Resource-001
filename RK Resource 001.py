@@ -781,8 +781,14 @@ def createfileifmissing(filename):
         open(filename, "wb").close()
 
 def createconfig(name, ID):
+    invconpath = "Member Lists/Config/" + name + ".ini"
+    if os.path.isfile(invconpath) is True:
+        membersleftinvfile = configopen(invconpath, True)["Invites file for those who has left the group"]
+    else:
+        membersleftinvfile = name + " members who has left"
+
     with open("Invite Lists/Config/" + name + ".ini", "wb") as setupfile:
-        setupfile.write("What to use if members nation is set to International==\nMin online chess rating==\nMax online chess rating==\nMin 960 chess rating==\nMax 960 chess rating==\nMin online chess games plaid==\nMin online chess win-ratio==\nLast logged in within days==\nMember on chess.com for days==\nBorn after date (YYYY-MM-DD)==\nBorn before date (YYYY-MM-DD)==\nMax timeout-ratio allowed==\nMax number of groups member can be in==\nMin number of groups member can be in==\nMin time/move (days-hours-minutes)==\nMax time/move (days-hours-minutes)==\nOnly invite those with a custom avatar (y/n)==\nMember should be from nation==\nGender (m/f)==\nLink to groups invite members page==http://www.chess.com/groups/invite_members?id=" + ID + "\nFile containing the main invites list==Invite Lists/" + name + "\nFile containing those who should receive priority invites (circumvents filter)==Invite Lists/" + name + " priority\nInvites file for those who has left the group==Invite Lists/" + name + " members who has left\nFile containing those who has received an invite==Invite Lists/" + name + " already invited\nFile containing your invites message for members who has left your group==Messages/Invite Messages/" + name + " Deserters Message\nFile containing your invites message for standard and priority invites lists==Messages/Invite Messages/" + name + " Standard Message")
+        setupfile.write("What to use if members nation is set to International==\nMin online chess rating==\nMax online chess rating==\nMin 960 chess rating==\nMax 960 chess rating==\nMin online chess games plaid==\nMin online chess win-ratio==\nLast logged in within days==\nMember on chess.com for days==\nBorn after date (YYYY-MM-DD)==\nBorn before date (YYYY-MM-DD)==\nMax timeout-ratio allowed==\nMax number of groups member can be in==\nMin number of groups member can be in==\nMin time/move (days-hours-minutes)==\nMax time/move (days-hours-minutes)==\nOnly invite those with a custom avatar (y/n)==\nMember should be from nation==\nGender (m/f)==\nLink to groups invite members page==http://www.chess.com/groups/invite_members?id=" + ID + "\nFile containing the main invites list==Invite Lists/" + name + "\nFile containing those who should receive priority invites (circumvents filter)==Invite Lists/" + name + " priority\nInvites file for those who has left the group==Invite Lists/" + membersleftinvfile + " members who has left\nFile containing those who has received an invite==Invite Lists/" + name + " already invited\nFile containing your invites message for members who has left your group==Messages/Invite Messages/" + name + " Deserter message\nFile containing your invites message for standard and priority invites lists==Messages/Invite Messages/" + name + " Standard Message")
     createfileifmissing("Messages/Invite Messages/" + name + " Standard Message")
     createfileifmissing("Messages/Invite Messages/" + name + " Deserters Message")
     createfileifmissing("Invite Lists/" + name + " already invited")
@@ -1086,6 +1092,8 @@ def inviter(targetlist, endless):
             memint = list()
 
             countryalt = condic["What to use if members nation is set to International"]
+            if countryalt == "":
+                countryalt = "International territory"
             minrat = condic["Min online chess rating"]
             maxrat = condic["Max online chess rating"]
             minranrat = condic["Min 960 chess rating"]
@@ -2197,7 +2205,7 @@ while pathway in (["y"]):
             deserters = streplacer(str(memlist), (["'", ""], ["[", ""], ["]", ""]))
             print "\n\nMembers who are no longer in " + target[1][0:-4] + ": " + deserters
             leftfile = condic["Members who has left invites file (optional)"]
-            if os.path.isfile(leftfile) is True:
+            if os.path.isfile(leftfile) is True and deserters != "":
                 with open(leftfile, "ab") as colfile:
                     colfile.write(deserters + ", ")
 
