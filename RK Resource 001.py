@@ -31,7 +31,7 @@ from operator import itemgetter
 from collections import OrderedDict
 from collections import Counter
 from string import punctuation
-supusr = False
+supusr = True
 
 def csvsoworker(memlist, choicepath):
     colwidth = max(len(element.decode("UTF-8")) for row in memlist for element in row) + 2
@@ -2206,8 +2206,9 @@ while pathway in (["y"]):
             print "\n\nMembers who are no longer in " + target[1][0:-4] + ": " + deserters
             leftfile = condic["Members who has left invites file (optional)"]
             if os.path.isfile(leftfile) is True and deserters != "":
+                deserters = deserters + ", "
                 with open(leftfile, "ab") as colfile:
-                    colfile.write(deserters + ", ")
+                    colfile.write(deserters)
 
     elif flow == "10":
         grcheck = raw_input("group to check: ")
