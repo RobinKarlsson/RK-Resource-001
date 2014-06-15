@@ -31,7 +31,7 @@ from operator import itemgetter
 from collections import OrderedDict
 from collections import Counter
 from string import punctuation
-supusr = False
+supusr = True
 
 def csvsoworker(memlist, choicepath):
     colwidth = max(len(element.decode("UTF-8")) for row in memlist for element in row) + 2
@@ -412,6 +412,56 @@ def fnamenot(nlst, fdir):
                 print fname
                 flist.append(fname)
     return flist
+
+def noteposter(target, msg, interval, nationalt, shutdown):
+    browserchoice = selbrowch()
+    Username = raw_input("\n\n\nUsername: ")
+    Password = raw_input("Password: ")
+    browser2, handle = pickbrowser(browserchoice, True)
+    browser2 = sellogin(Username, Password, browser2)
+    logincookie = browser2.get_cookies()
+    browser = mecbrowser(logincookie)
+    skipped = list()
+    print "\n\n"
+
+    for mem in target:
+        browser, response = mecopner(browser, "http://www.chess.com/members/view/" + mem)
+        soup = BeautifulSoup(response)
+
+        for placeholder in soup.find_all(class_ = "flag"):
+            country = placeholder["title"]
+        if country == "International":
+            country = nationalt
+        name = namechecker(soup)
+        if name == " ":
+            name = mem
+
+        browser2.get("http://www.chess.com/members/view/" + mem + "#usernotes_post")
+        counter = 1
+
+        while True:
+            try:
+                browser2.find_element_by_name("c23").send_keys(streplacer(msg, (["/name", name.strip()], ["/nation", country.strip()])))
+                browser2.find_element_by_name("c24").click()
+                break
+            except:
+                if counter == 20:
+                    print "\n\nSkipped " + mem + "\n\n"
+                    skipped.append()
+                    break
+                counter += 1
+                time.sleep(1)
+
+        time.sleep(interval)
+
+    if len(skipped) != 0:
+        print "skipped the following members:"
+        for name in skipped:
+            print name,
+    browser2.quit()
+
+    if shutdown == "y":
+        turnofcomp()
 
 def pmdriver(target, choice):
     while "" in target:
@@ -1038,6 +1088,8 @@ def gettmlinklist(targetname, browser):
     for pointer in pointerlist:
         del linklist[-1]
     return linklist
+
+
 
 def sellogin(Username, Password, browser):
     browser.get("https://www.chess.com/login")
@@ -1864,7 +1916,7 @@ for content in (["", "", "developed by Robin Karlsson", "", "", "Contact informa
     olprint2("{0: ^70}", content, "|", "|")
 olprint("|", "|", "-", 72, True)
 
-for content in (["", "", "Options", "Type /help or /help <number> for more info", "", "", "1. Extract the memberslist of one or more groups", "", "2. Build a csv file with data on a list of members", "", "3. Send invites for a group", "", "4. Posts per member in a groups finished votechess matches", "", "5. Build a csv file of a groups team match participants", "", "6. Filter a list of members for those who fill a few requirements", "", "7. Presentation of csv-files from options 2 and 5", "", "8. Temporary disabled", "", "9. Look for members who has recenty left your group", "", "10. Count number of group notes per member in the last 100 notes pages", "", "11. Build a birthday schedule for a list of members", "", "12. Send a personal message to a list of members", "", "13. Pair lists of players against each others", "", "14. Set operations on two lists", "", "15. Check a teams won/lost tm's per opponent", "", "16. Delete all group notes in a group", "", ""]):
+for content in (["", "", "Options", "Type /help or /help <number> for more info", "", "", "1. Extract the memberslist of one or more groups", "", "2. Build a csv file with data on a list of members", "", "3. Send invites for a group", "", "4. Posts per member in a groups finished votechess matches", "", "5. Build a csv file of a groups team match participants", "", "6. Filter a list of members for those who fill a few requirements", "", "7. Presentation of csv-files from options 2 and 5", "", "8. Send personal notes to a list of members", "", "9. Look for members who has recenty left your group", "", "10. Count number of group notes per member in the last 100 notes pages", "", "11. Build a birthday schedule for a list of members", "", "12. Send a personal message to a list of members", "", "13. Pair lists of players against each others", "", "14. Set operations on two lists", "", "15. Check a teams won/lost tm's per opponent", "", "16. Delete all group notes in a group", "", ""]):
     olprint2("{0: ^70}", content, "|", "|")
 olprint("*", "*", "-", 72, True)
 
@@ -1873,7 +1925,7 @@ makefolder((["Member Lists", "Member Lists/Config", "Invite Lists", "Invite List
 
 while pathway in (["y"]):
     flow = ""
-    while flow not in (["1", "2", "3", "4", "5", "6", "7", "9", "10", "11", "12", "13", "14", "15", "16", "42"]):
+    while flow not in (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "42"]):
         flow = raw_input("\n\n\nEnter your choice here: ")
 
         if flow == "/help 1":
@@ -1890,6 +1942,8 @@ while pathway in (["y"]):
             print "\n\nTakes a comma seperated list of members and sort out those who doesn't fill a few criterias regarding:\n\n Min online chess rating\n Max online chess rating\n Last online\n Member Since\n Older than (if birthdate is available on members profile)\n Younger than (if birthdate is available on members profile)\n Min number of groups member may be in\n Max number of groups member may be in\n Timeout-ratio\n Time per move\n If they have a custom avatar\n Gender, determined by comparing the members name to a list of male and female names"
         elif flow == "/help 7":
             print "\n\nPresentation of csv files from option 2 and 5. Can present data from the csv files sorted by any column, compare two csv files from option 5 to see what has changed or return the username of each member in the file and present it as a comma seperated list"
+        elif flow == "/help 8":
+            print "\n\nSend personalized notes to either a comma seperated list of members or those who are present in a set of pages. The note can include text with the members real name and nation.\n\nRequires the script to log in to chess.com, to send notes from your account"
         elif flow == "/help 9":
             print "\n\nAt first run the script builds a list of members who are currently in your group.\nAt future runs the script will build a new memberslist of your group, look for members who are in the memberslist compiled during the last run but not in the latest run.\nRemoves those who has had their accounts closed or changed their names and print the result, which is the members who has left your group in the timeperiod between two runs\n\nRequires the script to log in to and you to be an admin of the group that's checked, to access the manage members page"
         elif flow == "/help 10":
@@ -2163,7 +2217,17 @@ while pathway in (["y"]):
                 print "".join(element.ljust(colwidth) for element in cpointer)
 
     elif flow == "8":
-        "placeholder"
+        target = file_or_input(False, "\n\nName of the file containing your list of members: ", "", "\n\nEnter list of members to send notes: ", "")[0]
+        print "\n\nYou have entered " + str(len(target)) + " names\n\n"
+        msg = raw_input("\n\nEnter message to use (available commands: /name = member name or username, /nation = member nation): ")
+        nationalt = raw_input("What to use if member nation is international? ")
+        interval = enterint("Interval between notes (s): ")
+
+        shutdown = ""
+        while shutdown not in (["y", "n"]):
+            shutdown = raw_input("\n\nShut down computer when complete (might require elevated privileges)? (y/n) ")
+
+        noteposter(target, msg, interval, nationalt, shutdown)
 
     elif flow == "9":
         while flow not in (["1", "2"]):
