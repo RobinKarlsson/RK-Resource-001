@@ -150,7 +150,8 @@ This data can be presented and sorted using option 7 in the main script
 
 
 
- 8) Temporary disabled                    
+ 8) Send personalized notes to either a comma seperated list of members or those who are present in a set of pages. The note can include text with the members real name (or username) and nation.
+
 
 
  9) At first run the script builds a list of members who are currently in your group.
