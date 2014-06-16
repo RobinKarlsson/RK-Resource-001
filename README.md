@@ -43,8 +43,14 @@ ps. don't forget to update regularly
 
 
 
+===============
+
+
 
 Miscellaneous
+
+
+
 
 After adding a new group for which you wish to do invites you must create an invites message! Go to the folder /Messages/Invite Messages. There should now be two files called "{Group Name} Standard message" and "{Group Name} Deserter message".
 
