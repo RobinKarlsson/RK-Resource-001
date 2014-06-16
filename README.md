@@ -19,7 +19,7 @@ Instructions
 Step 1.
  - download and install python 2.7, https://www.python.org/download/releases/2.7.7/
 
- - Once python is installed either download and tarball or install (using pip would be the simplest way to install them, https://pip.pypa.io/en/latest/index.html) the following libraries: mechanize, bs4 and selenium
+ - Once python is installed either download and tarball or install the following libraries (using pip would be the simplest way to install them, https://pip.pypa.io/en/latest/index.html): mechanize, bs4 and selenium
 
 
 Step 2.
