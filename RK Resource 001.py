@@ -31,7 +31,7 @@ from operator import itemgetter
 from collections import OrderedDict
 from collections import Counter
 from string import punctuation
-supusr = False
+supusr = True
 
 def csvsoworker(memlist, choicepath):
     colwidth = max(len(element.decode("UTF-8")) for row in memlist for element in row) + 2
@@ -893,7 +893,6 @@ def filtmcemsg(msglist, browser, name, country, browserchoice):
             #browser.execute_script("tinyMCE.activeEditor.insertContent('%s')" % streplacer(content[1], (["/name", name.strip()], ["/nation", country.strip()], ["/newline", " <br/>"])))
             browser.find_element_by_id("tinymce").send_keys(streplacer(content[1], (["/name", name.strip()], ["/nation", country.strip()], ["/newline", "\n"])))
             browser.switch_to_default_content()
-            raw_input("text insterted with the insert command")
         elif content[0] == "2":
             browser.find_element_by_id("tinymcewindow_imageuploader").click()
             time.sleep(1)
