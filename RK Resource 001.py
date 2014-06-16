@@ -512,8 +512,9 @@ def pmdriver(target, choice):
         choice2 = raw_input("\nSort out those who dont fill a few requirements? (y/n) ")
 
     noadmins = ""
-    while noadmins not in (["y", "n"]):
-        noadmins = raw_input("\nInclude admins? (y/n) ")
+    if choice == "1":
+        while noadmins not in (["y", "n"]):
+            noadmins = raw_input("\nInclude admins? (y/n) ")
 
     Username = raw_input("\n\n\nUsername: ")
     Password = raw_input("Password: ")
@@ -826,9 +827,13 @@ def selbrowch():
         browserchoice = raw_input("Which browser do you want to use\n 1. Firefox\n 2. Chrome\n 3. PhantomJS\n 4. Internet Explorer\nYour choice: ")
     return browserchoice
 
-def createfileifmissing(filename):
+def createfileifmissing(filename, ismsg):
     if os.path.isfile(filename) is False:
-        open(filename, "wb").close()
+        if ismsg is False:
+            open(filename, "wb").close()
+        else:
+            with open(filename, "wb") as mfile:
+                mfile.write("<Text>\nHello this is an example message\n<Image>\nhttp://d1lalstwiwz2br.cloudfront.net/images_users/avatars/RobinKarlsson_large.4.jpeg\n<Video>\nhttp://www.youtube.com/watch?v=GY8YBF8dHQo")
 
 def createconfig(name, ID):
     invconpath = "Member Lists/Config/" + name + ".ini"
@@ -839,12 +844,12 @@ def createconfig(name, ID):
 
     with open("Invite Lists/Config/" + name + ".ini", "wb") as setupfile:
         setupfile.write("What to use if members nation is set to International==\nMin online chess rating==\nMax online chess rating==\nMin 960 chess rating==\nMax 960 chess rating==\nMin online chess games plaid==\nMin online chess win-ratio==\nLast logged in within days==\nMember on chess.com for days==\nBorn after date (YYYY-MM-DD)==\nBorn before date (YYYY-MM-DD)==\nMax timeout-ratio allowed==\nMax number of groups member can be in==\nMin number of groups member can be in==\nMin time/move (days-hours-minutes)==\nMax time/move (days-hours-minutes)==\nOnly invite those with a custom avatar (y/n)==\nMember should be from nation==\nGender (m/f)==\nLink to groups invite members page==http://www.chess.com/groups/invite_members?id=" + ID + "\nFile containing the main invites list==Invite Lists/" + name + "\nFile containing those who should receive priority invites (circumvents filter)==Invite Lists/" + name + " priority\nInvites file for those who has left the group==Invite Lists/" + membersleftinvfile + " members who has left\nFile containing those who has received an invite==Invite Lists/" + name + " already invited\nFile containing your invites message for members who has left your group==Messages/Invite Messages/" + name + " Deserter message\nFile containing your invites message for standard and priority invites lists==Messages/Invite Messages/" + name + " Standard Message")
-    createfileifmissing("Messages/Invite Messages/" + name + " Standard Message")
-    createfileifmissing("Messages/Invite Messages/" + name + " Deserters Message")
-    createfileifmissing("Invite Lists/" + name + " already invited")
-    createfileifmissing("Invite Lists/" + name + " members who has left")
-    createfileifmissing("Invite Lists/" + name + " priority")
-    createfileifmissing("Invite Lists/" + name)
+    createfileifmissing("Messages/Invite Messages/" + name + " Standard Message", True)
+    createfileifmissing("Messages/Invite Messages/" + name + " Deserters Message", True)
+    createfileifmissing("Invite Lists/" + name + " already invited", False)
+    createfileifmissing("Invite Lists/" + name + " members who has left", False)
+    createfileifmissing("Invite Lists/" + name + " priority", False)
+    createfileifmissing("Invite Lists/" + name, False)
 
 def configopen(filename, forinvites):
     if os.path.isfile(filename) is True:
@@ -884,11 +889,11 @@ def getfilelist(path, endswith):
 def filtmcemsg(msglist, browser, name, country, browserchoice):
     for content in msglist:
         if content[0] == "1":
-            #browser.execute_script("tinyMCE.activeEditor.insertContent('%s')" % streplacer(content[1], (["/name", name.strip()], ["/nation", country.strip()], ["/newline", " <br/>"])))
-
             browser.switch_to_frame("tinymcewindow_ifr")
+            #browser.execute_script("tinyMCE.activeEditor.insertContent('%s')" % streplacer(content[1], (["/name", name.strip()], ["/nation", country.strip()], ["/newline", " <br/>"])))
             browser.find_element_by_id("tinymce").send_keys(streplacer(content[1], (["/name", name.strip()], ["/nation", country.strip()], ["/newline", "\n"])))
             browser.switch_to_default_content()
+            raw_input("text insterted with the insert command")
         elif content[0] == "2":
             browser.find_element_by_id("tinymcewindow_imageuploader").click()
             time.sleep(1)
@@ -2015,7 +2020,7 @@ while pathway in (["y"]):
         if flow == "2":
             name = raw_input("\n\nGroup name: ")
             createconfig(name, str(enterint("Group ID: ")))
-            print "\n\nThe following files have been created\n\n  - /Messages/Invite Messages/" + name + " Standard Message (used to invite members from the standard and VIP invites lists)\n  - /Messages/Invite Messages/" + name + " Deserters Message (Used to reinvite those who have left " + name + ")\n  - Invite Lists/" + name + " (main invites list)\n  - Invite Lists/" + name + " priority (used for those whom you want to invite asap, circumvents any filters)\n  - Invite Lists/" + name + " members who has left (here you can place members who has left " + name + " to reinvite them using the invites message from /Messages/Invite Messages/" + name + " Deserters Message)\n  - Invite Lists/" + name + " already invited (stores the names of those who has received an invite from the script, members in this list wont receive an invite even if their names are in the standard invites list)\n\nTo use the inviter you need to first create a invites message for the script to use and put members whom you want to invite in the invites lists\nChanges to the filter used by " + name + " can be made by modifying the file Invite Lists/Config/" + name + "\n\n"
+            print "\n\nThe following files have been created\n\n  - /Messages/Invite Messages/" + name + " Standard Message (used to invite members from the standard and VIP invites lists)\n  - /Messages/Invite Messages/" + name + " Deserters Message (Used to reinvite those who have left " + name + ")\n  - Invite Lists/" + name + " (main invites list)\n  - Invite Lists/" + name + " priority (used for those whom you want to invite asap, circumvents any filters)\n  - Invite Lists/" + name + " members who has left (here you can place members who has left " + name + " to reinvite them using the invites message from /Messages/Invite Messages/" + name + " Deserters Message)\n  - Invite Lists/" + name + " already invited (stores the names of those who has received an invite from the script, members in this list wont receive an invite even if their names are in the standard invites list)\n\nTo use the inviter you need to first create a invites message for the script to use and put members whom you want to invite in the invites lists\nChanges to the filter used by " + name + " can be made by modifying the file Invite Lists/Config/" + name + "\n\n\n\n\nNames in the priority invites list will be invited before those in the list of members who has left and the standard list, without the use of any filters. Names in the invites list of members who has left will be invited before those in the standard list and with the deserters invites message\n\n"
             continue
 
         inifilelist = getfilelist("Invite Lists/Config", ".ini")
