@@ -58,12 +58,20 @@ The Standard message will be used for members from your standard and priority in
 
 
 Format of the invites messages should be as follows:
+
 <Text>
+
 By using the <Text> command followed by a newline you tell the script that what is entered here should be entered as raw text. 
+
 <Image>
+
 With this command we tell the script that this text should be entered as a image url, for example: http://d1lalstwiwz2br.cloudfront.net/images_users/avatars/RobinKarlsson_large.4.jpeg
+
 <Video>
+
 This text here is entered as a youtube video url, for example: http://www.youtube.com/watch?v=GY8YBF8dHQo
+
+
 
 
 
@@ -80,13 +88,21 @@ The text can include newlines, references to the members nation and name given o
 
 
 example message:
+
 <Text>
+
 Hey /name, how is /nation?/newlineWe would love for you to come and join us here at etc
+
 <Image>
+
 image url
+
 <Text>
+
 some more text
+
 <Video>
+
 video url
 
 
