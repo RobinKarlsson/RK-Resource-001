@@ -27,7 +27,7 @@ Step 2.
 
  - open a command prompt/terminal window and navigate to the unpacked folder
 
- - type python "RK Resource 001.py" to launch the script. It will know set up its file architecture
+ - type python "RK Resource 001.py" to launch the script. It will now set up its file architecture
 
 
 Step 3.
