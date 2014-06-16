@@ -15,15 +15,75 @@ Requirements
 
 Instructions
 
- 1) install the required software, the libraries can either be installed to your system or tarballed
- 
- 2) get the script
- 
- 3) run the script
- 
-===============
 
-At first run the script will set up its file architecture. Selenium webdrivers should be placed in the Webdriver/"YOUR_OS"/"BROWSER_YOU_USE" folder. Addons to the Webdriver goes to Webdriver/Extensions/"BROWSER_YOU_USE" folder
+Step 1.
+ - download and install python 2.7, https://www.python.org/download/releases/2.7.7/
+
+ - Once python is installed either download and tarball or install (using pip would be the simplest way to install them, https://pip.pypa.io/en/latest/index.html) the following libraries: mechanize, bs4 and selenium
+
+
+Step 2.
+ - Download and unpack the script, https://github.com/RobinKarlsson/RK-Resource-001/archive/master.zip
+
+ - open a command prompt/terminal window and navigate to the unpacked folder
+
+ - type python "RK Resource 001.py" to launch the script. It will know set up its file architecture
+
+
+Step 3.
+A few functions in the script requires a webdriver to function properly. The firefox driver comes with the selenium library so if you have firefox installed you're good to go.
+If you prefer chrome over firefox you can download a chromedriver from http://chromedriver.storage.googleapis.com/index.html (or for ie, http://selenium-release.storage.googleapis.com/index.html).
+Place the webdriver(s) in the folder /Webdriver/YOUR_OS/86
+
+
+Step 4.
+run the script again and you should be good to go ;))
+
+ps. don't forget to update regularly
+
+
+
+
+Miscellaneous
+
+After adding a new group for which you wish to do invites you must create an invites message! Go to the folder /Messages/Invite Messages. There should now be two files called "{Group Name} Standard message" and "{Group Name} Deserter message".
+
+The Standard message will be used for members from your standard and priority invites lists, while the deserter message will be used for members from the invites list of members who has left (to find members who has left your group use option 9 in the script, if you use the same name when adding a new group for 9 as you did for the inviter members who has left your group will be automatically added to the invites list of members who has left).
+
+
+Format of the invites messages should be as follows:
+<Text>
+By using the <Text> command followed by a newline you tell the script that what is entered here should be entered as raw text. 
+<Image>
+With this command we tell the script that this text should be entered as a image url, for example: http://d1lalstwiwz2br.cloudfront.net/images_users/avatars/RobinKarlsson_large.4.jpeg
+<Video>
+This text here is entered as a youtube video url, for example: http://www.youtube.com/watch?v=GY8YBF8dHQo
+
+
+
+Text and images can be multiple times and they are written in the order you place them in the message file.
+
+
+The text can include newlines, references to the members nation and name given on their profile through the commands:
+
+
+ - /name = gets replaced with the name given on members profile, username if no name is given.
+ - /nation = gets replaced with the members nation of origin (by modifying the file "/Invite Lists/Config/{Group Name}.ini" you can chooce what to use if member nation is international, plus set a few filters that will be used by the invites)
+ - /newline = newline... do NOT add a newline by enter unless you're done with the current section!!! use the /newline command
+
+
+
+example message:
+<Text>
+Hey /name, how is /nation?/newlineWe would love for you to come and join us here at etc
+<Image>
+image url
+<Text>
+some more text
+<Video>
+video url
+
+
 
 ===============
 
