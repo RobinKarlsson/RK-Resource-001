@@ -57,25 +57,6 @@ After adding a new group for which you wish to do invites you must create an inv
 The Standard message will be used for members from your standard and priority invites lists, while the deserter message will be used for members from the invites list of members who has left (to find members who has left your group use option 9 in the script, if you use the same name when adding a new group for 9 as you did for the inviter members who has left your group will be automatically added to the invites list of members who has left).
 
 
-Format of the invites messages should be as follows:
-
-<Text>
-
-By using the <Text> command followed by a newline you tell the script that what is entered here should be entered as raw text. 
-
-<Image>
-
-With this command we tell the script that this text should be entered as a image url, for example: http://d1lalstwiwz2br.cloudfront.net/images_users/avatars/RobinKarlsson_large.4.jpeg
-
-<Video>
-
-This text here is entered as a youtube video url, for example: http://www.youtube.com/watch?v=GY8YBF8dHQo
-
-
-
-
-
-Text and images can be multiple times and they are written in the order you place them in the message file.
 
 
 The text can include newlines, references to the members nation and name given on their profile through the commands:
@@ -88,29 +69,6 @@ The text can include newlines, references to the members nation and name given o
 
  - /newline = newline... do NOT add a newline by enter unless you're done with the current section!!! use the /newline command
 
-
-
-===============
-
-
-
-example message:
-
-<Text>
-
-Hey /name, how is /nation?/newlineWe would love for you to come and join us here at etc
-
-<Image>
-
-image url
-
-<Text>
-
-some more text
-
-<Video>
-
-video url
 
 
 
