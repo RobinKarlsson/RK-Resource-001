@@ -447,7 +447,7 @@ def noteposter(target, msg, interval, nationalt, shutdown):
             except:
                 if counter == 20:
                     print "\n\nSkipped " + mem + "\n\n"
-                    skipped.append()
+                    skipped.append(mem)
                     break
                 counter += 1
                 time.sleep(1)
