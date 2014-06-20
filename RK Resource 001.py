@@ -2099,7 +2099,7 @@ while pathway in (["y"]):
 
             outputfile.close()
             print "\n\n\nTimeouts per player (number of timeouts (" + str(timeoutnum) + ") / number of players (" + str(len(joined)) + ")): " + str((timeoutnum + 0.0) / len(joined))
-            print "Group points won ratio (points won (" + str(ptswon).replace(".0", "") + ") / total number of points (" + str(ptslost + ptswon).replace(".0", "") + ")): " + str((ptswon + 0.0) / (ptslost + ptswon)) + "\n\n"
+            print "Team match points won ratio (points won (" + str(ptswon).replace(".0", "") + ") / total number of points (" + str(ptslost + ptswon).replace(".0", "") + ")): " + str((ptswon + 0.0) / (ptslost + ptswon)) + "\n\n"
 
         elif pathtm == "2":
             maxtmrat = int(raw_input("\n\nGet members with a timeout-ratio above: ").replace("%", ""))
