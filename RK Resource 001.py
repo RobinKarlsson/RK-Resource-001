@@ -425,7 +425,8 @@ def noteposter(target, msg, interval, nationalt, shutdown):
     print "\n\n"
 
     for mem in target:
-        browser, response = mecopner(browser, "http://www.chess.com/members/view/" + mem)
+        print "processing: " + mem
+        browser, response = mecopner(browser, )
         soup = BeautifulSoup(response)
 
         for placeholder in soup.find_all(class_ = "flag"):
@@ -559,6 +560,9 @@ def pmdriver(target, choice):
 
         browser1, response = mecopner(browser1, membername)
         soup = BeautifulSoup(response)
+        if not membername2 in soup:
+            print "\n\nFailed to open page and skipped, " + membername + "\n\n"
+            continue
 
         for placeholder in soup.find_all(class_ = "flag"):
             country = placeholder["title"]
@@ -1092,8 +1096,6 @@ def gettmlinklist(targetname, browser):
     for pointer in pointerlist:
         del linklist[-1]
     return linklist
-
-
 
 def sellogin(Username, Password, browser):
     browser.get("https://www.chess.com/login")
@@ -2501,7 +2503,18 @@ while pathway in (["y"]):
             turnofcomp()
 
     elif flow == "42":
-        "None"
+        browser = mecbrowser("")
+        browser, response = mecopner(browser, raw_input("target page link: "))
+        usrlist = list()
+
+        for link in browser.links(url_regex="chess.com/members/view/"):
+            ltext = link.text
+            if ltext != "View Profile":
+                usrlist.append(ltext.replace("[IMG]", ""))
+
+        for mem in usrlist:
+            if mem != "":
+                print mem + ",",
 
     pathway = ""
     while pathway not in (["y", "n"]):
