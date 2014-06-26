@@ -560,7 +560,7 @@ def pmdriver(target, choice):
 
         browser1, response = mecopner(browser1, membername)
         soup = BeautifulSoup(response)
-        if not membername2 in soup:
+        if not membername2 in str(soup):
             print "\n\nFailed to open page and skipped, " + membername + "\n\n"
             continue
 
