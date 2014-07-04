@@ -31,7 +31,7 @@ from operator import itemgetter
 from collections import OrderedDict
 from collections import Counter
 from string import punctuation
-supusr = False
+supusr = True
 
 def csvsoworker(memlist, choicepath):
     colwidth = max(len(element.decode("UTF-8")) for row in memlist for element in row) + 2
@@ -426,7 +426,7 @@ def noteposter(target, msg, interval, nationalt, shutdown):
 
     for mem in target:
         print "processing: " + mem
-        browser, response = mecopner(browser, )
+        browser, response = mecopner(browser, "http://www.chess.com/members/view/" + mem)
         soup = BeautifulSoup(response)
 
         for placeholder in soup.find_all(class_ = "flag"):
@@ -2396,13 +2396,13 @@ while pathway in (["y"]):
         list1, list2 = file_or_input(True, "\n\nName of file 1: ", "Name of file 2: ", "\n\nList1: ", "List2: ")
 
         if choice14 == "1":
-            prlst = streplacer(str(list(set(list1).intersection(set(list2)))), ([" ", ""], ["(", ""], [")", ""], ["]", ""], ["[", ""], ["'", ""]))
+            prlst = streplacer(str(list(set(list1).intersection(set(list2)))), (["(", ""], [")", ""], ["]", ""], ["[", ""], ["'", ""]))
         elif choice14 == "2":
-            prlst = streplacer(str(list(set(list1).union(set(list2)))), ([" ", ""], ["(", ""], [")", ""], ["]", ""], ["[", ""], ["'", ""]))
+            prlst = streplacer(str(list(set(list1).union(set(list2)))), (["(", ""], [")", ""], ["]", ""], ["[", ""], ["'", ""]))
         elif choice14 == "3":
-            prlst = streplacer(str(list(set(list1).difference(set(list2)))), ([" ", ""], ["(", ""], [")", ""], ["]", ""], ["[", ""], ["'", ""]))
+            prlst = streplacer(str(list(set(list1).difference(set(list2)))), (["(", ""], [")", ""], ["]", ""], ["[", ""], ["'", ""]))
         elif choice14 == "4":
-            prlst = streplacer(str(list(set(list1).symmetric_difference(set(list2)))), ([" ", ""], ["(", ""], [")", ""], ["]", ""], ["[", ""], ["'", ""]))
+            prlst = streplacer(str(list(set(list1).symmetric_difference(set(list2)))), (["(", ""], [")", ""], ["]", ""], ["[", ""], ["'", ""]))
 
         choice6 = ""
         while choice6 not in (["1", "2"]):
