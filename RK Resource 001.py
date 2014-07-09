@@ -442,7 +442,7 @@ def noteposter(target, msg, interval, nationalt, shutdown):
 
         while True:
             try:
-                browser2.find_element_by_name("c23").send_keys(streplacer(msg, (["/name", name.strip()], ["/nation", country.strip()])))
+                browser2.find_element_by_name("c23").send_keys(streplacer(msg, (["/name", name.strip()], ["/firstname", name.split(" ")[0]], ["/nation", country.strip()])))
                 browser2.find_element_by_name("c24").click()
                 break
             except:
@@ -467,7 +467,7 @@ def noteposter(target, msg, interval, nationalt, shutdown):
 def pmdriver(target, choice):
     while "" in target:
         target.remove("")
-    print "\n\n\n\nsupported commands, will be replaced with each members respective info\n /name - members name or username (if name is unavailable)\n /nation - members nation of origin\n /newline - pagebreak\n\n\n"
+    print "\n\n\n\nsupported commands, will be replaced with each members respective info\n /name - members name or username (if name is unavailable)\n /firstname - member first name or username (if no name is available)\n /nation - members nation of origin\n /newline - pagebreak\n\n\n"
     subjectorg = raw_input("subject line: ")
     msglist = list()
     msgchoice = ""
@@ -573,7 +573,7 @@ def pmdriver(target, choice):
         if name == " ":
             name = membername2
 
-        subject = streplacer(subjectorg, (["/name", name.strip()], ["/nation", country.strip()], ["/newline", "\n"]))
+        subject = streplacer(subjectorg, (["/name", name.strip()], ["/firstname", name.split(" ")[0]], ["/nation", country.strip()], ["/newline", "\n"]))
 
         for link in soup.find_all("a", href = True):
             if link.text == "Send a Message":
@@ -894,8 +894,8 @@ def filtmcemsg(msglist, browser, name, country, browserchoice):
     for content in msglist:
         if content[0] == "1":
             browser.switch_to_frame("tinymcewindow_ifr")
-            #browser.execute_script("tinyMCE.activeEditor.insertContent('%s')" % streplacer(content[1], (["/name", name.strip()], ["/nation", country.strip()], ["/newline", " <br/>"])))
-            browser.find_element_by_id("tinymce").send_keys(streplacer(content[1], (["/name", name.strip()], ["/nation", country.strip()], ["/newline", "\n"])))
+            #browser.execute_script("tinyMCE.activeEditor.insertContent('%s')" % streplacer(content[1], (["/name", name.strip()], ["/firstname", name.split(" ")[0]], ["/nation", country.strip()], ["/newline", " <br/>"])))
+            browser.find_element_by_id("tinymce").send_keys(streplacer(content[1], (["/name", name.strip()], ["/firstname", name.split(" ")[0]], ["/nation", country.strip()], ["/newline", "\n"])))
             browser.switch_to_default_content()
         elif content[0] == "2":
             browser.find_element_by_id("tinymcewindow_imageuploader").click()
@@ -2225,7 +2225,7 @@ while pathway in (["y"]):
     elif flow == "8":
         target = file_or_input(False, "\n\nName of the file containing your list of members: ", "", "\n\nEnter list of members to send notes: ", "")[0]
         print "\n\nYou have entered " + str(len(target)) + " names\n\n"
-        msg = raw_input("\n\nEnter message to use (available commands: /name = member name or username, /nation = member nation): ")
+        msg = raw_input("\n\nEnter message to use (available commands: /name = member name or username, /firstname - member first name or username (if no name is available), /nation = member nation): ")
         nationalt = raw_input("What to use if member nation is international? ")
         interval = enterint("Interval between notes (s): ")
 
