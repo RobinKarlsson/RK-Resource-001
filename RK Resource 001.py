@@ -8,6 +8,7 @@
 import mechanize
 import os
 import sys
+import gc
 import csv
 import urlparse
 import cookielib
@@ -16,6 +17,7 @@ import base64
 import stat
 import re
 import time
+import subprocess
 import platform as _platform
 from time import strftime, gmtime
 from datetime import datetime, date, timedelta
@@ -107,7 +109,10 @@ def csvsoworker(memlist, choicepath):
                     element[choice2] = [int(subelem) for subelem in element[choice2]]
 
             if type(memlist2[0][choice2]) is str:
-                memlist2 = sorted(memlist2, key = lambda tup: tup[0].lower())
+                try:
+                    memlist2 = sorted(memlist2, key = lambda tup: tup[0].lower())
+                except AttributeError:
+                    memlist2 = sorted(memlist2, reverse = False, key = lambda tup: tup[choice2])
             elif type(memlist2[0][choice2]) is float or type(memlist2[0][choice2]) is list:
                 memlist2 = sorted(memlist2, reverse = True, key = lambda tup: tup[choice2])
 
@@ -135,7 +140,7 @@ def getmeminfo(target, filename):
     memlist = list()
     outputfile = open(filename + " " + strftime("%Y-%m-%d", gmtime()) + ".mem.csv", "wb")
     csvwriter = csv.writer(outputfile, delimiter = " ", quoting=csv.QUOTE_MINIMAL)
-    csvwriter.writerow(("Username", "Real name", "Live Standard rating", "Live Blitz rating", "Live Bullet rating", "Online rating", "960 rating", "Tactics rating", "Timeout-ratio", "Last online", "Member since", "Time/move", "Groups", "Points", "Total games", "Games won", "Games lost", "Games drawn", "Win ratio", "Nation", "Custom avatar"))
+    csvwriter.writerow(("Username", "Real name", "Live Standard rating", "Live Blitz rating", "Live Bullet rating", "Online rating", "960 rating", "Tactics rating", "Timeout-ratio", "Last online", "Member since", "Time/move", "Groups", "Points", "Total games", "Games won", "Games lost", "Games drawn", "Win ratio", "Nation", "Custom avatar", "Site Awards", "Tournament Trophies", "Game Trophies", "Fun Trophies"))
 
     for mem in target:
         print "Processing " + mem
@@ -145,6 +150,10 @@ def getmeminfo(target, filename):
 
         soup = BeautifulSoup(response)
 
+        browser, response = mecopner(browser, "http://www.chess.com/members/trophy_room/" + mem)
+        awardsoup = BeautifulSoup(response)
+
+        sawards, tourneytrophy, gametrophy, funtrophy = getawards(awardsoup)
         timemove = TimeMoveChecker(soup)
         memsinlastonl = memsin(soup)
         gamestat = gamestats(soup)
@@ -153,7 +162,7 @@ def getmeminfo(target, filename):
         else:
             winratm = 0
 
-        csvwriter.writerow((mem, namechecker(soup).encode("utf-8"), lstanratingchecker(soup), lblitzratingchecker(soup), lbulratingchecker(soup), onlratingchecker(soup), ranratingchecker(soup), tacratingchecker(soup), timeoutchecker(soup), memsinlastonl[1], memsinlastonl[0], timemove, groupmemlister(soup), ptscheck(soup), gamestat[0], gamestat[1], gamestat[2], gamestat[3], winratm, nationlister(soup).encode("utf-8"), AvatarCheck(soup)))
+        csvwriter.writerow((mem, namechecker(soup).encode("utf-8"), lstanratingchecker(soup), lblitzratingchecker(soup), lbulratingchecker(soup), onlratingchecker(soup), ranratingchecker(soup), tacratingchecker(soup), timeoutchecker(soup), memsinlastonl[1], memsinlastonl[0], timemove, groupmemlister(soup), ptscheck(soup), gamestat[0], gamestat[1], gamestat[2], gamestat[3], winratm, nationlister(soup).encode("utf-8"), AvatarCheck(soup), sawards, tourneytrophy, gametrophy, funtrophy))
 
 def getplatform():
     return _platform.platform(), _platform.system(), _platform.release(), _platform.architecture()
@@ -322,13 +331,16 @@ def turnofcomp():
 
     elif usrplatform[1] == "Darwin":
         try:
-            import subprocess
             subprocess.call(["osascript", "-e", 'tell app "System Events" to shut down'])
         except Exception, errormsg:
             if supusr is True:
                 print repr(errormsg)
 
     os.system("shutdown -h now")
+
+def ramusage():
+    placeholder = subprocess.Popen(['ps', 'v', '-p', str(os.getpid())], stdout = subprocess.PIPE).communicate()[0].split(b'\n')
+    return float(placeholder[1].split()[placeholder[0].split().index(b'RSS')]) / 1024
 
 def resource01(evenmtch, mtchlist):
     ctrl = False
@@ -425,6 +437,10 @@ def noteposter(target, msg, interval, nationalt, shutdown):
     print "\n\n"
 
     for mem in target:
+        try:
+            print "current memory usage: " + str(ramusage())
+        except:
+            "nothing"
         print "processing: " + mem
         browser, response = mecopner(browser, "http://www.chess.com/members/view/" + mem)
         soup = BeautifulSoup(response)
@@ -453,6 +469,8 @@ def noteposter(target, msg, interval, nationalt, shutdown):
                 counter += 1
                 time.sleep(1)
 
+        soup = None
+        gc.collect()
         time.sleep(interval)
 
     if len(skipped) != 0:
@@ -527,7 +545,7 @@ def pmdriver(target, choice):
     browser1 = mecbrowser(logincookie)
 
     if choice == "1":
-        memtpm = spider(target, False, browser1)
+        memtpm = memspider(target, False, browser1)
         if noadmins == "n":
             superadmins, admins = getadmins(getgrouphome(target, browser1), browser1)
             memtpm = memtpm.difference(superadmins + admins)
@@ -541,6 +559,10 @@ def pmdriver(target, choice):
 
     counter = 1
     for membername2 in memtpm:
+        try:
+            print "current memory usage: " + str(ramusage())
+        except:
+            "nothing"
         if choice2 == "y":
             passmemfil = memberprocesser(True, browser1, ([membername2]), minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat)
 
@@ -554,16 +576,13 @@ def pmdriver(target, choice):
                 browser0, handle = pickbrowser(browserchoice, True)
                 browser0 = sellogin(Username, Password, browser0)
                 counter = 1
-
         print "sending pm to " + membername2
         membername = "http://www.chess.com/members/view/" + membername2
-
         browser1, response = mecopner(browser1, membername)
         soup = BeautifulSoup(response)
         if not membername2 in str(soup):
             print "\n\nFailed to open page and skipped, " + membername + "\n\n"
             continue
-
         for placeholder in soup.find_all(class_ = "flag"):
             country = placeholder["title"]
         if country == "International":
@@ -614,7 +633,10 @@ def pmdriver(target, choice):
                             print repr(errormsg)
                         print "retrying"
 
+        soup = None
+        gc.collect()
         time.sleep(sleeptime)
+
     browser0.quit()
 
     if shutdown == "y":
@@ -629,7 +651,7 @@ def mecopner(browser, pointl):
             if supusr is True:
                 print repr(errormsg)
             print "something went wrong, reopening " + pointl
-            time.sleep(1)
+            time.sleep(2)
     return browser, response
 
 def nineworker(infile, inid, logincookie, key):
@@ -642,7 +664,7 @@ def nineworker(infile, inid, logincookie, key):
         target.append("http://www.chess.com/groups/managemembers?id=" + inid + "&page=" + str(counter))
         counter += 1
 
-    un = spider([target], True, mecbrowser(logincookie))
+    un = memspider([target], True, mecbrowser(logincookie))
 
     for member in memlistorg:
         if member not in un:
@@ -777,7 +799,7 @@ def tmparchecker(pagelist, targetname):
             placeholder = list()
     return tmpar, timeoutlist, winssdic, losedic
 
-def spider(target, silent, browser):
+def memspider(target, silent, browser):
     usrlist = list()
     for tlst in target:
         for pointer in tlst:
@@ -785,9 +807,10 @@ def spider(target, silent, browser):
 
             if "http://www.chess.com/groups/view/" in browser.geturl():
                 break
-
             soup = BeautifulSoup(response)
             p2 = str(soup.find_all(class_ = "next-on"))
+            soup = None
+            gc.collect()
             if silent == False:
                 print "checking " + pointer
 
@@ -878,6 +901,16 @@ def configopen(filename, forinvites):
     else:
         sys.exit("\n\n" + filename + " doesn't exist!!!\n\n")
 
+def getawards(soup):
+    results = {"Site Awards": 0, "Tournament Trophies": 0, "Game Trophies": 0, "Fun Trophies": 0}
+    awards = soup.find_all(class_ = "top-16 clear")
+
+    for award in awards:
+        award = str(award.text).strip()[0: -1].split("(")
+        results[award[0][0: -1]] = int(award[1])
+
+    return results["Site Awards"], results["Tournament Trophies"], results["Game Trophies"], results["Fun Trophies"]
+
 def getfilelist(path, endswith):
     lst = list()
     counter = 1
@@ -951,7 +984,8 @@ def remove_doublets(filename):
     else:
         open(filename, "wb").close()
         target = ""
-    return streplacer(str(OrderedDict.fromkeys((line for line in target if line)).keys()), (["' ", ""], ["'", ""], [",", ""], ["]", ""], ["[", ""], ["  ", " "])).split()
+    res = streplacer(str(OrderedDict.fromkeys((line for line in target if line)).keys()), (["' ", ""], ["'", ""], [",", ""], ["]", ""], ["[", ""], ["  ", " "])).split()
+    return res
 
 def evenpairing(lst1, lst2):
     playlst = list()
@@ -1235,7 +1269,7 @@ def inviter(targetlist, endless):
                 standardlst = True
                 invfilter = True
                 deserterlst = False
-
+            
             if priolst == True or standardlst == True:
                 msglist = fileopen(msgliststand, True)
             elif deserterlst == True:
@@ -1250,8 +1284,11 @@ def inviter(targetlist, endless):
 
                 if not picked in already_picked:
                     already_picked.append(picked)
-
             for member in already_picked:
+                try:
+                    print "current memory usage: " + str(ramusage())
+                except:
+                    "nothing"
                 if choice2 == "y" and standardlst == True:
                     try:
                         passmemfil = memberprocesser(True, browser1, ([member]), minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat)
@@ -1281,6 +1318,8 @@ def inviter(targetlist, endless):
                     country = countryalt
 
                 name = namechecker(soup)
+                soup = None
+                gc.collect()
                 if name == " ":
                     name = member
 
@@ -1326,10 +1365,10 @@ def inviter(targetlist, endless):
 
             with open(usedfile, "wb") as placeholder2:
                 placeholder2.write(updinvlist)
-
             if len(memint) != 0:
                 with open(alrfile, "ab") as placeholder3:
                     placeholder3.write(memint + ", ")
+
     browser2.quit()
 
 def vcman(vclinklist, yourside):
@@ -1502,9 +1541,12 @@ def memberprocesser(silent, browser, target, minrat, maxrat, mingames, minwinrat
     while "" in target:
         target.remove("")
     passmem = list()
-
     for targetx in target:
         if silent == False:
+            try:
+                print "current memory usage: " + str(ramusage())
+            except:
+                "nothing"
             print "checking " + targetx
 
         browser, response = mecopner(browser, "http://www.chess.com/members/view/" + targetx)
@@ -1512,19 +1554,26 @@ def memberprocesser(silent, browser, target, minrat, maxrat, mingames, minwinrat
             if "://www.chess.com/members/view/" not in browser.geturl():
                 continue
             soup = BeautifulSoup(response)
+            response = None
 
             if membersinceyear != "" or lastloginyear != "":
                 memsinlist = memsin(soup)
                 if memsinlist == "":
+                    soup = None
+                    gc.collect()
                     continue
 
                 if lastloginyear != "":
                     lonln = memsinlist[1]
                     if datetime(lonln[0], lonln[1], lonln[2]) < datetime(lastloginyear, lastloginmonth, lastloginday):
+                        soup = None
+                        gc.collect()
                         continue
 
             if timemax != "":
                 if timeoutchecker(soup) > timemax:
+                    soup = None
+                    gc.collect()
                     continue
 
             if timovchoicemax != "" or timovchoicemin != "":
@@ -1532,18 +1581,30 @@ def memberprocesser(silent, browser, target, minrat, maxrat, mingames, minwinrat
 
                 if timovchoicemax != "":
                     if timemove[0] > timovchoicemax[0]:
+                        soup = None
+                        gc.collect()
                         continue
                     if timemove[1] > timovchoicemax[1] and timemove[0] >= timovchoicemax[0]:
+                        soup = None
+                        gc.collect()
                         continue
                     if timemove[2] > timovchoicemax[2] and timemove[1] >= timovchoicemax[1] and timemove[0] >= timovchoicemax[0]:
+                        soup = None
+                        gc.collect()
                         continue
 
                 if timovchoicemin != "":
                     if timemove[0] < timovchoicemin[0]:
+                        soup = None
+                        gc.collect()
                         continue
                     if timemove[1] < timovchoicemin[1] and timemove[0] <= timovchoicemin[0]:
+                        soup = None
+                        gc.collect()
                         continue
                     if timemove[2] < timovchoicemin[2] and timemove[1] <= timovchoicemin[1] and timemove[0] <= timovchoicemin[0]:
+                        soup = None
+                        gc.collect()
                         continue
 
             if mingames != "" or minwinrat != "":
@@ -1551,32 +1612,46 @@ def memberprocesser(silent, browser, target, minrat, maxrat, mingames, minwinrat
 
                 if mingames != "":
                     if gamestat[0] < mingames:
+                        soup = None
+                        gc.collect()
                         continue
                 if minwinrat != "":
                     if gamestat[1] / gamestat[0]  < float(minwinrat):
+                        soup = None
+                        gc.collect()
                         continue
 
             if membersinceyear != "":
                 memsi = memsinlist[0]
                 if datetime(memsi[0], memsi[1], memsi[2]) > datetime(membersinceyear, membersincemonth, membersinceday):
+                    soup = None
+                    gc.collect()
                     continue
 
             if minrat != "" or maxrat != "":
                 rating = onlratingchecker(soup)
                 if minrat != "":
                     if rating < minrat:
+                        soup = None
+                        gc.collect()
                         continue
                 if maxrat != "":
                     if rating > maxrat:
+                        soup = None
+                        gc.collect()
                         continue
 
             if minranrat != "" or maxranrat != "":
                 rating = ranratingchecker(soup)
                 if minranrat != "":
                     if rating < minranrat:
+                        soup = None
+                        gc.collect()
                         continue
                 if maxranrat != "":
                     if rating > maxranrat:
+                        soup = None
+                        gc.collect()
                         continue
 
             if maxgroup != "" or mingroup != "":
@@ -1584,18 +1659,26 @@ def memberprocesser(silent, browser, target, minrat, maxrat, mingames, minwinrat
 
                 if maxgroup != "":
                     if groupcount > maxgroup:
+                        soup = None
+                        gc.collect()
                         continue
                 if mingroup != "":
                     if groupcount < mingroup:
+                        soup = None
+                        gc.collect()
                         continue
 
             if avatarch == "y":
                 if AvatarCheck(soup) == False:
+                    soup = None
+                    gc.collect()
                     continue
 
             if youngeryear != "" or olderyear != "":
                 birthdate = birthlister(soup)
                 if birthdate == "":
+                    soup = None
+                    gc.collect()
                     continue
                 while "" in birthdate:
                     birthdate.remove("")
@@ -1604,20 +1687,28 @@ def memberprocesser(silent, browser, target, minrat, maxrat, mingames, minwinrat
 
                 if youngeryear != "":
                     if datetime(birthdate[0], birthdate[1], birthdate[2]) < datetime(youngeryear, youngermonth, youngerday):
+                        soup = None
+                        gc.collect()
                         continue
                 if olderyear != "":
                     if datetime(birthdate[0], birthdate[1], birthdate[2]) > datetime(olderyear, oldermonth, olderday):
+                        soup = None
+                        gc.collect()
                         continue
 
             if heritage != "":
                 nation = nationlister(soup)
 
                 if heritage not in nation:
+                    soup = None
+                    gc.collect()
                     continue
 
             if memgender != "":
                 name = namechecker(soup)
                 if name == " ":
+                    soup = None
+                    gc.collect()
                     continue
                 name = name.split(" ")[0].lower()
                 Found = "n"
@@ -1635,14 +1726,19 @@ def memberprocesser(silent, browser, target, minrat, maxrat, mingames, minwinrat
                                 Found = "y"
                                 break
                 if Found == "n":
+                    soup = None
+                    gc.collect()
                     continue
 
             passmem.append(targetx)
+            soup = None
+            gc.collect()
         except Exception, errormsg:
             if supusr is True:
                 print repr(errormsg)
             print "\n\nskipped " + targetx + "\n\n"
             continue
+
     return passmem
 
 def namechecker(soup):
@@ -1822,8 +1918,14 @@ def memremoverf(inlist, logincookie):
         counter += 1
     targetlist.append(templst)
 
-    filtmem = set(spider(targetlist, True, mecbrowser(logincookie)))
+    filtmem = set(memspider(targetlist, True, mecbrowser(logincookie)))
     return inlist.difference(filtmem)
+
+def runagain():
+    pathway = ""
+    while pathway not in (["y", "n"]):
+        pathway = raw_input("\n\n\nRun again? (y/n) ")
+    return pathway
 
 def file_or_input(mult, fdiag1, fdiag2, idiag1, idiag2):
     list1 = ""
@@ -1980,7 +2082,7 @@ while pathway in (["y"]):
 
         logincookie = login()
         browser = mecbrowser(logincookie)
-        un1 = set(spider(target, False, browser))
+        un1 = set(memspider(target, False, browser))
 
         if noadmins == "n":
             superadmins, admins = getadmins(getgrouphome(target, browser), browser)
@@ -2100,8 +2202,14 @@ while pathway in (["y"]):
                 ptslost += value[3]
 
             outputfile.close()
-            print "\n\n\nTimeouts per player (number of timeouts (" + str(timeoutnum) + ") / number of players (" + str(len(joined)) + ")): " + str((timeoutnum + 0.0) / len(joined))
-            print "Team match points won ratio (points won (" + str(ptswon).replace(".0", "") + ") / total number of points (" + str(ptslost + ptswon).replace(".0", "") + ")): " + str((ptswon + 0.0) / (ptslost + ptswon)) + "\n\n"
+            try:
+                print "\n\n\nTimeouts per player (number of timeouts (" + str(timeoutnum) + ") / number of players (" + str(len(joined)) + ")): " + str((timeoutnum + 0.0) / len(joined))
+            except ZeroDivisionError:
+                "nothing"
+            try:
+                print "Team match points won ratio (points won (" + str(ptswon).replace(".0", "") + ") / total number of points (" + str(ptslost + ptswon).replace(".0", "") + ")): " + str((ptswon + 0.0) / (ptslost + ptswon)) + "\n\n"
+            except ZeroDivisionError:
+                "nothing"
 
         elif pathtm == "2":
             maxtmrat = int(raw_input("\n\nGet members with a timeout-ratio above: ").replace("%", ""))
@@ -2324,14 +2432,8 @@ while pathway in (["y"]):
         birthdsorter(birthdaylist)
 
     elif flow == "12":
-        choice = ""
-        while choice not in (["1", "2"]):
-            choice = raw_input("\n\noptions:\n 1. send a pm to all members from a set of pages\n 2. pm members from a custom list\nYour choice, young padawan: ")
-        if choice == "1":
-            target = tlstcreator()
-        elif choice == "2":
-            target = file_or_input(False, "\n\nName of the file containing your list: ", "", "\n\nEnter list of members to pm: ", "")[0]
-        pmdriver(target, choice)
+        target = file_or_input(False, "\n\nName of the file containing list of members to pm: ", "", "\n\nEnter list of members to pm: ", "")[0]
+        pmdriver(target, "2")
 
     elif flow == "13":
         gchoice = ""
@@ -2389,20 +2491,27 @@ while pathway in (["y"]):
                 print pair[0][0] + " (" + str(pair[0][1]) + ") - " + pair[1][0] + " (" + str(pair[1][1]) + ")"
 
     elif flow == "14":
-        choice14 = ""
-        while choice14 not in (["1", "2", "3", "4"]):
-            choice14 = raw_input("\n\nwhat would you like to get\n 1. Elements common to both lists (intersection)\n 2. Elements from both lists (union)\n 3. Elements in list 1 but not in list 2 (difference)\n 4. Elements in either list but not in both (symmetric difference)\nYour choice: ")
+        choice = ""
+        while choice not in (["1", "2", "3", "4", "5"]):
+            choice = raw_input("\n\nwhat would you like to get\n 1. Elements common to both lists (intersection)\n 2. Elements from both lists (union)\n 3. Elements in list 1 but not in list 2 (difference)\n 4. Elements in either list but not in both (symmetric difference)\n\n 5. Length of a comma seperated list\n\nYour choice: ")
 
-        list1, list2 = file_or_input(True, "\n\nName of file 1: ", "Name of file 2: ", "\n\nList1: ", "List2: ")
+        if choice in (["1", "2", "3", "4"]):
+            list1, list2 = file_or_input(True, "\n\nName of file 1: ", "Name of file 2: ", "\n\nList1: ", "List2: ")
+        else:
+            list1 = raw_input("\n\nEnter list: ")
 
-        if choice14 == "1":
+        if choice == "1":
             prlst = streplacer(str(list(set(list1).intersection(set(list2)))), (["(", ""], [")", ""], ["]", ""], ["[", ""], ["'", ""]))
-        elif choice14 == "2":
+        elif choice == "2":
             prlst = streplacer(str(list(set(list1).union(set(list2)))), (["(", ""], [")", ""], ["]", ""], ["[", ""], ["'", ""]))
-        elif choice14 == "3":
+        elif choice == "3":
             prlst = streplacer(str(list(set(list1).difference(set(list2)))), (["(", ""], [")", ""], ["]", ""], ["[", ""], ["'", ""]))
-        elif choice14 == "4":
+        elif choice == "4":
             prlst = streplacer(str(list(set(list1).symmetric_difference(set(list2)))), (["(", ""], [")", ""], ["]", ""], ["[", ""], ["'", ""]))
+        elif choice == "5":
+            print len(list1.split(","))
+            pathway = runagain()
+            continue
 
         choice6 = ""
         while choice6 not in (["1", "2"]):
@@ -2503,19 +2612,7 @@ while pathway in (["y"]):
             turnofcomp()
 
     elif flow == "42":
-        browser = mecbrowser("")
-        browser, response = mecopner(browser, raw_input("target page link: "))
-        usrlist = list()
+        "none"
 
-        for link in browser.links(url_regex="chess.com/members/view/"):
-            ltext = link.text
-            if ltext != "View Profile":
-                usrlist.append(ltext.replace("[IMG]", ""))
-
-        for mem in usrlist:
-            if mem != "":
-                print mem + ",",
-
-    pathway = ""
-    while pathway not in (["y", "n"]):
-        pathway = raw_input("\n\n\nRun again? (y/n) ")
+    gc.collect()
+    pathway = runagain()
