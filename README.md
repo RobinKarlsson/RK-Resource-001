@@ -132,6 +132,14 @@ Options
 
 - Column 21. If member has a custom avatar
 
+- Column 22. Number of site awards
+
+- Column 23. Number of tournament trophies
+
+- Column 24. Number of game trophies
+
+- Column 25. Number of fun trophies
+
 
 This data can be presented and sorted using option 7 in the main script
 
