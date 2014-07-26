@@ -437,10 +437,6 @@ def noteposter(target, msg, interval, nationalt, shutdown):
     print "\n\n"
 
     for mem in target:
-        try:
-            print "current memory usage: " + str(ramusage())
-        except:
-            "nothing"
         print "processing: " + mem
         browser, response = mecopner(browser, "http://www.chess.com/members/view/" + mem)
         soup = BeautifulSoup(response)
@@ -559,10 +555,6 @@ def pmdriver(target, choice):
 
     counter = 1
     for membername2 in memtpm:
-        try:
-            print "current memory usage: " + str(ramusage())
-        except:
-            "nothing"
         if choice2 == "y":
             passmemfil = memberprocesser(True, browser1, ([membername2]), minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat)
 
@@ -1285,10 +1277,6 @@ def inviter(targetlist, endless):
                 if not picked in already_picked:
                     already_picked.append(picked)
             for member in already_picked:
-                try:
-                    print "current memory usage: " + str(ramusage())
-                except:
-                    "nothing"
                 if choice2 == "y" and standardlst == True:
                     try:
                         passmemfil = memberprocesser(True, browser1, ([member]), minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat)
@@ -1543,10 +1531,6 @@ def memberprocesser(silent, browser, target, minrat, maxrat, mingames, minwinrat
     passmem = list()
     for targetx in target:
         if silent == False:
-            try:
-                print "current memory usage: " + str(ramusage())
-            except:
-                "nothing"
             print "checking " + targetx
 
         browser, response = mecopner(browser, "http://www.chess.com/members/view/" + targetx)
