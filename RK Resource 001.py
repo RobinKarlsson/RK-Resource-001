@@ -437,6 +437,10 @@ def noteposter(target, msg, interval, nationalt, shutdown):
     print "\n\n"
 
     for mem in target:
+        try:
+            print "current memory usage: " + str(ramusage())
+        except:
+            "nothing"
         print "processing: " + mem
         browser, response = mecopner(browser, "http://www.chess.com/members/view/" + mem)
         soup = BeautifulSoup(response)
@@ -555,6 +559,10 @@ def pmdriver(target, choice):
 
     counter = 1
     for membername2 in memtpm:
+        try:
+            print "current memory usage: " + str(ramusage())
+        except:
+            "nothing"
         if choice2 == "y":
             passmemfil = memberprocesser(True, browser1, ([membername2]), minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat)
 
@@ -801,8 +809,7 @@ def memspider(target, silent, browser):
                 break
             soup = BeautifulSoup(response)
             p2 = str(soup.find_all(class_ = "next-on"))
-            soup = None
-            gc.collect()
+
             if silent == False:
                 print "checking " + pointer
 
@@ -813,6 +820,10 @@ def memspider(target, silent, browser):
 
             if "next-on" not in p2:
                 break
+
+            soup = None
+            gc.collect()
+
     return list(set(usrlist))
 
 def ageproc(target):
@@ -1041,6 +1052,39 @@ def enterint(text):
             return number
         except ValueError:
             print "\n\nInvalid input, try again\n\n"
+
+def notesfriendscheck(tocheck, checkfor, choice):
+    present = list()
+    notpresent = list()
+    targetdic = dict()
+
+    for member in tocheck:
+        templst = list()
+        if choice == "1":
+            for count in xrange(1, 101):
+                templst.append("http://www.chess.com/members/notes/" + member + "?page=" + str(count))
+        elif choice == "2":
+            for count in xrange(1, 101):
+                templst.append("http://www.chess.com/home/friends?username=" + member + "&general=&name=&country=&sortby=alphabetical&page=" + str(count))
+
+        targetdic[member] = templst
+
+    logincookie = login()
+    browser = mecbrowser(logincookie)
+
+    for member, target in targetdic.items():
+        notfriends = True
+        friends = memspider([target], False, browser)
+        for mem in friends:
+            if mem.lower() == checkfor:
+                present.append(member)
+                notfriends = False
+                break
+
+        if notfriends == True:
+            notpresent.append(member)
+
+    return present, notpresent
 
 def memprmenu():
     minrat = enterint("\n\nMin (online chess) rating allowed. leave empty to skip: ")
@@ -1277,6 +1321,10 @@ def inviter(targetlist, endless):
                 if not picked in already_picked:
                     already_picked.append(picked)
             for member in already_picked:
+                try:
+                    print "current memory usage: " + str(ramusage())
+                except:
+                    "nothing"
                 if choice2 == "y" and standardlst == True:
                     try:
                         passmemfil = memberprocesser(True, browser1, ([member]), minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat)
@@ -1531,6 +1579,10 @@ def memberprocesser(silent, browser, target, minrat, maxrat, mingames, minwinrat
     passmem = list()
     for targetx in target:
         if silent == False:
+            try:
+                print "current memory usage: " + str(ramusage())
+            except:
+                "nothing"
             print "checking " + targetx
 
         browser, response = mecopner(browser, "http://www.chess.com/members/view/" + targetx)
@@ -1945,15 +1997,19 @@ def tlstcreator():
     while choice1 not in (["n"]):
         tlst = list()
         url1 = raw_input("\nPaste the url here: ")
-        if "&page=" in url1:
-            url1 = url1[0: url1.index("&page=")]
-        url1 = url1 + "&page="
-        start1 = enterint("\nEnter pagenumber to start on: ")
-        stop1 = enterint("\nEnter pagenumber to end on: ")
 
-        while start1 <= stop1:
-            tlst.append(url1 + str(start1))
-            start1 += 1
+        start1 = enterint("\nEnter pagenumber to start on: ")
+        if not start1 == "":
+            if "&page=" in url1:
+                url1 = url1[0: url1.index("&page=")]
+            stop1 = enterint("\nEnter pagenumber to end on: ")
+
+            url1 = url1 + "&page="
+            while start1 <= stop1:
+                tlst.append(url1 + str(start1))
+                start1 += 1
+        else:
+            tlst = [url1]
         targetlist.append(tlst)
 
         choice1 = ""
@@ -2318,7 +2374,7 @@ while pathway in (["y"]):
         target = file_or_input(False, "\n\nName of the file containing your list of members: ", "", "\n\nEnter list of members to send notes: ", "")[0]
         print "\n\nYou have entered " + str(len(target)) + " names\n\n"
         msg = raw_input("\n\nEnter message to use (available commands: /name = member name or username, /firstname - member first name or username (if no name is available), /nation = member nation): ")
-        nationalt = raw_input("What to use if member nation is international? ")
+        nationalt = raw_input("\nWhat to use if member nation is international? ")
         interval = enterint("Interval between notes (s): ")
 
         shutdown = ""
@@ -2596,7 +2652,20 @@ while pathway in (["y"]):
             turnofcomp()
 
     elif flow == "42":
-        "none"
+        choice = ""
+        while not choice in (["1", "2"]):
+            choice = raw_input("check\n 1. notes\n 2. friendslist\nEnter choice: ")
+        tocheck = raw_input("Members to check: ").replace(" ", "").split(",")
+        checkfor = raw_input("Check for: ").lower()
+
+        present, notpresent = notesfriendscheck(tocheck, checkfor, choice)
+
+        print "\n\nFound in:"
+        for mem in present:
+            print mem + ", ",
+        print "\n\n\nNot found in:"
+        for mem in notpresent:
+            print mem + ", ",
 
     gc.collect()
     pathway = runagain()
