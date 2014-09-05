@@ -33,7 +33,7 @@ from operator import itemgetter
 from collections import OrderedDict
 from collections import Counter
 from string import punctuation
-supusr = False
+supusr = True
 
 def csvsoworker(memlist, choicepath):
     colwidth = max(len(element.decode("UTF-8")) for row in memlist for element in row) + 2
@@ -163,6 +163,11 @@ def getmeminfo(target, filename):
             winratm = 0
 
         csvwriter.writerow((mem, namechecker(soup).encode("utf-8"), lstanratingchecker(soup), lblitzratingchecker(soup), lbulratingchecker(soup), onlratingchecker(soup), ranratingchecker(soup), tacratingchecker(soup), timeoutchecker(soup), memsinlastonl[1], memsinlastonl[0], timemove, groupmemlister(soup), ptscheck(soup), gamestat[0], gamestat[1], gamestat[2], gamestat[3], winratm, nationlister(soup).encode("utf-8"), AvatarCheck(soup), sawards, tourneytrophy, gametrophy, funtrophy))
+
+        soup.decompose()
+        response.close()
+        browser.clear_history()
+        gc.collect()
 
 def getplatform():
     return _platform.platform(), _platform.system(), _platform.release(), _platform.architecture()
@@ -304,6 +309,11 @@ def gettmopdata(targetname):
         oddmtch = soup.find_all(class_ = "odd")
         mtchlist = resource01(oddmtch, mtchlist)
 
+        soup.decompose()
+        response.close()
+        browser.clear_history()
+        gc.collect()
+
         if soupbrake == "[]":
             break
         pointer += 1
@@ -366,6 +376,11 @@ def gettmlinks(targetname):
         for link in souplinks:
             linklist.append("http://www.chess.com" + link)
 
+        soup.decompose()
+        response.close()
+        browser.clear_history()
+        gc.collect()
+
         if soupbrake == "[]":
             break
         pointer += 1
@@ -398,6 +413,12 @@ def getvclinks(yourside):
             linklist.append("http://www.chess.com" + link)
 
         soupbrake = str(soup.find_all(class_ = "next-on"))
+
+        soup.decompose()
+        response.close()
+        browser.clear_history()
+        gc.collect()
+
         if soupbrake == "[]":
             break
 
@@ -469,7 +490,9 @@ def noteposter(target, msg, interval, nationalt, shutdown):
                 counter += 1
                 time.sleep(1)
 
-        soup = None
+        soup.decompose()
+        response.close()
+        browser.clear_history()
         gc.collect()
         time.sleep(interval)
 
@@ -578,8 +601,10 @@ def pmdriver(target, choice):
                 counter = 1
         print "sending pm to " + membername2
         membername = "http://www.chess.com/members/view/" + membername2
+
         browser1, response = mecopner(browser1, membername)
         soup = BeautifulSoup(response)
+
         if not membername2 in str(soup):
             print "\n\nFailed to open page and skipped, " + membername + "\n\n"
             continue
@@ -633,7 +658,9 @@ def pmdriver(target, choice):
                             print repr(errormsg)
                         print "retrying"
 
-        soup = None
+        soup.decompose()
+        response.close()
+        browser1.clear_history()
         gc.collect()
         time.sleep(sleeptime)
 
@@ -694,6 +721,10 @@ def tmparchecker(pagelist, targetname):
         if "http://www.chess.com/groups/team_match?id=" not in page:
             continue
         print "processing: " + page
+        try:
+            print "current memory usage: " + str(ramusage())
+        except:
+            "nothing"
         alltmresults = list()
         counter2 = 0
         browser, response = mecopner(browser, page)
@@ -797,6 +828,12 @@ def tmparchecker(pagelist, targetname):
 
         except IndexError:
             placeholder = list()
+
+        soup.decompose()
+        response.close()
+        browser.clear_history()
+        gc.collect()
+
     return tmpar, timeoutlist, winssdic, losedic
 
 def memspider(target, silent, browser):
@@ -812,6 +849,10 @@ def memspider(target, silent, browser):
 
             if silent == False:
                 print "checking " + pointer
+                try:
+                    print "current memory usage: " + str(ramusage())
+                except:
+                    "nothing"
 
             for link in browser.links(url_regex="chess.com/members/view/"):
                 ltext = link.text
@@ -821,7 +862,9 @@ def memspider(target, silent, browser):
             if "next-on" not in p2:
                 break
 
-            soup = None
+            soup.decompose()
+            response.close()
+            browser.clear_history()
             gc.collect()
 
     return list(set(usrlist))
@@ -849,6 +892,11 @@ def ageproc(target):
 
         birthdate = map(int, [element.replace(",", "") for element in birthdate])
         flist.append(birthdate + tlst)
+
+        soup.decompose()
+        response.close()
+        browser.clear_history()
+        gc.collect()
     return flist
 
 def selbrowch():
@@ -1029,6 +1077,11 @@ def pairsorter(browser, target, choice):
             rating = tacratingchecker(soup)
 
         partup.append([mem, int(rating)])
+
+        soup.decompose()
+        response.close()
+        browser.clear_history()
+        gc.collect()
     return sorted(partup, reverse = True, key = lambda tup: tup[1])
 
 def olprint(startc, endc, inchar, endn, nline):
@@ -1165,6 +1218,12 @@ def gettmlinklist(targetname, browser):
     pointerlist = (0, 1, 2)
     for pointer in pointerlist:
         del linklist[-1]
+
+    soup.decompose()
+    response.close()
+    browser.clear_history()
+    gc.collect()
+
     return linklist
 
 def sellogin(Username, Password, browser):
@@ -1305,7 +1364,11 @@ def inviter(targetlist, endless):
                 standardlst = True
                 invfilter = True
                 deserterlst = False
-            
+
+            if len(memtinv) == 0:
+                print "\n\nWarning, empty invites list: " + infile
+                continue
+
             if priolst == True or standardlst == True:
                 msglist = fileopen(msgliststand, True)
             elif deserterlst == True:
@@ -1354,8 +1417,12 @@ def inviter(targetlist, endless):
                     country = countryalt
 
                 name = namechecker(soup)
-                soup = None
+
+                soup.decompose()
+                response.close()
+                browser1.clear_history()
                 gc.collect()
+
                 if name == " ":
                     name = member
 
@@ -1541,6 +1608,12 @@ def vcman(vclinklist, yourside):
                             else:
                                 parmemvc[user] = 0.5
                     nextbtn += 1
+
+        soup.decompose()
+        response.close()
+        browser1.clear_history()
+        gc.collect()
+
     browser3.quit()
     return parmemvc
 
@@ -1589,26 +1662,29 @@ def memberprocesser(silent, browser, target, minrat, maxrat, mingames, minwinrat
         try:
             if "://www.chess.com/members/view/" not in browser.geturl():
                 continue
+
             soup = BeautifulSoup(response)
-            response = None
+            response.close()
+            browser.clear_history()
+            gc.collect()
 
             if membersinceyear != "" or lastloginyear != "":
                 memsinlist = memsin(soup)
                 if memsinlist == "":
-                    soup = None
+                    soup.decompose()
                     gc.collect()
                     continue
 
                 if lastloginyear != "":
                     lonln = memsinlist[1]
                     if datetime(lonln[0], lonln[1], lonln[2]) < datetime(lastloginyear, lastloginmonth, lastloginday):
-                        soup = None
+                        soup.decompose()
                         gc.collect()
                         continue
 
             if timemax != "":
                 if timeoutchecker(soup) > timemax:
-                    soup = None
+                    soup.decompose()
                     gc.collect()
                     continue
 
@@ -1617,29 +1693,29 @@ def memberprocesser(silent, browser, target, minrat, maxrat, mingames, minwinrat
 
                 if timovchoicemax != "":
                     if timemove[0] > timovchoicemax[0]:
-                        soup = None
+                        soup.decompose()
                         gc.collect()
                         continue
                     if timemove[1] > timovchoicemax[1] and timemove[0] >= timovchoicemax[0]:
-                        soup = None
+                        soup.decompose()
                         gc.collect()
                         continue
                     if timemove[2] > timovchoicemax[2] and timemove[1] >= timovchoicemax[1] and timemove[0] >= timovchoicemax[0]:
-                        soup = None
+                        soup.decompose()
                         gc.collect()
                         continue
 
                 if timovchoicemin != "":
                     if timemove[0] < timovchoicemin[0]:
-                        soup = None
+                        soup.decompose()
                         gc.collect()
                         continue
                     if timemove[1] < timovchoicemin[1] and timemove[0] <= timovchoicemin[0]:
-                        soup = None
+                        soup.decompose()
                         gc.collect()
                         continue
                     if timemove[2] < timovchoicemin[2] and timemove[1] <= timovchoicemin[1] and timemove[0] <= timovchoicemin[0]:
-                        soup = None
+                        soup.decompose()
                         gc.collect()
                         continue
 
@@ -1648,19 +1724,19 @@ def memberprocesser(silent, browser, target, minrat, maxrat, mingames, minwinrat
 
                 if mingames != "":
                     if gamestat[0] < mingames:
-                        soup = None
+                        soup.decompose()
                         gc.collect()
                         continue
                 if minwinrat != "":
                     if gamestat[1] / gamestat[0]  < float(minwinrat):
-                        soup = None
+                        soup.decompose()
                         gc.collect()
                         continue
 
             if membersinceyear != "":
                 memsi = memsinlist[0]
                 if datetime(memsi[0], memsi[1], memsi[2]) > datetime(membersinceyear, membersincemonth, membersinceday):
-                    soup = None
+                    soup.decompose()
                     gc.collect()
                     continue
 
@@ -1668,12 +1744,12 @@ def memberprocesser(silent, browser, target, minrat, maxrat, mingames, minwinrat
                 rating = onlratingchecker(soup)
                 if minrat != "":
                     if rating < minrat:
-                        soup = None
+                        soup.decompose()
                         gc.collect()
                         continue
                 if maxrat != "":
                     if rating > maxrat:
-                        soup = None
+                        soup.decompose()
                         gc.collect()
                         continue
 
@@ -1681,12 +1757,12 @@ def memberprocesser(silent, browser, target, minrat, maxrat, mingames, minwinrat
                 rating = ranratingchecker(soup)
                 if minranrat != "":
                     if rating < minranrat:
-                        soup = None
+                        soup.decompose()
                         gc.collect()
                         continue
                 if maxranrat != "":
                     if rating > maxranrat:
-                        soup = None
+                        soup.decompose()
                         gc.collect()
                         continue
 
@@ -1695,25 +1771,25 @@ def memberprocesser(silent, browser, target, minrat, maxrat, mingames, minwinrat
 
                 if maxgroup != "":
                     if groupcount > maxgroup:
-                        soup = None
+                        soup.decompose()
                         gc.collect()
                         continue
                 if mingroup != "":
                     if groupcount < mingroup:
-                        soup = None
+                        soup.decompose()
                         gc.collect()
                         continue
 
             if avatarch == "y":
                 if AvatarCheck(soup) == False:
-                    soup = None
+                    soup.decompose()
                     gc.collect()
                     continue
 
             if youngeryear != "" or olderyear != "":
                 birthdate = birthlister(soup)
                 if birthdate == "":
-                    soup = None
+                    soup.decompose()
                     gc.collect()
                     continue
                 while "" in birthdate:
@@ -1723,12 +1799,12 @@ def memberprocesser(silent, browser, target, minrat, maxrat, mingames, minwinrat
 
                 if youngeryear != "":
                     if datetime(birthdate[0], birthdate[1], birthdate[2]) < datetime(youngeryear, youngermonth, youngerday):
-                        soup = None
+                        soup.decompose()
                         gc.collect()
                         continue
                 if olderyear != "":
                     if datetime(birthdate[0], birthdate[1], birthdate[2]) > datetime(olderyear, oldermonth, olderday):
-                        soup = None
+                        soup.decompose()
                         gc.collect()
                         continue
 
@@ -1736,14 +1812,14 @@ def memberprocesser(silent, browser, target, minrat, maxrat, mingames, minwinrat
                 nation = nationlister(soup)
 
                 if heritage not in nation:
-                    soup = None
+                    soup.decompose()
                     gc.collect()
                     continue
 
             if memgender != "":
                 name = namechecker(soup)
                 if name == " ":
-                    soup = None
+                    soup.decompose()
                     gc.collect()
                     continue
                 name = name.split(" ")[0].lower()
@@ -1762,12 +1838,12 @@ def memberprocesser(silent, browser, target, minrat, maxrat, mingames, minwinrat
                                 Found = "y"
                                 break
                 if Found == "n":
-                    soup = None
+                    soup.decompose()
                     gc.collect()
                     continue
 
             passmem.append(targetx)
-            soup = None
+            soup.decompose()
             gc.collect()
         except Exception, errormsg:
             if supusr is True:
@@ -2026,6 +2102,12 @@ def notclosedcheck(memlist):
 
         if mem in soup:
             memlist2.append(mem)
+
+        soup.decompose()
+        response.close()
+        browser.clear_history()
+        gc.collect()
+
     return memlist2
 
 def getgrouphome(targetlst, browser):
@@ -2034,6 +2116,11 @@ def getgrouphome(targetlst, browser):
         browser, response = mecopner(browser, target[0])
         for link in browser.links(url_regex="groups/home/"):
             grouphomelist.append("http://www.chess.com" + link.url)
+
+        response.close()
+        browser.clear_history()
+        gc.collect()
+
     return list(set(grouphomelist))
 
 def getadmins(targetlst, browser):
@@ -2052,6 +2139,11 @@ def getadmins(targetlst, browser):
         for line in str(admins).split("\n"):
             if '<li class="popUpMemberInfo popupTop" data-username="' in line:
                 adminlist.append(line.replace('<li class="popUpMemberInfo popupTop" data-username="', "")[0:-2])
+
+        soup.decompose()
+        response.close()
+        browser.clear_history()
+        gc.collect()
 
     return list(set(superadminlist)), list(set(adminlist))
 
@@ -2264,6 +2356,12 @@ while pathway in (["y"]):
                 soup = BeautifulSoup(response)
                 if timeoutchecker(soup) > maxtmrat:
                     deadbeatlist.append(member)
+
+                soup.decompose()
+                response.close()
+                browser.clear_history()
+                gc.collect()
+
             print "\n\n\nThe following members has a timeoutratio above " + str(maxtmrat) + "%: " + streplacer(str(deadbeatlist), (["'", ""], ["[", ""], ["]", ""]))
 
     elif flow == "6":
@@ -2458,6 +2556,12 @@ while pathway in (["y"]):
                     else:
                         notedic[ltext] = 1
             soupbrake = str(soup.find_all(class_ = "next-on"))
+
+            soup.decompose()
+            response.close()
+            browser.clear_history()
+            gc.collect()
+
             if soupbrake == "[]":
                 break
 
