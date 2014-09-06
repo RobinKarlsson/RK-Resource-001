@@ -482,7 +482,9 @@ def noteposter(target, msg, interval, nationalt, shutdown):
                 browser2.find_element_by_name("c23").send_keys(streplacer(msg, (["/name", name.strip()], ["/firstname", name.split(" ")[0]], ["/nation", country.strip()])))
                 browser2.find_element_by_name("c24").click()
                 break
-            except:
+            except Exception, errormsg:
+                if supusr is True:
+                    print repr(errormsg)
                 if counter == 20:
                     print "\n\nSkipped " + mem + "\n\n"
                     skipped.append(mem)
@@ -2098,9 +2100,10 @@ def notclosedcheck(memlist):
     memlist2 = list()
     for mem in memlist:
         browser, response = mecopner(browser, "http://www.chess.com/members/view/" + mem)
-        soup = str(BeautifulSoup(response))
+        soup = BeautifulSoup(response)
+        soupstr = str(soup)
 
-        if mem in soup:
+        if mem in soupstr:
             memlist2.append(mem)
 
         soup.decompose()
