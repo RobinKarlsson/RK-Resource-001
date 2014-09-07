@@ -1993,7 +1993,10 @@ def groupmemlister(soup):
     groupcountlist = list()
     for placeholder in soup.find_all(class_ = "parenthesis-link"):
         memgroups = placeholder.text
-    return int(memgroups)
+    try:
+        return int(memgroups)
+    except UnboundLocalError:
+        return 0
 
 def nationlister(soup):
     nationlist = list()
