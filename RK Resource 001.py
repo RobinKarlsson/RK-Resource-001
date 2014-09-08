@@ -391,7 +391,7 @@ def gettmlinks(targetname):
 def birthdsorter(birthdaylist):
     choice = "1"
     while choice not in (["1"]):
-        choice = raw_input("\n\nOptions:\n 1. print the collected information sorted by birthdays\nYour choice: ")
+        choice = raw_input("\n\nOptions:\n 1. print the collected information sorted by birthday\nYour choice: ")
 
     if choice == "1":
         birthdaylist = sorted(birthdaylist)
@@ -404,8 +404,7 @@ def getvclinks(yourside):
     yourside = yourside.replace(" ", "-").lower()
     browser = mecbrowser("")
 
-    pagenum = 1
-    while pagenum <= 100:
+    for pagenum in range(1, 101):
         browser, response = mecopner(browser, "http://www.chess.com/groups/votechess_diagrams/" + yourside + "/?sortby=completed&page=" + str(pagenum))
         soup = BeautifulSoup(response)
         souplinks = re.findall("/votechess/game(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", str(soup.find_all("a")))
@@ -422,7 +421,6 @@ def getvclinks(yourside):
         if soupbrake == "[]":
             break
 
-        pagenum += 1
     linklist = list(OrderedDict.fromkeys(linklist))
     return linklist
 
@@ -496,6 +494,7 @@ def noteposter(target, msg, interval, nationalt, shutdown):
         response.close()
         browser.clear_history()
         gc.collect()
+
         time.sleep(interval)
 
     if len(skipped) != 0:
@@ -524,16 +523,28 @@ def pmdriver(target, choice):
     elif msgchoice == "2":
         choicepm = "y"
         while choicepm == "y":
-            while choicepm not in(["1", "2"]):
-                choicepm = raw_input("\n\nAdd a snippet containing\n 1. Text\n 2. Image\nYour choice: ")
+            while choicepm not in(["1", "2", "3"]):
+                choicepm = raw_input("\n\nAdd a snippet containing\n 1. Text\n 2. Image\n 3. Youtube Video\nYour choice: ")
             if choicepm == "1":
                 text = raw_input("Enter the text: ")
             elif choicepm == "2":
                 text = raw_input("Enter url of the image: ")
+            elif choicepm == "3":
+                text = raw_input("Enter url of the video: ")
             msglist.append((choicepm, text))
 
             while choicepm not in (["y", "n"]):
                 choicepm = raw_input("add another snippet? (y/n) ")
+
+    msgstr = u""
+    for content in msglist:
+        if content[0] == "1":
+            msgstr = msgstr + content[1]
+        elif content[0] == "2":
+            msgstr = msgstr + '<img src="' + content[1] + '" />'
+        elif content[0] == "3":
+            cont = content[1]
+            msgstr = msgstr + '<iframe width="640" height="360" src="//www.youtube.com/embed/' + cont[cont.index("atch?v=") + 7:] + '?rel=0" frameborder="0" allowfullscreen></iframe>'
 
     nnation = raw_input("If member nation is International, use this instead: ")
 
@@ -578,7 +589,7 @@ def pmdriver(target, choice):
         memtpm = target
 
     if choice2 == "y":
-        minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat = memprmenu()
+        minpoints, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat = memprmenu()
 
     print "\n\n"
 
@@ -589,7 +600,7 @@ def pmdriver(target, choice):
         except:
             "nothing"
         if choice2 == "y":
-            passmemfil = memberprocesser(True, browser1, ([membername2]), minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat)
+            passmemfil = memberprocesser(True, browser1, ([membername2]), minpoints, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat)
 
             if membername2 not in passmemfil:
                 continue
@@ -640,7 +651,14 @@ def pmdriver(target, choice):
                 browser0.switch_to_frame("tinymcewindow_ifr")
                 browser0.find_element_by_id("tinymce").clear()
                 browser0.switch_to_default_content()
-                filtmcemsg(msglist, browser0, name, country, browserchoice)
+
+                try:
+                    try:
+                        filtmcemsg(msgstr, browser0, name, country, browserchoice)
+                    except UnicodeEncodeError:
+                        filtmcemsg(msgstr, browser0, membername2, country, browserchoice)
+                except:
+                    filtmcemsgold(msglist, browser0, name, country, browserchoice)
 
                 browser0.find_element_by_id("c16").click()
                 break
@@ -923,7 +941,7 @@ def createconfig(name, ID):
         membersleftinvfile = name + " members who has left"
 
     with open("Invite Lists/Config/" + name + ".ini", "wb") as setupfile:
-        setupfile.write("What to use if members nation is set to International==\nMin online chess rating==\nMax online chess rating==\nMin 960 chess rating==\nMax 960 chess rating==\nMin online chess games plaid==\nMin online chess win-ratio==\nLast logged in within days==\nMember on chess.com for days==\nBorn after date (YYYY-MM-DD)==\nBorn before date (YYYY-MM-DD)==\nMax timeout-ratio allowed==\nMax number of groups member can be in==\nMin number of groups member can be in==\nMin time/move (days-hours-minutes)==\nMax time/move (days-hours-minutes)==\nOnly invite those with a custom avatar (y/n)==\nMember should be from nation==\nGender (m/f)==\nLink to groups invite members page==http://www.chess.com/groups/invite_members?id=" + ID + "\nFile containing the main invites list==Invite Lists/" + name + "\nFile containing those who should receive priority invites (circumvents filter)==Invite Lists/" + name + " priority\nInvites file for those who has left the group==Invite Lists/" + membersleftinvfile + " members who has left\nFile containing those who has received an invite==Invite Lists/" + name + " already invited\nFile containing your invites message for members who has left your group==Messages/Invite Messages/" + name + " Deserter message\nFile containing your invites message for standard and priority invites lists==Messages/Invite Messages/" + name + " Standard Message")
+        setupfile.write("What to use if members nation is set to International==\nMin online chess rating==\nMax online chess rating==\nMin 960 chess rating==\nMax 960 chess rating==\nMin online chess games plaid==\nMin online chess win-ratio==\nLast logged in within days==\nMember on chess.com for days==\nBorn after date (YYYY-MM-DD)==\nBorn before date (YYYY-MM-DD)==\nMax timeout-ratio allowed==\nMax number of groups member can be in==\nMin number of groups member can be in==\nMin number of activity points allowed==\nMin time/move (days-hours-minutes)==\nMax time/move (days-hours-minutes)==\nOnly invite those with a custom avatar (y/n)==\nMember should be from nation==\nGender (m/f)==\nLink to groups invite members page==http://www.chess.com/groups/invite_members?id=" + ID + "\nFile containing the main invites list==Invite Lists/" + name + "\nFile containing those who should receive priority invites (circumvents filter)==Invite Lists/" + name + " priority\nInvites file for those who has left the group==Invite Lists/" + membersleftinvfile + " members who has left\nFile containing those who has received an invite==Invite Lists/" + name + " already invited\nFile containing your invites message for members who has left your group==Messages/Invite Messages/" + name + " Deserter message\nFile containing your invites message for standard and priority invites lists==Messages/Invite Messages/" + name + " Standard Message")
     createfileifmissing("Messages/Invite Messages/" + name + " Standard Message", True)
     createfileifmissing("Messages/Invite Messages/" + name + " Deserters Message", True)
     createfileifmissing("Invite Lists/" + name + " already invited", False)
@@ -976,38 +994,11 @@ def getfilelist(path, endswith):
                         counter += 1
     return lst
 
-def filtmcemsg(msglist, browser, name, country, browserchoice):
-    for content in msglist:
-        if content[0] == "1":
-            browser.switch_to_frame("tinymcewindow_ifr")
-            #browser.execute_script("tinyMCE.activeEditor.insertContent('%s')" % streplacer(content[1], (["/name", name.strip()], ["/firstname", name.split(" ")[0]], ["/nation", country.strip()], ["/newline", " <br/>"])))
-            browser.find_element_by_id("tinymce").send_keys(streplacer(content[1], (["/name", name.strip()], ["/firstname", name.split(" ")[0]], ["/nation", country.strip()], ["/newline", "\n"])))
-            browser.switch_to_default_content()
-        elif content[0] == "2":
-            browser.find_element_by_id("tinymcewindow_imageuploader").click()
-            time.sleep(1)
-            browser.switch_to_window(browser.window_handles[1])
-            while True:
-                try:
-                    WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.ID, "photourl")))
-                    browser.find_element_by_id("photourl").send_keys(content[1])
-                    browser.find_element_by_id("insert").click()
-                    break
-                except Exception, errormsg:
-                    if supusr is True:
-                        print repr(errormsg)
-                    print "\n\nrefreshing page\n\n"
-                    browser.refresh()
-
-            browser.switch_to_window(browser.window_handles[0])
-            time.sleep(1)
-
-        elif content[0] == "3":
-            browser.find_element_by_id("tinymcewindow_mce_media").click()
-            alert = browser.switch_to_alert()
-            alert.send_keys(content[1])
-            alert.accept()
-            time.sleep(1)
+def filtmcemsg(msgstr, browser, name, country, browserchoice):
+    msgstr = streplacer(msgstr, (["/name", name.strip()], ["/firstname", name.split(" ")[0]], ["/nation", country.strip()], ["/newline", "<br/>"]))
+    
+    browser.execute_script("tinyMCE.get('{0}').focus()".format("tinymcewindow"))
+    browser.execute_script("tinyMCE.activeEditor.setContent('{0}')".format(msgstr))
 
 def login():
     Username = raw_input("Username: ")
@@ -1184,6 +1175,7 @@ def memprmenu():
     timemax = enterint("\nMax timeoutratio allowed. leave empty to skip: ")
     maxgroup = enterint("\nMax number of groups member may be in. leave empty to skip: ")
     mingroup = enterint("Min number of groups member may be in. leave empty to skip: ")
+    minpoints = enterint("Min number of activity points member may have. leave empty to skip: ")
 
     timovchoicemin = raw_input("\nTime/move higher than (format: days - hours - minutes, leave empty to skip) ")
     timovchoicemax = raw_input("Time/move lower than (format: days - hours - minutes, leave empty to skip) ")
@@ -1201,7 +1193,7 @@ def memprmenu():
     memgender = "a"
     while memgender not in (["m", "f", ""]):
         memgender = raw_input("\nMember should be gender (determined by comparing member name to a list of male and female names). leave empty to skip (m/f): ")
-    return minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat
+    return minpoints, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat
 
 def makefolder(flst):
     for folder in flst:
@@ -1332,6 +1324,7 @@ def inviter(targetlist, endless):
             timemax = condic["Max timeout-ratio allowed"]
             maxgroup = condic["Max number of groups member can be in"]
             mingroup = condic["Min number of groups member can be in"]
+            minpoints = condic["Min number of activity points allowed"]
             timovchoicemin = condic["Min time/move (days-hours-minutes)"]
             timovchoicemax = condic["Max time/move (days-hours-minutes)"]
             avatarch = condic["Only invite those with a custom avatar (y/n)"]
@@ -1376,6 +1369,16 @@ def inviter(targetlist, endless):
             elif deserterlst == True:
                 msglist = fileopen(msglistleft, True)
 
+            msgstr = u""
+            for content in msglist:
+                if content[0] == "1":
+                    msgstr = msgstr + content[1]
+                elif content[0] == "2":
+                    msgstr = msgstr + '<img src="' + content[1] + '" />'
+                elif content[0] == "3":
+                    cont = content[1]
+                    msgstr = msgstr + '<iframe width="640" height="360" src="//www.youtube.com/embed/' + cont[cont.index("atch?v=") + 7:] + '?rel=0" frameborder="0" allowfullscreen></iframe>'
+
             already_picked = list()
             if invitenum2 > len(memtinv):
                 invitenum2 = len(memtinv)
@@ -1392,7 +1395,7 @@ def inviter(targetlist, endless):
                     "nothing"
                 if choice2 == "y" and standardlst == True:
                     try:
-                        passmemfil = memberprocesser(True, browser1, ([member]), minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat)
+                        passmemfil = memberprocesser(True, browser1, ([member]), minpoints, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat)
                     except UnboundLocalError:
                         continue
                     if member not in passmemfil:
@@ -1445,7 +1448,14 @@ def inviter(targetlist, endless):
                         browser2.find_element_by_id("tinymce").clear()
                         browser2.switch_to_default_content()
 
-                        filtmcemsg(msglist, browser2, name, country, browserchoice)
+                        try:
+                            try:
+                                filtmcemsg(msgstr, browser2, name, country, browserchoice)
+                            except UnicodeEncodeError:
+                                filtmcemsg(msgstr, browser2, member, country, browserchoice)
+                        except:
+                            filtmcemsgold(msglist, browser2, name, country, browserchoice)
+
                         browser2.find_element_by_id("c18").click()
                         break
 
@@ -1475,6 +1485,32 @@ def inviter(targetlist, endless):
                     placeholder3.write(memint + ", ")
 
     browser2.quit()
+
+def filtmcemsgold(msglist, browser, name, country, browserchoice):
+    for content in msglist:
+        if content[0] == "1":
+            browser.switch_to_frame("tinymcewindow_ifr")
+
+            browser.find_element_by_id("tinymce").send_keys(streplacer(content[1], (["/name", name.strip()], ["/firstname", name.split(" ")[0]], ["/nation", country.strip()], ["/newline", "\n"])))
+            browser.switch_to_default_content()
+        elif content[0] == "2":
+            browser.find_element_by_id("tinymcewindow_imageuploader").click()
+            time.sleep(1)
+            browser.switch_to_window(browser.window_handles[1])
+            while True:
+                try:
+                    WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.ID, "photourl")))
+                    browser.find_element_by_id("photourl").send_keys(content[1])
+                    browser.find_element_by_id("insert").click()
+                    break
+                except Exception, errormsg:
+                    if supusr is True:
+                        print repr(errormsg)
+                    print "\n\nrefreshing page\n\n"
+                    browser.refresh()
+
+            browser.switch_to_window(browser.window_handles[0])
+            time.sleep(1)
 
 def vcman(vclinklist, yourside):
     numgames = len(vclinklist)
@@ -1568,6 +1604,11 @@ def vcman(vclinklist, yourside):
 
         for pointer in movelist:
             print "\nchecking " + pointer
+            try:
+                print "current memory usage: " + str(ramusage())
+            except:
+                "nothing"
+
             browser1, response = mecopner(browser1, pointer)
 
             links1 = []
@@ -1647,7 +1688,7 @@ def fileopen(filename, message):
     else:
         return msglist
 
-def memberprocesser(silent, browser, target, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat):
+def memberprocesser(silent, browser, target, minpoints, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat):
     target = streplacer(str(target), ([" ", ""], ["(", ""], [")", ""], ["]", ""], ["[", ""], ["'", ""])).split(",")
     while "" in target:
         target.remove("")
@@ -1767,6 +1808,14 @@ def memberprocesser(silent, browser, target, minrat, maxrat, mingames, minwinrat
                         soup.decompose()
                         gc.collect()
                         continue
+
+            if minpoints != "":
+                pts = ptscheck(soup)
+
+                if pts < minpoints:
+                    soup.decompose()
+                    gc.collect()
+                    continue
 
             if maxgroup != "" or mingroup != "":
                 groupcount = groupmemlister(soup)
@@ -2029,10 +2078,8 @@ def memremoverf(inlist, logincookie):
     elif choice == "2":
         target = "http://www.chess.com/groups/membersearch?allnew=1&id=" + targetID + "&page="
 
-    counter = 1
-    while counter <= 100:
+    for counter in range(1, 101):
         templst.append(target + str(counter))
-        counter += 1
     targetlist.append(templst)
 
     filtmem = set(memspider(targetlist, True, mecbrowser(logincookie)))
@@ -2374,8 +2421,8 @@ while pathway in (["y"]):
         membernamelist = file_or_input(False, "\n\nName of the file containing your list: ", "", "\n\nEnter list of members to check: ", "")[0]
         browser = mecbrowser("")
 
-        minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat = memprmenu()
-        passmembers = memberprocesser(False, browser, membernamelist, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat)
+        minpoints, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat = memprmenu()
+        passmembers = memberprocesser(False, browser, membernamelist, minpoints, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat)
 
         choice6 = ""
         while choice6 not in (["1", "2"]):
@@ -2542,14 +2589,16 @@ while pathway in (["y"]):
         browser = mecbrowser(logincookie)
 
         target = list()
-        counter = 1
-        while counter <= 100:
+        for counter in range(1, 101):
             target.append(grcheck + str(counter))
-            counter += 1
 
         notedic = dict()
         for targetp in target:
             print targetp
+            try:
+                print "current memory usage: " + str(ramusage())
+            except:
+                "nothing"
             browser, response = mecopner(browser, targetp)
             soup = BeautifulSoup(response)
 
