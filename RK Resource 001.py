@@ -653,10 +653,7 @@ def pmdriver(target, choice):
                 browser0.switch_to_default_content()
 
                 try:
-                    try:
-                        filtmcemsg(msgstr, browser0, name, country, browserchoice)
-                    except UnicodeEncodeError:
-                        filtmcemsg(msgstr, browser0, membername2, country, browserchoice)
+                    filtmcemsg(msgstr, browser0, name, country, browserchoice)
                 except:
                     filtmcemsgold(msglist, browser0, name, country, browserchoice)
 
@@ -936,7 +933,7 @@ def createfileifmissing(filename, ismsg):
 def createconfig(name, ID):
     invconpath = "Member Lists/Config/" + name + ".ini"
     if os.path.isfile(invconpath) is True:
-        membersleftinvfile = configopen(invconpath, True)["Invites file for those who has left the group"]
+        membersleftinvfile = configopen(invconpath, True)["Members who has left invites file (optional)"]
     else:
         membersleftinvfile = name + " members who has left"
 
@@ -1449,10 +1446,7 @@ def inviter(targetlist, endless):
                         browser2.switch_to_default_content()
 
                         try:
-                            try:
-                                filtmcemsg(msgstr, browser2, name, country, browserchoice)
-                            except UnicodeEncodeError:
-                                filtmcemsg(msgstr, browser2, member, country, browserchoice)
+                            filtmcemsg(msgstr, browser2, name, country, browserchoice)
                         except:
                             filtmcemsgold(msglist, browser2, name, country, browserchoice)
 
@@ -2543,10 +2537,11 @@ while pathway in (["y"]):
             Key = raw_input("Encryption key: ")
 
             invconpath = "Invite Lists/Config/" + name + ".ini"
+            membersleftinvfile = "\nMembers who has left invites file (optional)=="
             if os.path.isfile(invconpath) is True:
-                membersleftinvfile = configopen(invconpath, True)["Invites file for those who has left the group"]
+                membersleftinvfile = membersleftinvfile + configopen(invconpath, True)["Invites file for those who has left the group"]
             else:
-                membersleftinvfile = "\nMembers who has left invites file (optional)==Invite Lists/" + name + " members who has left"
+                membersleftinvfile = membersleftinvfile + "Invite Lists/" + name + " members who has left"
 
             with open("Member Lists/Config/" + name + ".ini", "wb") as setupfile:
                 setupfile.write("Group ID==" + str(enterint("Group ID: ")) + "\nEncryption Key==" + Key + "\nMemberslist file==Member Lists/" + name + membersleftinvfile)
