@@ -193,6 +193,8 @@ This data can be presented and sorted using option 7 in the main script
 
 - Max number of groups member may be in
 
+- Min number of social points
+
 - Timeout-ratio
 
 - Time per move
