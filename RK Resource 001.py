@@ -33,7 +33,7 @@ from operator import itemgetter
 from collections import OrderedDict
 from collections import Counter
 from string import punctuation
-supusr = False
+supusr = True
 
 def csvsoworker(memlist, choicepath):
     colwidth = max(len(element.decode("UTF-8")) for row in memlist for element in row) + 2
@@ -47,11 +47,9 @@ def csvsoworker(memlist, choicepath):
         choicelist = (["0"])
         while cdone != "n":
             choice = ""
-            counter = 1
             print "\n\nwhat would you like to include?"
-            while counter < len(memlist[0]):
+            for counter in range(len(memlist[0])):
                 print " " + str(counter) + ". " + memlist[0][counter]
-                counter += 1
 
             choice = raw_input("Your choice: ")
             if choice not in choicelist:
@@ -119,10 +117,8 @@ def csvsoworker(memlist, choicepath):
         print "\n\n" + "".join(element.ljust(colwidth) for element in ltitle) + "\n"
         llength = len(memlist2[0])
         for cpointer in memlist2:
-            counter = 0
-            while counter < llength:
+            for counter in range(llength):
                 cpointer[counter] = str(cpointer[counter])
-                counter += 1
             print "".join(element.ljust(colwidth) for element in cpointer)
 
     elif choice == "2":
@@ -703,10 +699,8 @@ def nineworker(infile, inid, logincookie, key):
     target = list()
     memlistorg = memfiop(infile, key)
 
-    counter = 1
-    while counter <= 100:
+    for counter in range(1, 101):
         target.append("http://www.chess.com/groups/managemembers?id=" + inid + "&page=" + str(counter))
-        counter += 1
 
     un = memspider([target], True, mecbrowser(logincookie))
 
@@ -797,11 +791,11 @@ def tmparchecker(pagelist, targetname):
                         placeholder = list()
 
                 for placeholder in souppar1:
-                    counter = 0
                     placeholder = str(placeholder)
 
                     if "menu-icons timeline right-8" in placeholder:
                         timeouts = placeholder.count('class="menu-icons timeline right-8" title="Timeout"')
+                        counter = 0
                         while counter < timeouts:
                             timeouters1 = str(re.findall("http://www.chess.com/members/view/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", placeholder)[0]).replace("http://www.chess.com/members/view/", "")
                             timeoutlist.append(timeouters1)
@@ -830,11 +824,12 @@ def tmparchecker(pagelist, targetname):
                         placeholder = list()
 
                 for placeholder in souppar1:
-                    counter = 0
                     placeholder = str(placeholder)
 
                     if "menu-icons timeline left-8" in placeholder:
                         timeouts = placeholder.count('class="menu-icons timeline left-8" title="Timeout"')
+                        counter = 0
+
                         while counter < timeouts:
                             timeouters1 = str(re.findall("http://www.chess.com/members/view/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", placeholder)[3]).replace("http://www.chess.com/members/view/", "")
                             timeoutlist.append(timeouters1)
@@ -1075,11 +1070,9 @@ def pairsorter(browser, target, choice):
     return sorted(partup, reverse = True, key = lambda tup: tup[1])
 
 def olprint(startc, endc, inchar, endn, nline):
-    x = 0
     sys.stdout.write(startc)
-    while x < endn:
+    for x in range(endn):
         sys.stdout.write(inchar)
-        x += 1
     sys.stdout.write(endc)
     sys.stdout.flush()
     if nline == True:
@@ -2127,9 +2120,9 @@ def tlstcreator():
             stop1 = enterint("\nEnter pagenumber to end on: ")
 
             url1 = url1 + "&page="
-            while start1 <= stop1:
-                tlst.append(url1 + str(start1))
-                start1 += 1
+            for x in range(start1, stop1 + 1):
+                tlst.append(url1 + str(x))
+
         else:
             tlst = [url1]
         targetlist.append(tlst)
