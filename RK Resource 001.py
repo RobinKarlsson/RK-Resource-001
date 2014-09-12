@@ -140,6 +140,12 @@ def getmeminfo(target, filename):
 
     for mem in target:
         print "Processing " + mem
+        try:
+            if supusr is True:
+                print "current memory usage: " + str(ramusage())
+        except:
+            "nothing"
+
         browser, response = mecopner(browser, "http://www.chess.com/members/view/" + mem)
         if "://www.chess.com/members/view/" not in browser.geturl():
             continue
@@ -296,6 +302,11 @@ def gettmopdata(targetname):
     pointer = 1
     while True:
         browser, response = mecopner(browser, str(linkarchive) + "&page=" + str(pointer))
+        try:
+            if supusr is True:
+                print "current memory usage: " + str(ramusage())
+        except:
+            "nothing"
         soup = BeautifulSoup(response)
         soupbrake = str(soup.find_all(class_ = "next-on"))
 
@@ -365,6 +376,11 @@ def gettmlinks(targetname):
 
     while True:
         browser, response = mecopner(browser, str(linkarchive) + "&page=" + str(pointer))
+        try:
+            if supusr is True:
+                print "current memory usage: " + str(ramusage())
+        except:
+            "nothing"
         soup = BeautifulSoup(response)
 
         soupbrake = str(soup.find_all(class_ = "next-on"))
@@ -453,7 +469,8 @@ def noteposter(target, msg, interval, nationalt, shutdown):
 
     for mem in target:
         try:
-            print "current memory usage: " + str(ramusage())
+            if supusr is True:
+                print "current memory usage: " + str(ramusage())
         except:
             "nothing"
         print "processing: " + mem
@@ -533,14 +550,20 @@ def pmdriver(target, choice):
                 choicepm = raw_input("add another snippet? (y/n) ")
 
     msgstr = u""
+    msglistold = list()
     for content in msglist:
         if content[0] == "1":
+            msglistold.append(content)
             msgstr = msgstr + content[1]
         elif content[0] == "2":
+            msglistold.append(content)
             msgstr = msgstr + '<img src="' + content[1] + '" />'
         elif content[0] == "3":
             cont = content[1]
             msgstr = msgstr + '<iframe width="640" height="360" src="//www.youtube.com/embed/' + cont[cont.index("atch?v=") + 7:] + '?rel=0" frameborder="0" allowfullscreen></iframe>'
+
+    msglist = msglistold
+    del msglistold
 
     nnation = raw_input("If member nation is International, use this instead: ")
 
@@ -591,8 +614,12 @@ def pmdriver(target, choice):
 
     counter = 1
     for membername2 in memtpm:
+        if membername2 not in notclosedcheck([membername2]):
+            continue
+
         try:
-            print "current memory usage: " + str(ramusage())
+            if supusr is True:
+                print "current memory usage: " + str(ramusage())
         except:
             "nothing"
         if choice2 == "y":
@@ -733,7 +760,8 @@ def tmparchecker(pagelist, targetname):
             continue
         print "processing: " + page
         try:
-            print "current memory usage: " + str(ramusage())
+            if supusr is True:
+                print "current memory usage: " + str(ramusage())
         except:
             "nothing"
         alltmresults = list()
@@ -862,7 +890,8 @@ def memspider(target, silent, browser):
             if silent == False:
                 print "checking " + pointer
                 try:
-                    print "current memory usage: " + str(ramusage())
+                    if supusr is True:
+                        print "current memory usage: " + str(ramusage())
                 except:
                     "nothing"
 
@@ -889,6 +918,12 @@ def ageproc(target):
     flist = []
     for targetx in target:
         print "checking: " + targetx
+        try:
+            if supusr is True:
+                print "current memory usage: " + str(ramusage())
+        except:
+            "nothing"
+
         tlst = [targetx]
         browser, response = mecopner(browser, "http://www.chess.com/members/view/" + targetx)
 
@@ -1044,6 +1079,12 @@ def pairsorter(browser, target, choice):
     partup = list()
     for mem in target:
         browser, response = mecopner(browser, "http://www.chess.com/members/view/" + mem)
+        try:
+            if supusr is True:
+                print "current memory usage: " + str(ramusage())
+        except:
+            "nothing"
+
         if "://www.chess.com/members/view/" not in browser.geturl():
             continue
 
@@ -1199,8 +1240,11 @@ def gettmlinklist(targetname, browser):
     for link in souplinks:
         linklist.append("http://www.chess.com" + link)
 
-    pointerlist = (0, 1, 2)
-    for pointer in pointerlist:
+    if len(linklist) == 0:
+        print "\n\n\t Invalid group name!!!\n\n"
+        sys.exit()
+
+    for pointer in range(3):
         del linklist[-1]
 
     soup.decompose()
@@ -1380,7 +1424,8 @@ def inviter(targetlist, endless):
                     already_picked.append(picked)
             for member in already_picked:
                 try:
-                    print "current memory usage: " + str(ramusage())
+                    if supusr is True:
+                        print "current memory usage: " + str(ramusage())
                 except:
                     "nothing"
                 if choice2 == "y" and standardlst == True:
@@ -1389,6 +1434,11 @@ def inviter(targetlist, endless):
                     except UnboundLocalError:
                         continue
                     if member not in passmemfil:
+                        memtinv.remove(member)
+                        continue
+
+                else:
+                    if member not in notclosedcheck([member]):
                         memtinv.remove(member)
                         continue
 
@@ -1432,7 +1482,6 @@ def inviter(targetlist, endless):
                 while True:
                     try:
                         print "\nInviting " + member + " to " + invgroup
-                        memint.append(member)
 
                         browser2.switch_to_frame("tinymcewindow_ifr")
                         browser2.find_element_by_id("tinymce").clear()
@@ -1444,22 +1493,22 @@ def inviter(targetlist, endless):
                             filtmcemsgold(msglist, browser2, name, country, browserchoice)
 
                         browser2.find_element_by_id("c18").click()
+                        memint.append(member)
                         break
 
                     except Exception, errormsg:
                         if supusr is True:
                             print repr(errormsg)
                         print "\n\nRetrying " + member + " to " + invgroup + "!!!\n\n"
-                        while True:
-                            browser2.get(groupinv)
-                            try:
-                                WebDriverWait(browser2, 5).until(EC.presence_of_element_located((By.ID, "c15")))
-                                browser2.find_element_by_name("c15").send_keys(member)
-                                break
-                            except Exception, errormsg:
-                                if supusr is True:
-                                    print repr(errormsg)
-                                print "retrying"
+
+                        browser2.get(groupinv)
+                        try:
+                            WebDriverWait(browser2, 5).until(EC.presence_of_element_located((By.ID, "c15")))
+                            browser2.find_element_by_name("c15").send_keys(member)
+                        except Exception, errormsg:
+                            if supusr is True:
+                                print repr(errormsg)
+                            break
 
             updinvlist = set(memtinv).difference(set(memint))
             updinvlist = misc1(updinvlist)
@@ -1497,6 +1546,13 @@ def filtmcemsgold(msglist, browser, name, country, browserchoice):
                     browser.refresh()
 
             browser.switch_to_window(browser.window_handles[0])
+            time.sleep(1)
+
+        elif content[0] == "3":
+            browser.find_element_by_id("tinymcewindow_mce_media").click()
+            alert = browser.switch_to_alert()
+            alert.send_keys(content[1])
+            alert.accept()
             time.sleep(1)
 
 def vcman(vclinklist, yourside):
@@ -1592,7 +1648,8 @@ def vcman(vclinklist, yourside):
         for pointer in movelist:
             print "\nchecking " + pointer
             try:
-                print "current memory usage: " + str(ramusage())
+                if supusr is True:
+                    print "current memory usage: " + str(ramusage())
             except:
                 "nothing"
 
@@ -1624,7 +1681,14 @@ def vcman(vclinklist, yourside):
                     except:
                         break
                     time.sleep(2)
+
                     print "\nchecking " + pointer + " page " + str(nextbtn)
+                    try:
+                        if supusr is True:
+                            print "current memory usage: " + str(ramusage())
+                    except:
+                        "nothing"
+
                     vcelem = browser3.find_elements_by_partial_link_text("")
                     for curvcparmem in vcelem:
                         memsellink = curvcparmem.get_attribute("href") or ""
@@ -1683,7 +1747,8 @@ def memberprocesser(silent, browser, target, minpoints, minrat, maxrat, mingames
     for targetx in target:
         if silent == False:
             try:
-                print "current memory usage: " + str(ramusage())
+                if supusr is True:
+                    print "current memory usage: " + str(ramusage())
             except:
                 "nothing"
             print "checking " + targetx
@@ -1883,6 +1948,7 @@ def memberprocesser(silent, browser, target, minpoints, minrat, maxrat, mingames
             passmem.append(targetx)
             soup.decompose()
             gc.collect()
+
         except Exception, errormsg:
             if supusr is True:
                 print repr(errormsg)
@@ -2584,7 +2650,8 @@ while pathway in (["y"]):
         for targetp in target:
             print targetp
             try:
-                print "current memory usage: " + str(ramusage())
+                if supusr is True:
+                    print "current memory usage: " + str(ramusage())
             except:
                 "nothing"
             browser, response = mecopner(browser, targetp)
@@ -2783,6 +2850,12 @@ while pathway in (["y"]):
 
         while True:
             browser.get("http://www.chess.com/groups/notes/" + gname)
+            try:
+                if supusr is True:
+                    print "current memory usage: " + str(ramusage())
+            except:
+                "nothing"
+
             time.sleep(sleeptime)
             try:
                 browser.find_element_by_css_selector("a.red").click()
