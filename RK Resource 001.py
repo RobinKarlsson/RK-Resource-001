@@ -121,6 +121,14 @@ def csvsoworker(memlist, choicepath):
                 cpointer[counter] = str(cpointer[counter])
             print "".join(element.ljust(colwidth) for element in cpointer)
 
+        choice2 = raw_input("\n\nGet the same list in an invites friendly format? (y/n): ")
+
+        if choice2 == "y":
+            print "\n\n"
+            for cpointer in memlist2:
+                print cpointer[0] + ", ",
+            print "\n"
+
     elif choice == "2":
         del memlist[0]
         memlist2 = list()
@@ -614,7 +622,12 @@ def pmdriver(target, choice):
 
     counter = 1
     for membername2 in memtpm:
-        if membername2 not in notclosedcheck([membername2]):
+        membername = "http://www.chess.com/members/view/" + membername2
+
+        browser1, response = mecopner(browser1, membername)
+        soup = BeautifulSoup(response)
+
+        if membername2 not in str(soup):
             continue
 
         try:
@@ -636,10 +649,6 @@ def pmdriver(target, choice):
                 browser0 = sellogin(Username, Password, browser0)
                 counter = 1
         print "sending pm to " + membername2
-        membername = "http://www.chess.com/members/view/" + membername2
-
-        browser1, response = mecopner(browser1, membername)
-        soup = BeautifulSoup(response)
 
         if not membername2 in str(soup):
             print "\n\nFailed to open page and skipped, " + membername + "\n\n"
@@ -1423,6 +1432,9 @@ def inviter(targetlist, endless):
                 if not picked in already_picked:
                     already_picked.append(picked)
             for member in already_picked:
+                browser1, response = mecopner(browser1, "http://www.chess.com/members/view/" + member)
+                soup = BeautifulSoup(response)
+
                 try:
                     if supusr is True:
                         print "current memory usage: " + str(ramusage())
@@ -1438,7 +1450,7 @@ def inviter(targetlist, endless):
                         continue
 
                 else:
-                    if member not in notclosedcheck([member]):
+                    if member not in str(soup):
                         memtinv.remove(member)
                         continue
 
@@ -1452,9 +1464,6 @@ def inviter(targetlist, endless):
                         browser2, handle = pickbrowser(browserchoice, True)
                         browser2 = sellogin(Username, Password, browser2)
                         counter = 1
-
-                browser1, response = mecopner(browser1, "http://www.chess.com/members/view/" + member)
-                soup = BeautifulSoup(response)
 
                 for placeholder in soup.find_all(class_ = "flag"):
                     country = placeholder["title"]
