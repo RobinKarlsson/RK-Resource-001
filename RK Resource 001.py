@@ -126,7 +126,7 @@ def csvsoworker(memlist, choicepath):
         if choice2 == "y":
             print "\n\n"
             for cpointer in memlist2:
-                print cpointer[0] + ", ",
+                print cpointer[0] + ",",
             print "\n"
 
     elif choice == "2":
