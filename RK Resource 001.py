@@ -5,9 +5,17 @@
 # contact chess.com profile: "http://www.chess.com/members/view/RobinKarlsson"
 # version 0.8.9 dev
 
-import mechanize
+supusr = False
+
 import os
 import sys
+import subprocess
+
+try:
+    import mechanize
+except:
+    sys.exit("\n\n\tCouln't import the mechanize library, shutting down\n\n")
+
 import gc
 import csv
 import urlparse
@@ -17,23 +25,30 @@ import base64
 import stat
 import re
 import time
-import subprocess
 import platform as _platform
 from time import strftime, gmtime
 from datetime import datetime, date, timedelta
-from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.alert import Alert
-from bs4 import BeautifulSoup
+
+try:
+    from selenium import webdriver
+    from selenium.webdriver.common.keys import Keys
+    from selenium.webdriver.common.by import By
+    from selenium.webdriver.chrome.options import Options
+    from selenium.webdriver.support.ui import WebDriverWait
+    from selenium.webdriver.support import expected_conditions as EC
+    from selenium.webdriver.common.alert import Alert
+except:
+    sys.exit("\n\n\tCouln't import the selenium library, shutting down\n\n")
+
+try:
+    from bs4 import BeautifulSoup
+except:
+    sys.exit("\n\n\tCouln't import the BeautifulSoup4 library, shutting down\n\n")
+
 from operator import itemgetter
 from collections import OrderedDict
 from collections import Counter
 from string import punctuation
-supusr = False
 
 def csvsoworker(memlist, choicepath):
     colwidth = max(len(element.decode("UTF-8")) for row in memlist for element in row) + 2
@@ -138,6 +153,27 @@ def csvsoworker(memlist, choicepath):
 
         print "\n\n" + streplacer(str(memlist2), (["'", ""], ["[", ""], ["]", ""]))
 
+def debugout():
+    try:
+        print "\nRAM usage (script): " + str(ramusage()) + " MB"
+    except Exception, errormsg:
+        print "WARNING: Couldn't access RAM usage"
+        print repr(errormsg)
+
+    try:
+        print "CPU usage (system): " + str(psutil.cpu_percent()) + "%"
+    except Exception, errormsg:
+        print "WARNING: Couldn't access CPU usage"
+        print repr(errormsg)
+
+    try:
+        sigstrength()
+    except Exception, errormsg:
+        print "WARNING: Couldn't access network strength"
+        print repr(errormsg)
+
+    print ""
+
 def getmeminfo(target, filename):
     browser = mecbrowser("")
 
@@ -148,11 +184,9 @@ def getmeminfo(target, filename):
 
     for mem in target:
         print "Processing " + mem
-        try:
-            if supusr is True:
-                print "current memory usage: " + str(ramusage())
-        except:
-            "nothing"
+
+        if supusr is True:
+            debugout()
 
         browser, response = mecopner(browser, "http://www.chess.com/members/view/" + mem)
         if "://www.chess.com/members/view/" not in browser.geturl():
@@ -203,7 +237,6 @@ def mecbrowser(logincookie):
     return browser
 
 def pickbrowser(browserchoice, adext):
-    usrplatform = getplatform()
     handle = False
     while True:
         if browserchoice == "1":
@@ -242,7 +275,7 @@ def pickbrowser(browserchoice, adext):
                                 print repr(errormsg)
                             print "Failed to load " + os.path.abspath("Webdriver/Extensions/Chrome/" + fname)
 
-            if usrplatform[1] == "Linux":
+            if usrsys == "Linux":
                 chromepath = os.path.abspath("Webdriver/Linux/86/chromedriver")
                 os.environ["webdriver.chrome.driver"] = chromepath
                 try:
@@ -254,36 +287,36 @@ def pickbrowser(browserchoice, adext):
                     browser = webdriver.Chrome(chromepath)
                 break
 
-            elif usrplatform[1] == "Windows":
+            elif usrsys == "Windows":
                 chromepath = os.path.abspath("Webdriver/Windows/86/chromedriver.exe")
                 os.environ["webdriver.chrome.driver"] = chromepath
                 browser = webdriver.Chrome(chromepath, chrome_options = copt)
                 break
 
-            elif usrplatform[1] == "Darwin":
+            elif usrsys == "Darwin":
                 chromepath = os.path.abspath("Webdriver/Mac/86/chromedriver")
                 os.environ["webdriver.chrome.driver"] = chromepath
                 browser = webdriver.Chrome(chromepath, chrome_options = copt)
                 break
 
         elif browserchoice == "3":
-            if usrplatform[1] == "Linux":
+            if usrsys == "Linux":
                 browser = webdriver.PhantomJS(os.path.abspath("Webdriver/Linux/86/phantomjs"))
                 break
 
-            elif usrplatform[1] == "Windows":
+            elif usrsys == "Windows":
                 browser = webdriver.PhantomJS(os.path.abspath("Webdriver/Windows/86/phantomjs.exe"))
                 break
 
-            elif usrplatform[1] == "Darwin":
+            elif usrsys == "Darwin":
                 browser = webdriver.PhantomJS(os.path.abspath("Webdriver/Mac/86/phantomjs"))
                 break
 
         elif browserchoice == "4":
-            if usrplatform[1] == "Windows":
+            if usrsys == "Windows":
                 browser = webdriver.Ie(os.path.abspath("Webdriver/Windows/86/IEDriverServer.exe"))
                 break
-        browserchoice = raw_input("\nSomething went wrong, please send this to the developer: " + browserchoice + str(usrplatform) + "\n\nTry and pick another browser\n 1. Firefox\n 2. Chrome\n 3. PhantomJS\n 4. Internet Explorer\nEnter choice: ")
+        browserchoice = raw_input("\nSomething went wrong, please send this to the developer: " + browserchoice + "   " + str(getplatform()) + "\n\nTry and pick another browser\n 1. Firefox\n 2. Chrome\nEnter choice: ")
 
     if handle == True:
         time.sleep(2)
@@ -310,11 +343,10 @@ def gettmopdata(targetname):
     pointer = 1
     while True:
         browser, response = mecopner(browser, str(linkarchive) + "&page=" + str(pointer))
-        try:
-            if supusr is True:
-                print "current memory usage: " + str(ramusage())
-        except:
-            "nothing"
+
+        if supusr is True:
+            debugout()
+
         soup = BeautifulSoup(response)
         soupbrake = str(soup.find_all(class_ = "next-on"))
 
@@ -335,9 +367,7 @@ def gettmopdata(targetname):
     return mtchlist
 
 def turnofcomp():
-    usrplatform = getplatform()
-
-    if usrplatform[1] == "Linux":
+    if usrsys == "Linux":
         import dbus
         try:
             dbus.Interface(dbus.SystemBus().get_object("org.freedesktop.ConsoleKit", "/org/freedesktop/ConsoleKit/Manager"), "org.freedesktop.ConsoleKit.Manager").get_dbus_method("Stop")() #ConsoleKit
@@ -351,10 +381,10 @@ def turnofcomp():
             if supusr is True:
                 print repr(errormsg)
 
-    elif usrplatform[1] == "Windows":
+    elif usrsys == "Windows":
         os.system("shutdown -h now")
 
-    elif usrplatform[1] == "Darwin":
+    elif usrsys == "Darwin":
         try:
             subprocess.call(["osascript", "-e", 'tell app "System Events" to shut down'])
         except Exception, errormsg:
@@ -384,11 +414,10 @@ def gettmlinks(targetname):
 
     while True:
         browser, response = mecopner(browser, str(linkarchive) + "&page=" + str(pointer))
-        try:
-            if supusr is True:
-                print "current memory usage: " + str(ramusage())
-        except:
-            "nothing"
+
+        if supusr is True:
+            debugout()
+
         soup = BeautifulSoup(response)
 
         soupbrake = str(soup.find_all(class_ = "next-on"))
@@ -465,6 +494,9 @@ def fnamenot(nlst, fdir):
     return flist
 
 def noteposter(target, msg, interval, nationalt, shutdown):
+    while "" in target:
+        target.remove("")
+
     browserchoice = selbrowch()
     Username = raw_input("\n\n\nUsername: ")
     Password = raw_input("Password: ")
@@ -476,11 +508,9 @@ def noteposter(target, msg, interval, nationalt, shutdown):
     print "\n\n"
 
     for mem in target:
-        try:
-            if supusr is True:
-                print "current memory usage: " + str(ramusage())
-        except:
-            "nothing"
+        if supusr is True:
+            debugout()
+
         print "processing: " + mem
         browser, response = mecopner(browser, "http://www.chess.com/members/view/" + mem)
         soup = BeautifulSoup(response)
@@ -630,11 +660,9 @@ def pmdriver(target, choice):
         if membername2 not in str(soup):
             continue
 
-        try:
-            if supusr is True:
-                print "current memory usage: " + str(ramusage())
-        except:
-            "nothing"
+        if supusr is True:
+            debugout()
+
         if choice2 == "y":
             passmemfil = memberprocesser(True, browser1, ([membername2]), minpoints, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat)
 
@@ -691,6 +719,7 @@ def pmdriver(target, choice):
 
                 browser0.find_element_by_id("c16").click()
                 break
+
             except Exception, errormsg:
                 if supusr is True:
                     print repr(errormsg)
@@ -726,6 +755,7 @@ def mecopner(browser, pointl):
         except Exception, errormsg:
             if supusr is True:
                 print repr(errormsg)
+
             print "something went wrong, reopening " + pointl
             time.sleep(2)
     return browser, response
@@ -768,11 +798,10 @@ def tmparchecker(pagelist, targetname):
         if "http://www.chess.com/groups/team_match?id=" not in page:
             continue
         print "processing: " + page
-        try:
-            if supusr is True:
-                print "current memory usage: " + str(ramusage())
-        except:
-            "nothing"
+
+        if supusr is True:
+            debugout()
+
         alltmresults = list()
         counter2 = 0
         browser, response = mecopner(browser, page)
@@ -898,11 +927,9 @@ def memspider(target, silent, browser):
 
             if silent == False:
                 print "checking " + pointer
-                try:
-                    if supusr is True:
-                        print "current memory usage: " + str(ramusage())
-                except:
-                    "nothing"
+
+                if supusr is True:
+                    debugout()
 
             for link in browser.links(url_regex="chess.com/members/view/"):
                 ltext = link.text
@@ -927,11 +954,9 @@ def ageproc(target):
     flist = []
     for targetx in target:
         print "checking: " + targetx
-        try:
-            if supusr is True:
-                print "current memory usage: " + str(ramusage())
-        except:
-            "nothing"
+
+        if supusr is True:
+            debugout()
 
         tlst = [targetx]
         browser, response = mecopner(browser, "http://www.chess.com/members/view/" + targetx)
@@ -957,8 +982,8 @@ def ageproc(target):
 
 def selbrowch():
     browserchoice = ""
-    while browserchoice not in (["1", "2", "3", "4"]):
-        browserchoice = raw_input("Which browser do you want to use\n 1. Firefox\n 2. Chrome\n 3. PhantomJS\n 4. Internet Explorer\nYour choice: ")
+    while browserchoice not in (["1", "2"]):
+        browserchoice = raw_input("\nWhich browser do you want to use\n 1. Firefox\n 2. Chrome\nYour choice: ")
     return browserchoice
 
 def createfileifmissing(filename, ismsg):
@@ -1088,11 +1113,9 @@ def pairsorter(browser, target, choice):
     partup = list()
     for mem in target:
         browser, response = mecopner(browser, "http://www.chess.com/members/view/" + mem)
-        try:
-            if supusr is True:
-                print "current memory usage: " + str(ramusage())
-        except:
-            "nothing"
+
+        if supusr is True:
+            debugout()
 
         if "://www.chess.com/members/view/" not in browser.geturl():
             continue
@@ -1435,11 +1458,9 @@ def inviter(targetlist, endless):
                 browser1, response = mecopner(browser1, "http://www.chess.com/members/view/" + member)
                 soup = BeautifulSoup(response)
 
-                try:
-                    if supusr is True:
-                        print "current memory usage: " + str(ramusage())
-                except:
-                    "nothing"
+                if supusr is True:
+                    debugout()
+
                 if choice2 == "y" and standardlst == True:
                     try:
                         passmemfil = memberprocesser(True, browser1, ([member]), minpoints, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat)
@@ -1656,11 +1677,9 @@ def vcman(vclinklist, yourside):
 
         for pointer in movelist:
             print "\nchecking " + pointer
-            try:
-                if supusr is True:
-                    print "current memory usage: " + str(ramusage())
-            except:
-                "nothing"
+
+            if supusr is True:
+                debugout()
 
             browser1, response = mecopner(browser1, pointer)
 
@@ -1692,11 +1711,9 @@ def vcman(vclinklist, yourside):
                     time.sleep(2)
 
                     print "\nchecking " + pointer + " page " + str(nextbtn)
-                    try:
-                        if supusr is True:
-                            print "current memory usage: " + str(ramusage())
-                    except:
-                        "nothing"
+
+                    if supusr is True:
+                        debugout()
 
                     vcelem = browser3.find_elements_by_partial_link_text("")
                     for curvcparmem in vcelem:
@@ -1755,11 +1772,9 @@ def memberprocesser(silent, browser, target, minpoints, minrat, maxrat, mingames
     passmem = list()
     for targetx in target:
         if silent == False:
-            try:
-                if supusr is True:
-                    print "current memory usage: " + str(ramusage())
-            except:
-                "nothing"
+            if supusr is True:
+                debugout()
+
             print "checking " + targetx
 
         browser, response = mecopner(browser, "http://www.chess.com/members/view/" + targetx)
@@ -2262,6 +2277,28 @@ def getadmins(targetlst, browser):
 
     return list(set(superadminlist)), list(set(adminlist))
 
+def sigstrength():
+    if usrsys == "Linux":
+        cmd = subprocess.Popen(["iwconfig"], stdout = subprocess.PIPE, stderr = subprocess.STDOUT).communicate()[0]
+
+        for line in cmd.split("\n"):
+            if "ESSID" in line:
+                print "Network interface: " + line[0: line.index(" ")] + "  ",
+            if "Link Quality" in line:
+                print line.strip().replace("=", ": ")
+
+usrsys = getplatform()[1]
+
+for x in sys.argv:
+    if x == "Debug":
+        print "\n\n\tDebug outputs active\n\n"
+        supusr = True
+
+        try:
+            import psutil
+        except:
+            print "\n\n\tWARNING: couldn't import psutil, RAM and CPU checks might not work properly!!!\n\n"
+
 olprint("*", "*", "-", 72, True)
 for content in (["", "", "", "RK Resource 001", "version 0.8.9 dev", "", "", ""]):
     olprint2("{0: ^70}", content, "|", "|")
@@ -2658,11 +2695,10 @@ while pathway in (["y"]):
         notedic = dict()
         for targetp in target:
             print targetp
-            try:
-                if supusr is True:
-                    print "current memory usage: " + str(ramusage())
-            except:
-                "nothing"
+
+            if supusr is True:
+                debugout()
+
             browser, response = mecopner(browser, targetp)
             soup = BeautifulSoup(response)
 
@@ -2859,11 +2895,9 @@ while pathway in (["y"]):
 
         while True:
             browser.get("http://www.chess.com/groups/notes/" + gname)
-            try:
-                if supusr is True:
-                    print "current memory usage: " + str(ramusage())
-            except:
-                "nothing"
+
+            if supusr is True:
+                debugout()
 
             time.sleep(sleeptime)
             try:
