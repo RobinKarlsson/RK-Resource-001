@@ -2287,6 +2287,18 @@ def sigstrength():
             if "Link Quality" in line:
                 print line.strip().replace("=", ": ")
 
+    elif usrsys == "Windows":
+        signal = False
+        cmd = subprocess.Popen(["netsh", "wlan", "show", "all"], stdout = subprocess.PIPE).communicate()[0]
+
+        for line in cmd[cmd.index("SHOW INTERFACES"): cmd.index("SHOW HOSTED NETWORK")].split("\n"):
+            if "Signal" in line:
+                signal = True
+                print "Signal strength: " + line.split()[2]
+
+        if signal == False:
+            print "No signal"
+
 usrsys = getplatform()[1]
 
 for x in sys.argv:
