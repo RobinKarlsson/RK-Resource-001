@@ -152,11 +152,12 @@ def csvsoworker(memlist, choicepath):
         print "\n\n" + streplacer(str(memlist2), (["'", ""], ["[", ""], ["]", ""]))
 
 def debugout():
-    try:
-        print "\nRAM usage (script): " + str(ramusage()) + " MB"
-    except Exception, errormsg:
-        print "WARNING: Couldn't access RAM usage"
-        print repr(errormsg)
+    if usrsys != "Windows":
+        try:
+            print "\nRAM usage (script): " + str(ramusage()) + " MB"
+        except Exception, errormsg:
+            print "WARNING: Couldn't access RAM usage"
+            print repr(errormsg)
 
     try:
         print "CPU usage (system): " + str(psutil.cpu_percent()) + "%"
