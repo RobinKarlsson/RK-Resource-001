@@ -5,8 +5,6 @@
 # contact chess.com profile: "http://www.chess.com/members/view/RobinKarlsson"
 # version 0.8.9 dev
 
-supusr = False
-
 import os
 import sys
 import subprocess
@@ -534,6 +532,7 @@ def noteposter(target, msg, interval, nationalt, shutdown):
             except Exception, errormsg:
                 if supusr is True:
                     print repr(errormsg)
+                    debugout()
                 if counter == 20:
                     print "\n\nSkipped " + mem + "\n\n"
                     skipped.append(mem)
@@ -611,7 +610,7 @@ def pmdriver(target, choice):
             sleeptime = int(sleeptime)
             break
         except ValueError:
-            "do nothing"        
+            None
 
     browserchoice = selbrowch()
 
@@ -704,6 +703,7 @@ def pmdriver(target, choice):
         except Exception, errormsg:
             if supusr is True:
                 print repr(errormsg)
+                debugout()
             continue
 
         while True:
@@ -723,6 +723,7 @@ def pmdriver(target, choice):
             except Exception, errormsg:
                 if supusr is True:
                     print repr(errormsg)
+                    debugout()
                 print "\n\nRetrying " + membername2
 
                 while True:
@@ -734,6 +735,7 @@ def pmdriver(target, choice):
                     except Exception, errormsg:
                         if supusr is True:
                             print repr(errormsg)
+                            debugout()
                         print "retrying"
 
         soup.decompose()
@@ -755,6 +757,7 @@ def mecopner(browser, pointl):
         except Exception, errormsg:
             if supusr is True:
                 print repr(errormsg)
+                debugout()
 
             print "something went wrong, reopening " + pointl
             time.sleep(2)
@@ -1025,7 +1028,7 @@ def configopen(filename, forinvites):
                         try:
                             value = float(value)
                         except ValueError:
-                            "nothing"
+                            None
                     condic[data[0]] = value
                 return condic
         else:
@@ -1529,6 +1532,7 @@ def inviter(targetlist, endless):
                     except Exception, errormsg:
                         if supusr is True:
                             print repr(errormsg)
+                            debugout()
                         print "\n\nRetrying " + member + " to " + invgroup + "!!!\n\n"
 
                         browser2.get(groupinv)
@@ -1538,6 +1542,7 @@ def inviter(targetlist, endless):
                         except Exception, errormsg:
                             if supusr is True:
                                 print repr(errormsg)
+                                debugout()
                             break
 
             updinvlist = set(memtinv).difference(set(memint))
@@ -1572,6 +1577,7 @@ def filtmcemsgold(msglist, browser, name, country, browserchoice):
                 except Exception, errormsg:
                     if supusr is True:
                         print repr(errormsg)
+                        debugout()
                     print "\n\nrefreshing page\n\n"
                     browser.refresh()
 
@@ -1976,6 +1982,7 @@ def memberprocesser(silent, browser, target, minpoints, minrat, maxrat, mingames
         except Exception, errormsg:
             if supusr is True:
                 print repr(errormsg)
+                debugout()
             print "\n\nskipped " + targetx + "\n\n"
             continue
 
@@ -2040,7 +2047,7 @@ def onlratingchecker(soup):
             try:
                 onrating = int(x.text.replace("Online Chess", "").strip())
             except ValueError:
-                "nothing"
+                None
     return onrating
 
 def ranratingchecker(soup):
@@ -2050,7 +2057,7 @@ def ranratingchecker(soup):
             try:
                 onrating = int(x.text.replace("Chess960", "").strip())
             except ValueError:
-                "nothing"
+                None
     return onrating
 
 def tacratingchecker(soup):
@@ -2060,7 +2067,7 @@ def tacratingchecker(soup):
             try:
                 onrating = int(x.text.replace("Tactics", "").strip())
             except ValueError:
-                "nothing"
+                None
     return onrating
 
 def lstanratingchecker(soup):
@@ -2070,7 +2077,7 @@ def lstanratingchecker(soup):
             try:
                 onrating = int(x.text.replace("Live Chess - Standard", "").strip())
             except ValueError:
-                "nothing"
+                None
     return onrating
 
 def lbulratingchecker(soup):
@@ -2080,7 +2087,7 @@ def lbulratingchecker(soup):
             try:
                 onrating = int(x.text.replace("Live Chess - Bullet", "").strip())
             except ValueError:
-                "nothing"
+                None
     return onrating
 
 def lblitzratingchecker(soup):
@@ -2090,7 +2097,7 @@ def lblitzratingchecker(soup):
             try:
                 onrating = int(x.text.replace("Live Chess - Blitz", "").strip())
             except ValueError:
-                "nothing"
+                None
     return onrating
 
 def ratingchecker(soup):
@@ -2105,7 +2112,7 @@ def ratingchecker(soup):
             try:
                 ratinglist.append(int(placeholder.text))
             except ValueError:
-                "nada"
+                None
     return ratinglist
 
 def memsin(soup):
@@ -2279,27 +2286,52 @@ def getadmins(targetlst, browser):
 
 def sigstrength():
     if usrsys == "Linux":
+        cmd = subprocess.Popen(["nm-tool"], stdout = subprocess.PIPE, stderr = subprocess.STDOUT).communicate()[0]
+
+        for line in cmd.split("\n"):
+            if "*" in line and "current AP" not in line:
+                line = line.strip()
+                #essid = "AP: " + line[1: line.index(":")] + "  "
+                essid = ""
+
+                line = [x for x in line.split()]
+
+                sigstren = line.index("Strength")
+                sigstren = "Signal strength: " + line[sigstren + 1] + "%" + "  "
+
+                #sigfreq = line.index("Freq")
+                #sigfreq = "Freq: " + line[sigfreq + 1] + line[sigfreq + 2].replace(",", "") + "  "
+                sigfreq = ""
+
         cmd = subprocess.Popen(["iwconfig"], stdout = subprocess.PIPE, stderr = subprocess.STDOUT).communicate()[0]
 
         for line in cmd.split("\n"):
-            if "ESSID" in line:
-                print "Network interface: " + line[0: line.index(" ")] + "  ",
+            if "ESSID:" in line:
+                #interf = "Interface: " + line[0: line.index(" ")] + "  "
+                interf = ""
             if "Link Quality" in line:
-                print line.strip().replace("=", ": ")
+                quality = line.strip().replace("=", ": ")
+
+        try:
+            print interf + essid + sigfreq + sigstren + quality
+        except:
+            print "No network connection"
 
     elif usrsys == "Windows":
         signal = False
-        cmd = subprocess.Popen(["netsh", "wlan", "show", "all"], stdout = subprocess.PIPE).communicate()[0]
+        cmd = subprocess.Popen(["netsh", "wlan", "show", "all"], stdout = subprocess.PIPE, stderr = subprocess.STDOUT).communicate()[0]
 
         for line in cmd[cmd.index("SHOW INTERFACES"): cmd.index("SHOW HOSTED NETWORK")].split("\n"):
             if "Signal" in line:
-                signal = True
-                print "Signal strength: " + line.split()[2]
+                sigstren = "Signal strength: " + line.split()[2]
 
-        if signal == False:
-            print "No signal"
+        try:
+            print sigstren
+        except:
+            print "No network connection"
 
 usrsys = getplatform()[1]
+supusr = False
 
 for x in sys.argv:
     if x == "Debug":
@@ -2311,25 +2343,25 @@ for x in sys.argv:
         except:
             print "\n\n\tWARNING: couldn't import psutil, RAM and CPU checks might not work properly!!!\n\n"
 
-olprint("*", "*", "-", 72, True)
-for content in (["", "", "", "RK Resource 001", "version 0.8.9 dev", "", "", ""]):
-    olprint2("{0: ^70}", content, "|", "|")
-olprint("|", "|", "-", 72, True)
-
-for content in (["", "", "developed by Robin Karlsson", "", "", "Contact information", "", "r.robin.karlsson@gmail.com", "http://www.chess.com/members/view/RobinKarlsson", "", ""]):
-    olprint2("{0: ^70}", content, "|", "|")
-olprint("|", "|", "-", 72, True)
-
-for content in (["", "", "Options", "Type /help or /help <number> for more info", "", "", "1. Extract the memberslist of one or more groups", "", "2. Build a csv file with data on a list of members", "", "3. Send invites for a group", "", "4. Posts per member in a groups finished votechess matches", "", "5. Build a csv file of a groups team match participants", "", "6. Filter a list of members for those who fill a few requirements", "", "7. Presentation of csv-files from options 2 and 5", "", "8. Send personal notes to a list of members", "", "9. Look for members who has recenty left your group", "", "10. Count number of group notes per member in the last 100 notes pages", "", "11. Build a birthday schedule for a list of members", "", "12. Send a personal message to a list of members", "", "13. Pair lists of players against each others", "", "14. Set operations on two lists", "", "15. Check a teams won/lost tm's per opponent", "", "16. Delete all group notes in a group", "", ""]):
-    olprint2("{0: ^70}", content, "|", "|")
-olprint("*", "*", "-", 72, True)
-
 pathway = "y"
 makefolder((["Member Lists", "Member Lists/Config", "Invite Lists", "Invite Lists/Config", "namelists", "Webdriver", "Webdriver/Linux", "Webdriver/Mac", "Webdriver/Windows", "Webdriver/Linux/86", "Webdriver/Mac/86", "Webdriver/Windows/86", "Webdriver/Extensions", "Webdriver/Extensions/Chrome", "Webdriver/Extensions/Firefox", "Messages", "Messages/Invite Messages"]))
 
 while pathway in (["y"]):
+    olprint("*", "*", "-", 72, True)
+    for content in (["", "", "", "RK Resource 001", "version 0.8.9 dev", "", "", ""]):
+        olprint2("{0: ^70}", content, "|", "|")
+    olprint("|", "|", "-", 72, True)
+
+    for content in (["", "", "developed by Robin Karlsson", "", "", "Contact information", "", "r.robin.karlsson@gmail.com", "http://www.chess.com/members/view/RobinKarlsson", "", ""]):
+        olprint2("{0: ^70}", content, "|", "|")
+    olprint("|", "|", "-", 72, True)
+
+    for content in (["", "", "Options", "Type /help or /help <number> for more info", "", "", "1. Extract the memberslist of one or more groups", "", "2. Build a csv file with data on a list of members", "", "3. Send invites for a group", "", "4. Posts per member in a groups finished votechess matches", "", "5. Build a csv file of a groups team match participants", "", "6. Filter a list of members for those who fill a few requirements", "", "7. Presentation of csv-files from options 2 and 5", "", "8. Send personal notes to a list of members", "", "9. Look for members who has recenty left your group", "", "10. Count number of group notes per member in the last 100 notes pages", "", "11. Build a birthday schedule for a list of members", "", "12. Send a personal message to a list of members", "", "13. Pair lists of players against each others", "", "14. Set operations on two lists", "", "15. Check a teams won/lost tm's per opponent", "", "16. Delete all group notes in a group", "", "17. Check signal strength", "", ""]):
+        olprint2("{0: ^70}", content, "|", "|")
+    olprint("*", "*", "-", 72, True)
+
     flow = ""
-    while flow not in (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "42"]):
+    while flow not in (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "42"]):
         flow = raw_input("\n\n\nEnter your choice here: ")
 
         if flow == "/help 1":
@@ -2364,6 +2396,8 @@ while pathway in (["y"]):
             print "\n\nCount number of wins, losses and draws per opponent in a teams team match archive"
         elif flow == "/help 16":
             print "\n\nDeletes all group notes from a specified group\n\nRequires login and admin privilege to access and delete notes"
+        elif flow == "/help 17":
+            print "\n\nPrints your network signal strength continuously every 0.5 seconds"
         elif flow == "/help":
             print "\n\n\nTo add extensions/addons to the scripts chrome or firefox browser you need to download the extension in crx format for chrome or xpi for firefox. Once the addon is downloaded, place it in the Webdriver/Extensions/Chrome or Webdriver/Extensions/Firefox folder.\n\nIt's recommended to use the adblock plus extension\n\n\n\n\nTo use the scripts ability to determine a members gender you will need to have a list of male and female first names in the namelists folder. male names should be stored in a file called 'male' and female names in a file called 'female'.\n\nFor best performance the names should be in the format:\nname1\nname2\nname3\netc\n\nIt's also recommended to sort the names based on how commonly they are used"
 
@@ -2501,11 +2535,11 @@ while pathway in (["y"]):
             try:
                 print "\n\n\nTimeouts per player (number of timeouts (" + str(timeoutnum) + ") / number of players (" + str(len(joined)) + ")): " + str((timeoutnum + 0.0) / len(joined))
             except ZeroDivisionError:
-                "nothing"
+                None
             try:
                 print "Team match points won ratio (points won (" + str(ptswon).replace(".0", "") + ") / total number of points (" + str(ptslost + ptswon).replace(".0", "") + ")): " + str((ptswon + 0.0) / (ptslost + ptswon)) + "\n\n"
             except ZeroDivisionError:
-                "nothing"
+                None
 
         elif pathtm == "2":
             maxtmrat = int(raw_input("\n\nGet members with a timeout-ratio above: ").replace("%", ""))
@@ -2925,6 +2959,14 @@ while pathway in (["y"]):
 
         if shutdown == "y":
             turnofcomp()
+
+    elif flow == "17":
+        if usrsys == "Linux" or usrsys == "Windows":
+            while True:
+                sigstrength()
+                time.sleep(0.4)
+        else:
+            print "\n\nUnfortunately this option is currently not suported on " + usrsys
 
     elif flow == "42":
         choice = ""
