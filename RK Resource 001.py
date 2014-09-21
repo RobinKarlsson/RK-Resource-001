@@ -2287,7 +2287,7 @@ def getadmins(targetlst, browser):
     return list(set(superadminlist)), list(set(adminlist))
 
 def ltime():
-    return " " + time.strftime("%H:%M:%S") + "  "
+    return time.strftime("%H:%M") + " "
 
 def sigstrength():
     
@@ -2325,9 +2325,9 @@ def sigstrength():
                 quality = line.strip().replace("=", ": ")
 
         try:
-            print ltime() + interf + essid + sigfreq + sigstren + quality
+            print ltime() + " " + interf + essid + sigfreq + sigstren + quality
         except:
-            print ltime() + "No network connection"
+            print ltime() + " " + "No network connection"
 
     elif usrsys == "Windows":
         signal = False
@@ -2338,9 +2338,9 @@ def sigstrength():
                 sigstren = "Signal strength: " + line.split()[2]
 
         try:
-            print ltime() + sigstren
+            print ltime() + " " + sigstren
         except:
-            print ltime() + "No network connection"
+            print ltime() + " " + "No network connection"
 
 usrsys = getplatform()[1]
 supusr = False
