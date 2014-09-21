@@ -177,12 +177,12 @@ def getmeminfo(target, filename):
     browser = mecbrowser("")
 
     memlist = list()
-    outputfile = open(filename + " " + strftime("%Y-%m-%d", gmtime()) + ".mem.csv", "wb")
+    outputfile = open(filename + " " + time.strftime("%Y-%m-%d %H:%M") + ".mem.csv", "wb")
     csvwriter = csv.writer(outputfile, delimiter = " ", quoting=csv.QUOTE_MINIMAL)
     csvwriter.writerow(("Username", "Real name", "Live Standard rating", "Live Blitz rating", "Live Bullet rating", "Online rating", "960 rating", "Tactics rating", "Timeout-ratio", "Last online", "Member since", "Time/move", "Groups", "Points", "Total games", "Games won", "Games lost", "Games drawn", "Win ratio", "Nation", "Custom avatar", "Site Awards", "Tournament Trophies", "Game Trophies", "Fun Trophies"))
 
     for mem in target:
-        print "Processing " + mem
+        print ltime() + "Processing " + mem
 
         if supusr is True:
             debugout()
@@ -250,13 +250,13 @@ def pickbrowser(browserchoice, adext):
                         except Exception, errormsg:
                             if supusr is True:
                                 print repr(errormsg)
-                            print "Failed to load " + os.path.abspath("Webdriver/Extensions/Firefox/" + fname)
+                            print ltime() + "Failed to load " + os.path.abspath("Webdriver/Extensions/Firefox/" + fname)
             try:
                 browser = webdriver.Firefox(fopt)
             except Exception, errormsg:
                 if supusr is True:
                     print repr(errormsg)
-                print "\n\nFailed to initiate Firefox with addons, reverting to standard\n\n"
+                print "\n\n" + ltime() + "Failed to initiate Firefox with addons, reverting to standard\n\n"
                 browser = webdriver.Firefox()
             break
 
@@ -272,7 +272,7 @@ def pickbrowser(browserchoice, adext):
                         except Exception, errormsg:
                             if supusr is True:
                                 print repr(errormsg)
-                            print "Failed to load " + os.path.abspath("Webdriver/Extensions/Chrome/" + fname)
+                            print ltime() + "Failed to load " + os.path.abspath("Webdriver/Extensions/Chrome/" + fname)
 
             if usrsys == "Linux":
                 chromepath = os.path.abspath("Webdriver/Linux/86/chromedriver")
@@ -282,7 +282,7 @@ def pickbrowser(browserchoice, adext):
                 except Exception, errormsg:
                     if supusr is True:
                         print repr(errormsg)
-                    print "\n\nFailed to initiate Chrome with extensions, reverting to standard\n\n"
+                    print "\n\n" + ltime() + "Failed to initiate Chrome with extensions, reverting to standard\n\n"
                     browser = webdriver.Chrome(chromepath)
                 break
 
@@ -510,7 +510,7 @@ def noteposter(target, msg, interval, nationalt, shutdown):
         if supusr is True:
             debugout()
 
-        print "processing: " + mem
+        print ltime() + "processing: " + mem
         browser, response = mecopner(browser, "http://www.chess.com/members/view/" + mem)
         soup = BeautifulSoup(response)
 
@@ -535,7 +535,7 @@ def noteposter(target, msg, interval, nationalt, shutdown):
                     print repr(errormsg)
                     debugout()
                 if counter == 20:
-                    print "\n\nSkipped " + mem + "\n\n"
+                    print "\n\n" + ltime() + "Skipped " + mem + "\n\n"
                     skipped.append(mem)
                     break
                 counter += 1
@@ -552,6 +552,7 @@ def noteposter(target, msg, interval, nationalt, shutdown):
         print "skipped the following members:"
         for name in skipped:
             print name,
+        print "\n"
     browser2.quit()
 
     if shutdown == "y":
@@ -676,10 +677,10 @@ def pmdriver(target, choice):
                 browser0, handle = pickbrowser(browserchoice, True)
                 browser0 = sellogin(Username, Password, browser0)
                 counter = 1
-        print "sending pm to " + membername2
+        print ltime() + "sending pm to " + membername2
 
         if not membername2 in str(soup):
-            print "\n\nFailed to open page and skipped, " + membername + "\n\n"
+            print "\n\n" + ltime() + "Failed to open page and skipped, " + membername + "\n\n"
             continue
         for placeholder in soup.find_all(class_ = "flag"):
             country = placeholder["title"]
@@ -725,7 +726,7 @@ def pmdriver(target, choice):
                 if supusr is True:
                     print repr(errormsg)
                     debugout()
-                print "\n\nRetrying " + membername2
+                print "\n\n" + ltime() + "Retrying " + membername2
 
                 while True:
                     browser0.get("http://www.chess.com" + memlink)
@@ -737,7 +738,7 @@ def pmdriver(target, choice):
                         if supusr is True:
                             print repr(errormsg)
                             debugout()
-                        print "retrying"
+                        print ltime() + "retrying"
 
         soup.decompose()
         response.close()
@@ -760,7 +761,7 @@ def mecopner(browser, pointl):
                 print repr(errormsg)
                 debugout()
 
-            print "something went wrong, reopening " + pointl
+            print ltime() + "something went wrong, reopening " + pointl
             time.sleep(2)
     return browser, response
 
@@ -801,7 +802,7 @@ def tmparchecker(pagelist, targetname):
     for page in pagelist:
         if "http://www.chess.com/groups/team_match?id=" not in page:
             continue
-        print "processing: " + page
+        print ltime() + "processing: " + page
 
         if supusr is True:
             debugout()
@@ -821,7 +822,7 @@ def tmparchecker(pagelist, targetname):
             regopen = ([int(regopen[2]), int(regopen[0]), int(regopen[1])])
             print regopen
             if datetime(regopen[0], regopen[1], regopen[2]) < datetime(tmyear, tmmonth, tmday):
-                print page + " didn't pass the timecheck"
+                print ltime() + page + " didn't pass the timecheck"
                 continue
 
         soupgroup = str(soup.find_all(class_ = "default border-top alternate"))
@@ -906,7 +907,7 @@ def tmparchecker(pagelist, targetname):
                             counter += 1
 
             else:
-                print "\n\nfailed to find your group in this match: " + page + "!!!\n"
+                print "\n\n" + ltime() + "failed to find your group in this match: " + page + "!!!\n"
 
         except IndexError:
             placeholder = list()
@@ -930,7 +931,7 @@ def memspider(target, silent, browser):
             p2 = str(soup.find_all(class_ = "next-on"))
 
             if silent == False:
-                print "checking " + pointer
+                print ltime() + "checking " + pointer
 
                 if supusr is True:
                     debugout()
@@ -957,7 +958,7 @@ def ageproc(target):
 
     flist = []
     for targetx in target:
-        print "checking: " + targetx
+        print ltime() + "checking: " + targetx
 
         if supusr is True:
             debugout()
@@ -1431,7 +1432,7 @@ def inviter(targetlist, endless):
                 deserterlst = False
 
             if len(memtinv) == 0:
-                print "\n\nWarning, empty invites list: " + infile
+                print "\n\n" + ltime() + "Warning, empty invites list: " + infile
                 continue
 
             if priolst == True or standardlst == True:
@@ -1515,7 +1516,7 @@ def inviter(targetlist, endless):
 
                 while True:
                     try:
-                        print "\nInviting " + member + " to " + invgroup
+                        print + "\n" + ltime() + "Inviting " + member + " to " + invgroup
 
                         browser2.switch_to_frame("tinymcewindow_ifr")
                         browser2.find_element_by_id("tinymce").clear()
@@ -1534,7 +1535,7 @@ def inviter(targetlist, endless):
                         if supusr is True:
                             print repr(errormsg)
                             debugout()
-                        print "\n\nRetrying " + member + " to " + invgroup + "!!!\n\n"
+                        print "\n\n" + ltime() + "Retrying " + member + " to " + invgroup + "!!!\n\n"
 
                         browser2.get(groupinv)
                         try:
@@ -1579,7 +1580,7 @@ def filtmcemsgold(msglist, browser, name, country, browserchoice):
                     if supusr is True:
                         print repr(errormsg)
                         debugout()
-                    print "\n\nrefreshing page\n\n"
+                    print "\n\n" + ltime() + "refreshing page\n\n"
                     browser.refresh()
 
             browser.switch_to_window(browser.window_handles[0])
@@ -1604,7 +1605,7 @@ def vcman(vclinklist, yourside):
     parmemvc = Counter()
     oldnames = ([yourside])
     for vcmatch in vclinklist:
-        print "\n\nChecking match number " + str(vclinklist.index(vcmatch)) + " of " + str(numgames) + "\n\n"
+        print "\n\n" + ltime() + "Checking match number " + str(vclinklist.index(vcmatch)) + " of " + str(numgames) + "\n\n"
         skipmatch = False
         counter = 0
         movelist = list()
@@ -1618,9 +1619,9 @@ def vcman(vclinklist, yourside):
                 if counter == 10:
                     skipmatch = True
                     break
-                print "\n\nReopening " + vcmatch + "\n\n"
+                print "\n\n" + ltime() + "Reopening " + vcmatch + "\n\n"
         if skipmatch == True:
-            print "\n\n\nFailed to load page and therefore skipped the match,  " + vcmatch + "\n\n\n"
+            print"\n\n\n" + ltime()+ "Failed to load page and therefore skipped the match,  " + vcmatch + "\n\n\n"
             continue
         browser3.find_element_by_id("c33").click()
         time.sleep(2)
@@ -1629,7 +1630,7 @@ def vcman(vclinklist, yourside):
         soup = BeautifulSoup(response)
 
         if '      initialSetup: "",' not in str(soup):
-            print "\n\n\nskipped " + vcmatch + "\n\n\n"
+            print "\n\n\n" + ltime()+ "skipped " + vcmatch + "\n\n\n"
             continue
 
         boardpos = str(re.findall("boardFlip: (?:[a-zA-Z]|(?:%[a-fA-F]))+", str(soup.find_all(class_ = "chess_viewer")))[0]).replace("boardFlip: ", "")
@@ -1683,7 +1684,7 @@ def vcman(vclinklist, yourside):
                 movelist = movelist[1::2]
 
         for pointer in movelist:
-            print "\nchecking " + pointer
+            print "\n" + ltime() + "checking " + pointer
 
             if supusr is True:
                 debugout()
@@ -1717,7 +1718,7 @@ def vcman(vclinklist, yourside):
                         break
                     time.sleep(2)
 
-                    print "\nchecking " + pointer + " page " + str(nextbtn)
+                    print "\n" + ltime() + "checking " + pointer + " page " + str(nextbtn)
 
                     if supusr is True:
                         debugout()
@@ -1782,7 +1783,7 @@ def memberprocesser(silent, browser, target, minpoints, minrat, maxrat, mingames
             if supusr is True:
                 debugout()
 
-            print "checking " + targetx
+            print ltime() + "checking " + targetx
 
         browser, response = mecopner(browser, "http://www.chess.com/members/view/" + targetx)
         try:
@@ -1984,7 +1985,7 @@ def memberprocesser(silent, browser, target, minpoints, minrat, maxrat, mingames
             if supusr is True:
                 print repr(errormsg)
                 debugout()
-            print "\n\nskipped " + targetx + "\n\n"
+            print "\n\n" + ltime() + "skipped " + targetx + "\n\n"
             continue
 
     return passmem
@@ -2285,38 +2286,48 @@ def getadmins(targetlst, browser):
 
     return list(set(superadminlist)), list(set(adminlist))
 
+def ltime():
+    return " " + time.strftime("%H:%M:%S") + "  "
+
 def sigstrength():
+    
+
     if usrsys == "Linux":
         cmd = subprocess.Popen(["nm-tool"], stdout = subprocess.PIPE, stderr = subprocess.STDOUT).communicate()[0]
 
         for line in cmd.split("\n"):
             if "*" in line and "current AP" not in line:
                 line = line.strip()
-                #essid = "AP: " + line[1: line.index(":")] + "  "
-                essid = ""
+
+                if supusr == True:
+                    essid = "AP: " + line[1: line.index(":")] + "  "
+
+                    sigfreq = line.index("Freq")
+                    sigfreq = "Freq: " + line[sigfreq + 5: line.index("Hz")] + "Hz  "
+                else:
+                    essid = ""
+                    sigfreq = ""
 
                 line = [x for x in line.split()]
 
                 sigstren = line.index("Strength")
                 sigstren = "Signal strength: " + line[sigstren + 1] + "%" + "  "
 
-                #sigfreq = line.index("Freq")
-                #sigfreq = "Freq: " + line[sigfreq + 1] + line[sigfreq + 2].replace(",", "") + "  "
-                sigfreq = ""
-
         cmd = subprocess.Popen(["iwconfig"], stdout = subprocess.PIPE, stderr = subprocess.STDOUT).communicate()[0]
 
         for line in cmd.split("\n"):
             if "ESSID:" in line:
-                #interf = "Interface: " + line[0: line.index(" ")] + "  "
-                interf = ""
+                if supusr == True:
+                    interf = "Interface: " + line[0: line.index(" ")] + "  "
+                else:
+                    interf = ""
             if "Link Quality" in line:
                 quality = line.strip().replace("=", ": ")
 
         try:
-            print interf + essid + sigfreq + sigstren + quality
+            print ltime() + interf + essid + sigfreq + sigstren + quality
         except:
-            print "No network connection"
+            print ltime() + "No network connection"
 
     elif usrsys == "Windows":
         signal = False
@@ -2327,9 +2338,9 @@ def sigstrength():
                 sigstren = "Signal strength: " + line.split()[2]
 
         try:
-            print sigstren
+            print ltime() + sigstren
         except:
-            print "No network connection"
+            print ltime() + "No network connection"
 
 usrsys = getplatform()[1]
 supusr = False
@@ -2477,6 +2488,15 @@ while pathway in (["y"]):
         for key, value in sorted(parmemvc.items(), key = itemgetter(1), reverse = True):
             print "\n" + key + " has made " + str(int(value)) + " posts"
 
+        while flow not in (["y", "n"]):
+            flow = raw_input("\n\nGet the same list in an invites friendly format? (y/n) ")
+
+        if flow == "y":
+            print "\n\n"
+            for key, value in sorted(parmemvc.items(), key = itemgetter(1), reverse = True):
+                print key + ",",
+            print "\n"
+
     elif flow == "5":
         pathtm = ""
         while pathtm not in (["1", "2"]):
@@ -2504,7 +2524,7 @@ while pathway in (["y"]):
             joined = {}
             membernamelist = list()
 
-            outputfile = open(targetnameorgf + " " + strftime("%Y-%m-%d", gmtime()) + ".tm.csv", "wb")
+            outputfile = open(targetnameorgf + " " + time.strftime("%Y-%m-%d %H:%M") + ".tm.csv", "wb")
             csvwriter = csv.writer(outputfile, delimiter = " ", quoting=csv.QUOTE_MINIMAL)
 
             for pointer in set(tmparcount.keys())|set(winssdic.keys())|set(losedic.keys())|set(tmtimeoutcount.keys()):
@@ -2548,7 +2568,7 @@ while pathway in (["y"]):
 
             deadbeatlist = list()
             for member in tmpar:
-                print "checking " + member
+                print ltime() + "checking " + member
                 browser, response = mecopner(browser, "http://www.chess.com/members/view/" + member)
                 if "://www.chess.com/members/view/" not in browser.geturl():
                     continue
@@ -2741,7 +2761,7 @@ while pathway in (["y"]):
 
         notedic = dict()
         for targetp in target:
-            print targetp
+            print ltime() + targetp
 
             if supusr is True:
                 debugout()
@@ -2771,6 +2791,15 @@ while pathway in (["y"]):
 
         for nam, num in sorteddic.items():
             print nam + " has made " + str(num) + " notes"
+
+        while flow not in (["y", "n"]):
+            flow = raw_input("\n\nGet the same list in an invites friendly format? (y/n) ")
+
+        if flow == "y":
+            print "\n\n"
+            for nam, num in sorteddic.items():
+                print nam + ",",
+            print "\n"
 
     elif flow == "11":
         target = file_or_input(False, "\n\nName of the file containing your list: ", "", "\n\nEnter list of members to check: ", "")[0]
@@ -2984,6 +3013,7 @@ while pathway in (["y"]):
         print "\n\n\nNot found in:"
         for mem in notpresent:
             print mem + ", ",
+        print "\n"
 
     gc.collect()
     pathway = runagain()
