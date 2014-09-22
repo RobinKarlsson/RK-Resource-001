@@ -2780,7 +2780,7 @@ while pathway in (["y"]):
             memlist = nineworker(condic["Memberslist file"], str(condic["Group ID"]), logincookie, str(condic["Encryption Key"]))
 
             deserters = streplacer(str(memlist), (["'", ""], ["[", ""], ["]", ""]))
-            print "\n\nMembers who are no longer in " + target[1][0:-4] + ": " + deserters
+            print "\n\n" + ltime() + "Members who are no longer in " + target[1][0:-4] + ": " + deserters
             leftfile = condic["Members who has left invites file (optional)"]
             if os.path.isfile(leftfile) is True and deserters != "":
                 deserters = deserters + ", "
