@@ -2289,9 +2289,47 @@ def getadmins(targetlst, browser):
 def ltime():
     return time.strftime("%H:%M") + " "
 
-def sigstrength():
-    
+def update001():
+    scriptname = os.path.basename(sys.argv[0])
+    browser = mecbrowser("")
 
+    print "\n\n" + ltime() + "Downloading file(s)"
+
+    if scriptname.endswith(".py") or scriptname.endswith(".pyc"):
+
+        if scriptname.endswith(".pyc"):
+            scriptname = scriptname[: -1]
+
+        furl = "https://raw.githubusercontent.com/RobinKarlsson/RK-Resource-001/master/RK%20Resource%20001.py"
+        browser.retrieve(furl, scriptname)[0]
+
+    elif scriptname.endswith(".exe"):
+        import zipfile
+
+        furl = ""
+        fname = "temp.zip"
+        browser.retrieve(furl, fname)[0]
+
+        print "\n\nDownload complete. Installing..."
+
+        with zipfile.ZipFile(fname, "r") as z:
+            z.extractall()
+
+        os.remove(fname)
+
+    else:
+        print "\n\nWARNING: Unknown file format, aborting update\n\n"
+        return
+
+    print "\n\n" + ltime() + "Update complete\n\nShutting down in:",
+
+    for timer in range(5, 0, -1):
+        print timer,
+        time.sleep(1)
+
+    sys.exit()
+
+def sigstrength():
     if usrsys == "Linux":
         cmd = subprocess.Popen(["nm-tool"], stdout = subprocess.PIPE, stderr = subprocess.STDOUT).communicate()[0]
 
@@ -2368,7 +2406,7 @@ while pathway in (["y"]):
         olprint2("{0: ^70}", content, "|", "|")
     olprint("|", "|", "-", 72, True)
 
-    for content in (["", "", "Options", "Type /help or /help <number> for more info", "", "", "1. Extract the memberslist of one or more groups", "", "2. Build a csv file with data on a list of members", "", "3. Send invites for a group", "", "4. Posts per member in a groups finished votechess matches", "", "5. Build a csv file of a groups team match participants", "", "6. Filter a list of members for those who fill a few requirements", "", "7. Presentation of csv-files from options 2 and 5", "", "8. Send personal notes to a list of members", "", "9. Look for members who has recenty left your group", "", "10. Count number of group notes per member in the last 100 notes pages", "", "11. Build a birthday schedule for a list of members", "", "12. Send a personal message to a list of members", "", "13. Pair lists of players against each others", "", "14. Set operations on two lists", "", "15. Check a teams won/lost tm's per opponent", "", "16. Delete all group notes in a group", "", "17. Check signal strength", "", ""]):
+    for content in (["", "", "Options", "", "Type /help or /help <number> for more info", "Type /Upgrade to update to the latest version", "", "", "1. Extract the memberslist of one or more groups", "", "2. Build a csv file with data on a list of members", "", "3. Send invites for a group", "", "4. Posts per member in a groups finished votechess matches", "", "5. Build a csv file of a groups team match participants", "", "6. Filter a list of members for those who fill a few requirements", "", "7. Presentation of csv-files from options 2 and 5", "", "8. Send personal notes to a list of members", "", "9. Look for members who has recenty left your group", "", "10. Count number of group notes per member in the last 100 notes pages", "", "11. Build a birthday schedule for a list of members", "", "12. Send a personal message to a list of members", "", "13. Pair lists of players against each others", "", "14. Set operations on two lists", "", "15. Check a teams won/lost tm's per opponent", "", "16. Delete all group notes in a group", "", "17. Check signal strength", "", ""]):
         olprint2("{0: ^70}", content, "|", "|")
     olprint("*", "*", "-", 72, True)
 
@@ -2412,6 +2450,9 @@ while pathway in (["y"]):
             print "\n\nPrints your network signal strength continuously every 0.5 seconds"
         elif flow == "/help":
             print "\n\n\nTo add extensions/addons to the scripts chrome or firefox browser you need to download the extension in crx format for chrome or xpi for firefox. Once the addon is downloaded, place it in the Webdriver/Extensions/Chrome or Webdriver/Extensions/Firefox folder.\n\nIt's recommended to use the adblock plus extension\n\n\n\n\nTo use the scripts ability to determine a members gender you will need to have a list of male and female first names in the namelists folder. male names should be stored in a file called 'male' and female names in a file called 'female'.\n\nFor best performance the names should be in the format:\nname1\nname2\nname3\netc\n\nIt's also recommended to sort the names based on how commonly they are used"
+
+        elif flow == "/Upgrade":
+            update001()
 
     if flow == "1":
         print "\n\n\nchess.com members list extractor\n"
