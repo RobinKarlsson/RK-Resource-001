@@ -1516,7 +1516,7 @@ def inviter(targetlist, endless):
 
                 while True:
                     try:
-                        print + "\n" + ltime() + "Inviting " + member + " to " + invgroup
+                        print "\n" + ltime() + "Inviting " + member + " to " + invgroup
 
                         browser2.switch_to_frame("tinymcewindow_ifr")
                         browser2.find_element_by_id("tinymce").clear()
