@@ -3,7 +3,7 @@
 # developed by Robin Karlsson
 # contact email: "r.robin.karlsson@gmail.com"
 # contact chess.com profile: "http://www.chess.com/members/view/RobinKarlsson"
-# version 0.8.9 dev
+# version 0.9 dev
 
 import os
 import sys
@@ -2398,7 +2398,7 @@ makefolder((["Member Lists", "Member Lists/Config", "Invite Lists", "Invite List
 
 while pathway in (["y"]):
     olprint("*", "*", "-", 72, True)
-    for content in (["", "", "", "RK Resource 001", "version 0.8.9 dev", "", "", ""]):
+    for content in (["", "", "", "RK Resource 001", "version 0.9", "", "", ""]):
         olprint2("{0: ^70}", content, "|", "|")
     olprint("|", "|", "-", 72, True)
 
