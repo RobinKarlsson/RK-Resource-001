@@ -2306,7 +2306,7 @@ def update001():
     elif scriptname.endswith(".exe"):
         import zipfile
 
-        furl = "https://www.dropbox.com/s/u6ktn1nzcknqx3y/RK%20Resource%20001.rar?dl=1"
+        furl = "https://www.dropbox.com/s/zsedtxhcn8ywagz/RK%20Resource%20001.zip?dl=1"
         fname = "temp.zip"
         browser.retrieve(furl, fname)[0]
 
