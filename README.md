@@ -6,6 +6,12 @@ contact: r.robin.karlsson@gmail.com
 
 ===============
 
+NEWS:
+
+Windows users can now download a prepacked, executable version of the script from: https://www.dropbox.com/s/zsedtxhcn8ywagz/RK%20Resource%20001.zip?dl=1
+
+===============
+
 Requirements
 
 - Python 2.7
@@ -250,3 +256,7 @@ Ratings can be Live Standard, Live Blitz, Live Bullet, Online chess, 960 or tact
 
 
  16) Delete all group notes in a group
+
+
+
+ 17) Check network strength
