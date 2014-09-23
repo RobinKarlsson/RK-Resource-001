@@ -2306,7 +2306,7 @@ def update001():
     elif scriptname.endswith(".exe"):
         import zipfile
 
-        furl = ""
+        furl = "https://www.dropbox.com/s/u6ktn1nzcknqx3y/RK%20Resource%20001.rar?dl=1"
         fname = "temp.zip"
         browser.retrieve(furl, fname)[0]
 
@@ -2321,10 +2321,10 @@ def update001():
         print "\n\nWARNING: Unknown file format, aborting update\n\n"
         return
 
-    print "\n\n" + ltime() + "Update complete\n\nShutting down in:",
+    print "\n\n" + ltime() + "Update complete\n\nShutting down in:\n"
 
     for timer in range(5, 0, -1):
-        print timer,
+        print timer
         time.sleep(1)
 
     sys.exit()
