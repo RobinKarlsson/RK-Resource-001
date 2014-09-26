@@ -154,7 +154,7 @@ def csvsoworker(memlist, choicepath):
 def debugout():
     if usrsys != "Windows":
         try:
-            print "\nRAM usage (script): " + str(ramusage()) + " MB"
+            print "RAM usage (script): " + str(ramusage()) + " MB"
         except Exception, errormsg:
             print "WARNING: Couldn't access RAM usage"
             print repr(errormsg)
@@ -2487,7 +2487,7 @@ while pathway in (["y"]):
             print "\n\n" + un1
 
         elif choice6 == "2":
-            memfile1 = raw_input("\nName of the file to which your list will be saved: ")
+            memfile1 = raw_input("\nName of the file to which your list will be saved: ") + ".txt"
             with open(memfile1, "ab") as placeholder2:
                 placeholder2.write(un1)
 
@@ -2639,7 +2639,7 @@ while pathway in (["y"]):
             print "\n\n" + streplacer(str(passmembers), (["'", ""], ["[", ""], ["]", ""]))
 
         if choice6 == "2":
-            memfile1 = raw_input("\nName of the file to which your list will be saved: ")
+            memfile1 = raw_input("\nName of the file to which your list will be saved: ") + ".txt"
             with open(memfile1, "ab") as placeholder2:
                 placeholder2.write(streplacer(str(passmembers), (["'", ""], ["[", ""], ["]", ""])))
 
@@ -2937,7 +2937,7 @@ while pathway in (["y"]):
             print "\n\n" + prlst
 
         elif choice6 == "2":
-            sfile = raw_input("\nName of the file to which your list will be saved: ")
+            sfile = raw_input("\nName of the file to which your list will be saved: ") + ".txt"
             with open(sfile, "wb") as placeholder2:
                 placeholder2.write(prlst)
 
@@ -2953,23 +2953,30 @@ while pathway in (["y"]):
         drawdic = dict()
 
         for tm in mtchlist:
-            if tm[5] == "Won":
+            if "Won" in tm[5]:
                 if tm[2] in winssdic:
                     winssdic[tm[2]] += 1
                 else:
                     winssdic[tm[2]] = 1
 
-            elif tm[5] == "Lost":
+            elif "Lost" in tm[5]:
                 if tm[2] in losedic:
                     losedic[tm[2]] += 1
                 else:
                     losedic[tm[2]] = 1
 
-            elif tm[5] == "Draw":
+            elif "Draw" in tm[5]:
                 if tm[2] in drawdic:
                     drawdic[tm[2]] += 1
                 else:
                     drawdic[tm[2]] = 1
+
+            else:
+                if supusr is True:
+                    print "something aint right in this match, please send this to the developer:\n"
+                    print tm
+                    debugout()
+                
 
         width = 0
         for opteam in set(winssdic.keys())|set(losedic.keys())|set(drawdic.keys()):
