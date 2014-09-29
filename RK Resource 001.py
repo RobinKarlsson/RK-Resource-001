@@ -129,6 +129,7 @@ def csvsoworker(memlist, choicepath):
 
         print "\n\n" + "".join(element.ljust(colwidth) for element in ltitle) + "\n"
         llength = len(memlist2[0])
+
         for cpointer in memlist2:
             for counter in range(llength):
                 cpointer[counter] = str(cpointer[counter])
@@ -166,12 +167,20 @@ def debugout():
         print repr(errormsg)
 
     try:
-        sigstrength()
+        if usrsys == "Linux":
+            template = "|{0:6}|{1:9}|{2:20}|{3:7}|{4:7}|{5:8}|{6:9}|"
+            print "\n" + template.format(" Time", "Interface", "ESSID".center(20), "Sig Str", "Quality", "Sig lvl", "Frequency") + "\n" + template.format("-" * 6, "-" * 9, "-" * 20, "-" * 7, "-" * 7, "-" * 8, "-" * 9)
+
+        elif usrsys == "Windows":
+            template = "|{0:6}|{1:15}|"
+            print "\n" + template.format(" Time", "Signal Strength") + "\n" + template.format("-" * 6, "-" * 15)
+
+        sigstrength(template)
     except Exception, errormsg:
         print "WARNING: Couldn't access network strength"
         print repr(errormsg)
 
-    print ""
+    print "\n\n"
 
 def getmeminfo(target, filename):
     browser = mecbrowser("")
@@ -251,8 +260,10 @@ def pickbrowser(browserchoice, adext):
                             if supusr is True:
                                 print repr(errormsg)
                             print ltime() + "Failed to load " + os.path.abspath("Webdriver/Extensions/Firefox/" + fname)
+
             try:
                 browser = webdriver.Firefox(fopt)
+
             except Exception, errormsg:
                 if supusr is True:
                     print repr(errormsg)
@@ -315,6 +326,7 @@ def pickbrowser(browserchoice, adext):
             if usrsys == "Windows":
                 browser = webdriver.Ie(os.path.abspath("Webdriver/Windows/86/IEDriverServer.exe"))
                 break
+
         browserchoice = raw_input("\nSomething went wrong, please send this to the developer: " + browserchoice + "   " + str(getplatform()) + "\n\nTry and pick another browser\n 1. Firefox\n 2. Chrome\nEnter choice: ")
 
     if handle == True:
@@ -421,6 +433,7 @@ def gettmlinks(targetname):
 
         soupbrake = str(soup.find_all(class_ = "next-on"))
         souplinks = re.findall("/groups/team_match(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]i|(?:%[0-9a-fA-F][0-9a-fA-F]))+", str(soup.find_all("a")))
+
         for link in souplinks:
             linklist.append("http://www.chess.com" + link)
 
@@ -516,8 +529,10 @@ def noteposter(target, msg, interval, nationalt, shutdown):
 
         for placeholder in soup.find_all(class_ = "flag"):
             country = placeholder["title"]
+
         if country == "International":
             country = nationalt
+
         name = namechecker(soup)
         if name == " ":
             name = mem
@@ -564,6 +579,7 @@ def pmdriver(target, choice):
     print "\n\n\n\nsupported commands, will be replaced with each members respective info\n /name - members name or username (if name is unavailable)\n /firstname - member first name or username (if no name is available)\n /nation - members nation of origin\n /newline - pagebreak\n\n\n"
     subjectorg = raw_input("subject line: ")
     msglist = list()
+
     msgchoice = ""
     while msgchoice not in (["1", "2"]):
         msgchoice = raw_input("\nGet the message from\n 1. File in the Messages folder\n 2. Input\nEnter choice: ")
@@ -643,6 +659,7 @@ def pmdriver(target, choice):
         if noadmins == "n":
             superadmins, admins = getadmins(getgrouphome(target, browser1), browser1)
             memtpm = memtpm.difference(superadmins + admins)
+
     elif choice == "2":
         memtpm = target
 
@@ -682,8 +699,10 @@ def pmdriver(target, choice):
         if not membername2 in str(soup):
             print "\n\n" + ltime() + "Failed to open page and skipped, " + membername + "\n\n"
             continue
+
         for placeholder in soup.find_all(class_ = "flag"):
             country = placeholder["title"]
+
         if country == "International":
             country = nnation
 
@@ -1024,6 +1043,7 @@ def configopen(filename, forinvites):
                 for line in rowlist:
                     data = line.split("==")
                     value = data[1].replace("\n", "")
+
                     try:
                         value = int(value)
                     except ValueError:
@@ -1031,6 +1051,7 @@ def configopen(filename, forinvites):
                             value = float(value)
                         except ValueError:
                             None
+
                     condic[data[0]] = value
                 return condic
         else:
@@ -1189,6 +1210,7 @@ def notesfriendscheck(tocheck, checkfor, choice):
     for member, target in targetdic.items():
         notfriends = True
         friends = memspider([target], False, browser)
+
         for mem in friends:
             if mem.lower() == checkfor:
                 present.append(member)
@@ -1459,6 +1481,7 @@ def inviter(targetlist, endless):
 
                 if not picked in already_picked:
                     already_picked.append(picked)
+
             for member in already_picked:
                 browser1, response = mecopner(browser1, "http://www.chess.com/members/view/" + member)
                 soup = BeautifulSoup(response)
@@ -1483,8 +1506,10 @@ def inviter(targetlist, endless):
                 if browserchoice == "1":
                     if counted == "y":
                         counted = ""
+
                     else:
                         counter += 1
+
                     if counter > 70:
                         browser2.quit()
                         browser2, handle = pickbrowser(browserchoice, True)
@@ -1538,9 +1563,11 @@ def inviter(targetlist, endless):
                         print "\n\n" + ltime() + "Retrying " + member + " to " + invgroup + "!!!\n\n"
 
                         browser2.get(groupinv)
+
                         try:
                             WebDriverWait(browser2, 5).until(EC.presence_of_element_located((By.ID, "c15")))
                             browser2.find_element_by_name("c15").send_keys(member)
+
                         except Exception, errormsg:
                             if supusr is True:
                                 print repr(errormsg)
@@ -1553,6 +1580,7 @@ def inviter(targetlist, endless):
 
             with open(usedfile, "wb") as placeholder2:
                 placeholder2.write(updinvlist)
+
             if len(memint) != 0:
                 with open(alrfile, "ab") as placeholder3:
                     placeholder3.write(memint + ", ")
@@ -1566,16 +1594,19 @@ def filtmcemsgold(msglist, browser, name, country, browserchoice):
 
             browser.find_element_by_id("tinymce").send_keys(streplacer(content[1], (["/name", name.strip()], ["/firstname", name.split(" ")[0]], ["/nation", country.strip()], ["/newline", "\n"])))
             browser.switch_to_default_content()
+
         elif content[0] == "2":
             browser.find_element_by_id("tinymcewindow_imageuploader").click()
             time.sleep(1)
             browser.switch_to_window(browser.window_handles[1])
+
             while True:
                 try:
                     WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.ID, "photourl")))
                     browser.find_element_by_id("photourl").send_keys(content[1])
                     browser.find_element_by_id("insert").click()
                     break
+
                 except Exception, errormsg:
                     if supusr is True:
                         print repr(errormsg)
@@ -1604,25 +1635,30 @@ def vcman(vclinklist, yourside):
 
     parmemvc = Counter()
     oldnames = ([yourside])
+
     for vcmatch in vclinklist:
         print "\n\n" + ltime() + "Checking match number " + str(vclinklist.index(vcmatch)) + " of " + str(numgames) + "\n\n"
         skipmatch = False
         counter = 0
         movelist = list()
+
         while True:
             try:
                 browser3.get(vcmatch)
                 WebDriverWait(browser3, 10).until(EC.presence_of_element_located((By.ID, "c33")))
                 break
+
             except:
                 counter += 1
                 if counter == 10:
                     skipmatch = True
                     break
                 print "\n\n" + ltime() + "Reopening " + vcmatch + "\n\n"
+
         if skipmatch == True:
             print"\n\n\n" + ltime()+ "Failed to load page and therefore skipped the match,  " + vcmatch + "\n\n\n"
             continue
+
         browser3.find_element_by_id("c33").click()
         time.sleep(2)
 
@@ -1711,6 +1747,7 @@ def vcman(vclinklist, yourside):
             if "next-on" in p2:
                 browser3.get(pointer)
                 nextbtn = 2
+
                 while True:
                     try:
                         browser3.find_element_by_css_selector('li.next-on>a').click()
@@ -1823,10 +1860,12 @@ def memberprocesser(silent, browser, target, minpoints, minrat, maxrat, mingames
                         soup.decompose()
                         gc.collect()
                         continue
+
                     if timemove[1] > timovchoicemax[1] and timemove[0] >= timovchoicemax[0]:
                         soup.decompose()
                         gc.collect()
                         continue
+
                     if timemove[2] > timovchoicemax[2] and timemove[1] >= timovchoicemax[1] and timemove[0] >= timovchoicemax[0]:
                         soup.decompose()
                         gc.collect()
@@ -1837,10 +1876,12 @@ def memberprocesser(silent, browser, target, minpoints, minrat, maxrat, mingames
                         soup.decompose()
                         gc.collect()
                         continue
+
                     if timemove[1] < timovchoicemin[1] and timemove[0] <= timovchoicemin[0]:
                         soup.decompose()
                         gc.collect()
                         continue
+
                     if timemove[2] < timovchoicemin[2] and timemove[1] <= timovchoicemin[1] and timemove[0] <= timovchoicemin[0]:
                         soup.decompose()
                         gc.collect()
@@ -1854,6 +1895,7 @@ def memberprocesser(silent, browser, target, minpoints, minrat, maxrat, mingames
                         soup.decompose()
                         gc.collect()
                         continue
+
                 if minwinrat != "":
                     if gamestat[1] / gamestat[0]  < float(minwinrat):
                         soup.decompose()
@@ -1862,6 +1904,7 @@ def memberprocesser(silent, browser, target, minpoints, minrat, maxrat, mingames
 
             if membersinceyear != "":
                 memsi = memsinlist[0]
+
                 if datetime(memsi[0], memsi[1], memsi[2]) > datetime(membersinceyear, membersincemonth, membersinceday):
                     soup.decompose()
                     gc.collect()
@@ -1869,11 +1912,13 @@ def memberprocesser(silent, browser, target, minpoints, minrat, maxrat, mingames
 
             if minrat != "" or maxrat != "":
                 rating = onlratingchecker(soup)
+
                 if minrat != "":
                     if rating < minrat:
                         soup.decompose()
                         gc.collect()
                         continue
+
                 if maxrat != "":
                     if rating > maxrat:
                         soup.decompose()
@@ -1882,11 +1927,13 @@ def memberprocesser(silent, browser, target, minpoints, minrat, maxrat, mingames
 
             if minranrat != "" or maxranrat != "":
                 rating = ranratingchecker(soup)
+
                 if minranrat != "":
                     if rating < minranrat:
                         soup.decompose()
                         gc.collect()
                         continue
+
                 if maxranrat != "":
                     if rating > maxranrat:
                         soup.decompose()
@@ -1909,6 +1956,7 @@ def memberprocesser(silent, browser, target, minpoints, minrat, maxrat, mingames
                         soup.decompose()
                         gc.collect()
                         continue
+
                 if mingroup != "":
                     if groupcount < mingroup:
                         soup.decompose()
@@ -1927,6 +1975,7 @@ def memberprocesser(silent, browser, target, minpoints, minrat, maxrat, mingames
                     soup.decompose()
                     gc.collect()
                     continue
+
                 while "" in birthdate:
                     birthdate.remove("")
 
@@ -1937,6 +1986,7 @@ def memberprocesser(silent, browser, target, minpoints, minrat, maxrat, mingames
                         soup.decompose()
                         gc.collect()
                         continue
+
                 if olderyear != "":
                     if datetime(birthdate[0], birthdate[1], birthdate[2]) > datetime(olderyear, oldermonth, olderday):
                         soup.decompose()
@@ -1957,6 +2007,7 @@ def memberprocesser(silent, browser, target, minpoints, minrat, maxrat, mingames
                     soup.decompose()
                     gc.collect()
                     continue
+
                 name = name.split(" ")[0].lower()
                 Found = "n"
 
@@ -2004,6 +2055,7 @@ def AvatarCheck(soup):
 def gamestats(soup):
     for stats in soup.find_all(class_ = "even footer"):
         stats = str(stats.text).replace("Total Games:", "").strip()
+
         if "\n" not in stats:
             stats = streplacer(stats, (["(", ""], [")", ""], ["/", ""], ["W", ""], ["L", ""], ["D", ""])).split(" ")
             while "" in stats:
@@ -2234,6 +2286,7 @@ def tlstcreator():
 def notclosedcheck(memlist):
     browser = mecbrowser("")
     memlist2 = list()
+
     for mem in memlist:
         browser, response = mecopner(browser, "http://www.chess.com/members/view/" + mem)
         soup = BeautifulSoup(response)
@@ -2251,8 +2304,10 @@ def notclosedcheck(memlist):
 
 def getgrouphome(targetlst, browser):
     grouphomelist = list()
+
     for target in targetlst:
         browser, response = mecopner(browser, target[0])
+
         for link in browser.links(url_regex="groups/home/"):
             grouphomelist.append("http://www.chess.com" + link.url)
 
@@ -2265,6 +2320,7 @@ def getgrouphome(targetlst, browser):
 def getadmins(targetlst, browser):
     adminlist = list()
     superadminlist = list()
+
     for link in targetlst:
         browser, response = mecopner(browser, link)
         soup = BeautifulSoup(response)
@@ -2329,7 +2385,7 @@ def update001():
 
     sys.exit()
 
-def sigstrength():
+def sigstrength(template):
     if usrsys == "Linux":
         cmd = subprocess.Popen(["nm-tool"], stdout = subprocess.PIPE, stderr = subprocess.STDOUT).communicate()[0]
 
@@ -2338,34 +2394,39 @@ def sigstrength():
                 line = line.strip()
 
                 if supusr == True:
-                    essid = "AP: " + line[1: line.index(":")] + "  "
+                    essid = line[1: line.index(":")][:20]
 
                     sigfreq = line.index("Freq")
-                    sigfreq = "Freq: " + line[sigfreq + 5: line.index("Hz")] + "Hz  "
-                else:
-                    essid = ""
-                    sigfreq = ""
+                    sigfreq = line[sigfreq + 5: line.index("Hz")] + "Hz"
 
                 line = [x for x in line.split()]
 
                 sigstren = line.index("Strength")
-                sigstren = "Signal strength: " + line[sigstren + 1] + "%" + "  "
+                sigstren = line[sigstren + 1] + "%"
 
         cmd = subprocess.Popen(["iwconfig"], stdout = subprocess.PIPE, stderr = subprocess.STDOUT).communicate()[0]
 
         for line in cmd.split("\n"):
             if "ESSID:" in line:
                 if supusr == True:
-                    interf = "Interface: " + line[0: line.index(" ")] + "  "
-                else:
-                    interf = ""
-            if "Link Quality" in line:
-                quality = line.strip().replace("=", ": ")
+                    interf = line[0: line.index(" ")].replace("ESSID:", "")[:9]
 
-        try:
-            print ltime() + " " + interf + essid + sigfreq + sigstren + quality
-        except:
-            print ltime() + " " + "No network connection"
+            if "Link Quality" in line:
+                quality = line.strip().split("  ")
+                level = quality[1].replace("Signal level=", "")
+                quality = quality[0].replace("Link Quality=", "")
+
+        if supusr == False:
+            try:
+                print template.format(ltime(), sigstren.center(15), quality.center(12), level.center(12))
+            except NameError:
+                print template.format(ltime(), "n/a".center(15), "n/a".center(12), "n/a".center(12))
+
+        else:
+            try:
+                print template.format(ltime(), interf.center(9), essid.center(20), sigstren.center(7), quality.center(7), level.center(8), sigfreq.center(9))
+            except NameError:
+                print template.format(ltime(), "n/a".center(9), "No connection".center(20), "n/a".center(7), "n/a".center(7), "n/a".center(8), "n/a".center(9))
 
     elif usrsys == "Windows":
         signal = False
@@ -2376,9 +2437,9 @@ def sigstrength():
                 sigstren = "Signal strength: " + line.split()[2]
 
         try:
-            print ltime() + " " + sigstren
-        except:
-            print ltime() + " " + "No network connection"
+            print template.format(ltime(), sigstren.center(15))
+        except NameError:
+            print template.format(ltime(), "n/a".center(15))
 
 usrsys = getplatform()[1]
 supusr = False
@@ -3039,12 +3100,25 @@ while pathway in (["y"]):
             turnofcomp()
 
     elif flow == "17":
-        if usrsys == "Linux" or usrsys == "Windows":
-            while True:
-                sigstrength()
-                time.sleep(0.4)
+        if usrsys == "Linux":
+            if supusr == False:
+                template = "|{0:6}|{1:15}|{2:12}|{3:12}|"
+                print "\n\n\n" + template.format(" Time", "Signal Strength", "Link Quality", "Signal Level") + "\n" + template.format("-" * 6, "-" * 15, "-" * 12, "-" * 12)
+            else:
+                template = "|{0:6}|{1:9}|{2:20}|{3:7}|{4:7}|{5:8}|{6:9}|"
+                print "\n\n\n" + template.format(" Time", "Interface", "ESSID".center(20), "Sig Str", "Quality", "Sig lvl", "Frequency") + "\n" + template.format("-" * 6, "-" * 9, "-" * 20, "-" * 7, "-" * 7, "-" * 8, "-" * 9)
+
+        elif usrsys == "Windows":
+            template = "|{0:6}|{1:15}|"
+            print "\n\n\n" + template.format(" Time", "Signal Strength") + "\n" + template.format("-" * 6, "-" * 15)
+
         else:
             print "\n\nUnfortunately this option is currently not suported on " + usrsys
+            continue
+
+        while True:
+            sigstrength(template)
+            time.sleep(0.4)
 
     elif flow == "42":
         choice = ""
