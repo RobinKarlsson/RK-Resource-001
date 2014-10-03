@@ -352,6 +352,7 @@ def gettmopdata(targetname):
     linkarchive = linklist.pop(-1)
     mtchlist = list()
     pointer = 1
+
     while True:
         browser, response = mecopner(browser, str(linkarchive) + "&page=" + str(pointer))
 
@@ -537,7 +538,7 @@ def noteposter(target, msg, interval, nationalt, shutdown):
         if name == " ":
             name = mem
 
-        browser2.get("http://www.chess.com/members/view/" + mem + "#usernotes_post")
+        browser2 = selopner(browser2, "http://www.chess.com/members/view/" + mem + "#usernotes_post")
         counter = 1
 
         while True:
@@ -715,7 +716,7 @@ def pmdriver(target, choice):
         for link in soup.find_all("a", href = True):
             if link.text == "Send a Message":
                 memlink = link["href"]
-                browser0.get("http://www.chess.com" + memlink)
+                browser0 = selopner(browser0, "http://www.chess.com" + memlink)
                 time.sleep(2)
 
         try:
@@ -748,7 +749,7 @@ def pmdriver(target, choice):
                 print "\n\n" + ltime() + "Retrying " + membername2
 
                 while True:
-                    browser0.get("http://www.chess.com" + memlink)
+                    browser0 = selopner(browser0, "http://www.chess.com" + memlink)
                     try:
                         WebDriverWait(browser0, 10).until(EC.presence_of_element_located((By.ID, "c15")))
                         browser0.find_element_by_name("c15").send_keys(subject)
@@ -774,7 +775,7 @@ def mecopner(browser, pointl):
     while True:
         try:
             response = browser.open(pointl)
-            break
+            return browser, response
         except Exception, errormsg:
             if supusr is True:
                 print repr(errormsg)
@@ -782,7 +783,6 @@ def mecopner(browser, pointl):
 
             print ltime() + "something went wrong, reopening " + pointl
             time.sleep(2)
-    return browser, response
 
 def nineworker(infile, inid, logincookie, key):
     memlist = list()
@@ -1313,8 +1313,21 @@ def gettmlinklist(targetname, browser):
 
     return linklist
 
+def selopner(browser, pointl):
+    while True:
+        try:
+            browser.get(pointl)
+            return browser
+        except Exception, errormsg:
+            if supusr is True:
+                print repr(errormsg)
+                debugout()
+
+            print ltime() + "something went wrong, reopening " + pointl
+            time.sleep(2)
+
 def sellogin(Username, Password, browser):
-    browser.get("https://www.chess.com/login")
+    browser = selopner(browser, "https://www.chess.com/login")
     WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.ID, "btnLogin")))
 
     browser.find_element_by_name("c1").send_keys(Username)
@@ -1531,7 +1544,7 @@ def inviter(targetlist, endless):
                 if name == " ":
                     name = member
 
-                browser2.get(groupinv)
+                browser2 = selopner(browser2, groupinv)
 
                 try:
                     WebDriverWait(browser2, 5).until(EC.presence_of_element_located((By.ID, "c15")))
@@ -1562,7 +1575,7 @@ def inviter(targetlist, endless):
                             debugout()
                         print "\n\n" + ltime() + "Retrying " + member + " to " + invgroup + "!!!\n\n"
 
-                        browser2.get(groupinv)
+                        browser2 = selopner(browser2, groupinv)
 
                         try:
                             WebDriverWait(browser2, 5).until(EC.presence_of_element_located((By.ID, "c15")))
@@ -1644,7 +1657,7 @@ def vcman(vclinklist, yourside):
 
         while True:
             try:
-                browser3.get(vcmatch)
+                browser3 = selopner(browser3, vcmatch)
                 WebDriverWait(browser3, 10).until(EC.presence_of_element_located((By.ID, "c33")))
                 break
 
@@ -1745,7 +1758,7 @@ def vcman(vclinklist, yourside):
             p2 = str(soup.find_all(class_ = "next-on"))
 
             if "next-on" in p2:
-                browser3.get(pointer)
+                browser3 = selopner(browser3, pointer)
                 nextbtn = 2
 
                 while True:
@@ -3079,7 +3092,7 @@ while pathway in (["y"]):
         browser = sellogin(Username, Password, browser)
 
         while True:
-            browser.get("http://www.chess.com/groups/notes/" + gname)
+            browser = selopner(browser, "http://www.chess.com/groups/notes/" + gname)
 
             if supusr is True:
                 debugout()
