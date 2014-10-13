@@ -10,6 +10,8 @@ NEWS:
 
 Windows users can now download a prepacked, executable version of the script from: https://www.dropbox.com/s/zsedtxhcn8ywagz/RK%20Resource%20001.zip?dl=1
 
+And can thus skip step 1 - 2 in the instructions
+
 ===============
 
 Requirements
