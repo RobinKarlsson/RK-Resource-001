@@ -939,6 +939,8 @@ def tmparchecker(pagelist, targetname):
     return tmpar, timeoutlist, winssdic, losedic
 
 def memspider(target, silent, browser):
+    if silent == False:
+        print "\n\nTime      Page\n"
     usrlist = list()
     for tlst in target:
         for pointer in tlst:
@@ -950,7 +952,7 @@ def memspider(target, silent, browser):
             p2 = str(soup.find_all(class_ = "next-on"))
 
             if silent == False:
-                print ltime() + "checking " + pointer
+                print ltime() + "    " + pointer
 
                 if supusr is True:
                     debugout()
