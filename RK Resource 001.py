@@ -1028,7 +1028,7 @@ def createconfig(name, ID):
         membersleftinvfile = name + " members who has left"
 
     with open("Invite Lists/Config/" + name + ".ini", "wb") as setupfile:
-        setupfile.write("What to use if members nation is set to International==\nMin online chess rating==\nMax online chess rating==\nMin 960 chess rating==\nMax 960 chess rating==\nMin online chess games plaid==\nMin online chess win-ratio==\nLast logged in within days==\nMember on chess.com for days==\nBorn after date (YYYY-MM-DD)==\nBorn before date (YYYY-MM-DD)==\nMax timeout-ratio allowed==\nMax number of groups member can be in==\nMin number of groups member can be in==\nMin number of activity points allowed==\nMin time/move (days-hours-minutes)==\nMax time/move (days-hours-minutes)==\nOnly invite those with a custom avatar (y/n)==\nMember should be from nation==\nGender (m/f)==\nLink to groups invite members page==http://www.chess.com/groups/invite_members?id=" + ID + "\nFile containing the main invites list==Invite Lists/" + name + "\nFile containing those who should receive priority invites (circumvents filter)==Invite Lists/" + name + " priority\nInvites file for those who has left the group==Invite Lists/" + membersleftinvfile + "\nFile containing those who has received an invite==Invite Lists/" + name + " already invited\nFile containing your invites message for members who has left your group==Messages/Invite Messages/" + name + " Deserter message\nFile containing your invites message for standard and priority invites lists==Messages/Invite Messages/" + name + " Standard Message")
+        setupfile.write("What to use if members nation is set to International==\nMin online chess rating==\nMax online chess rating==\nMin 960 chess rating==\nMax 960 chess rating==\nMin online chess games plaid==\nMin online chess win-ratio==\nLast logged in within days==\nMember on chess.com for days==\nBorn after date (YYYY-MM-DD)==\nBorn before date (YYYY-MM-DD)==\nMax timeout-ratio allowed==\nMax number of groups member can be in==\nMin number of groups member can be in==\nMin number of activity points allowed==\nMin time/move (days-hours-minutes)==\nMax time/move (days-hours-minutes)==\nOnly invite those with a custom avatar (y/n)==\nMember should be from nation==\nGender (m/f)==\nLink to groups invite members page==http://www.chess.com/groups/invite_members?id=" + ID + "\nFile containing the main invites list==Invite Lists/" + name + "\nFile containing those who should receive priority invites (circumvents filter)==Invite Lists/" + name + " priority\nInvites file for those who has left the group==Invite Lists/" + membersleftinvfile + "\nFile containing those who has received an invite==Invite Lists/" + name + " already invited\nFile containing your invites message for members who has left your group==Messages/Invite Messages/" + name + " Deserter message\nFile containing your invites message for standard and priority invites lists==Messages/Invite Messages/" + name + " Standard Message\nComma seperated list of usernames that should not be invited==")
     createfileifmissing("Messages/Invite Messages/" + name + " Standard Message", True)
     createfileifmissing("Messages/Invite Messages/" + name + " Deserter message", True)
     createfileifmissing("Invite Lists/" + name + " already invited", False)
@@ -1446,6 +1446,8 @@ def inviter(targetlist, endless):
             msglistleft = condic["File containing your invites message for members who has left your group"]
             msgliststand = condic["File containing your invites message for standard and priority invites lists"]
 
+            notToInvite = condic["Comma seperated list of usernames that should not be invited"].replace(" ", "").split(",")
+
             memalrinv = remove_doublets(alrfile)
 
             usedfile = priofile
@@ -1498,6 +1500,10 @@ def inviter(targetlist, endless):
                     already_picked.append(picked)
 
             for member in already_picked:
+                if member in notToInvite:
+                    memtinv.remove(member)
+                    continue
+
                 browser1, response = mecopner(browser1, "http://www.chess.com/members/view/" + member)
                 soup = BeautifulSoup(response)
 
@@ -1575,6 +1581,7 @@ def inviter(targetlist, endless):
                         if supusr is True:
                             print repr(errormsg)
                             debugout()
+
                         print "\n\n" + ltime() + "Retrying " + member + " to " + invgroup + "!!!\n\n"
 
                         browser2 = selopner(browser2, groupinv)
