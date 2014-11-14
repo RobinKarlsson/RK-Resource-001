@@ -6,6 +6,7 @@
 # version 0.9 dev
 
 import os
+from os.path import isfile, join
 import sys
 import subprocess
 
@@ -2583,26 +2584,56 @@ while pathway in (["y"]):
         getmeminfo(target, filename)
 
     elif flow == "3":
-        while flow not in (["1", "2"]):
-            flow = raw_input("Would you like to\n 1. Send invites for existing groups\n 2. Add a new group\nMake your choice, young padawan: ")
+        flow = ""
+
+        while flow not in (["1", "2", "3", "4"]):
+            flow = raw_input("Would you like to\n 1. Send invites for existing groups\n 2. Add a new group\n 3. Inspect an invite list\n 4. Add names to a groups invite list\n\nMake your choice, young padawan: ")
+
+        print "\n"
 
         if flow == "2":
             name = raw_input("\n\nGroup name: ")
             createconfig(name, str(enterint("Group ID: ")))
             print "\n\nThe following files have been created\n\n  - /Messages/Invite Messages/" + name + " Standard Message (used to invite members from the standard and VIP invites lists)\n  - /Messages/Invite Messages/" + name + " Deserters Message (Used to reinvite those who have left " + name + ")\n  - Invite Lists/" + name + " (main invites list)\n  - Invite Lists/" + name + " priority (used for those whom you want to invite asap, circumvents any filters)\n  - Invite Lists/" + name + " members who has left (here you can place members who has left " + name + " to reinvite them using the invites message from /Messages/Invite Messages/" + name + " Deserters Message)\n  - Invite Lists/" + name + " already invited (stores the names of those who has received an invite from the script, members in this list wont receive an invite even if their names are in the standard invites list)\n\nTo use the inviter you need to first create a invites message for the script to use and put members whom you want to invite in the invites lists\nChanges to the filter used by " + name + " can be made by modifying the file Invite Lists/Config/" + name + "\n\n\n\n\nNames in the priority invites list will be invited before those in the list of members who has left and the standard list, without the use of any filters. Names in the invites list of members who has left will be invited before those in the standard list and with the deserters invites message\n\n"
-            continue
 
-        inifilelist = getfilelist("Invite Lists/Config", ".ini")
-        print "\n\nwhich group would you like to send invites for?\n 0 Infinite loop over all groups"
-        for fname in inifilelist:
-            print "", fname[0], fname[1].replace(".ini", "")
+        elif flow == "3":
+            count = 1
+            flist = []
+            for x in sorted([x for x in os.listdir("Invite Lists") if isfile(join("Invite Lists", x))]):
+                if x[-1] == "~":
+                    continue
+                print " " + str(count) + ". " + x
+                flist.append(x)
+                count += 1
 
-        invchoice = enterint("which group(s) would you like to send invites for? ")
+            with open("Invite Lists/" + flist[enterint("\nWhich file do you want to inspect: ") - 1], "rb") as f:
+                print f.read()
 
-        if invchoice == 0:
-            inviter(inifilelist, True)
+        elif flow == "4":
+            count = 1
+            flist = []
+            for x in sorted([x for x in os.listdir("Invite Lists") if isfile(join("Invite Lists", x))]):
+                if "~" in x or "already invited" in x or "members who has left" in x:
+                    continue
+                print " " + str(count) + ". " + x
+                flist.append(x)
+                count += 1
+
+            with open("Invite Lists/" + flist[enterint("\nWhich file do you want to add names to: ") - 1], "ab") as f:
+                f.write(", " + raw_input("\nEnter a comma seperated list of usernames to be added: "))
+
         else:
-            inviter([inifilelist[invchoice - 1]], False)
+            inifilelist = getfilelist("Invite Lists/Config", ".ini")
+            print "\n\nwhich group would you like to send invites for?\n 0 Infinite loop over all groups"
+            for fname in inifilelist:
+                print "", fname[0], fname[1].replace(".ini", "")
+
+            invchoice = enterint("which group(s) would you like to send invites for? ")
+
+            if invchoice == 0:
+                inviter(inifilelist, True)
+            else:
+                inviter([inifilelist[invchoice - 1]], False)
 
     elif flow == "4":
         yourside = raw_input("Name of group to check: ")
