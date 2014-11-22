@@ -36,6 +36,7 @@ try:
     from selenium.webdriver.support.ui import WebDriverWait
     from selenium.webdriver.support import expected_conditions as EC
     from selenium.webdriver.common.alert import Alert
+    from selenium.webdriver.support.ui import Select
 except:
     sys.exit("\n\n\tCouln't import the selenium library, shutting down\n\n")
 
@@ -2490,12 +2491,12 @@ while pathway in (["y"]):
         olprint2("{0: ^70}", content, "|", "|")
     olprint("|", "|", "-", 72, True)
 
-    for content in (["", "", "Options", "", "Type /help or /help <number> for more info", "Type /Upgrade to update to the latest version", "", "", "1. Extract the memberslist of one or more groups", "", "2. Build a csv file with data on a list of members", "", "3. Send invites for a group", "", "4. Posts per member in a groups finished votechess matches", "", "5. Build a csv file of a groups team match participants", "", "6. Filter a list of members for those who fill a few requirements", "", "7. Presentation of csv-files from options 2 and 5", "", "8. Send personal notes to a list of members", "", "9. Look for members who has recenty left your group", "", "10. Count number of group notes per member in the last 100 notes pages", "", "11. Build a birthday schedule for a list of members", "", "12. Send a personal message to a list of members", "", "13. Pair lists of players against each others", "", "14. Set operations on two lists", "", "15. Check a teams won/lost tm's per opponent", "", "16. Delete all group notes in a group", "", "17. Check signal strength", "", ""]):
+    for content in (["", "", "Options", "", "Type /help or /help <number> for more info", "Type /Upgrade to update to the latest version", "", "", "1. Extract the memberslist of one or more groups", "", "2. Build a csv file with data on a list of members", "", "3. Send invites for a group", "", "4. Posts per member in a groups finished votechess matches", "", "5. Build a csv file of a groups team match participants", "", "6. Filter a list of members for those who fill a few requirements", "", "7. Presentation of csv-files from options 2 and 5", "", "8. Send personal notes to a list of members", "", "9. Look for members who has recenty left your group", "", "10. Count number of group notes per member in the last 100 notes pages", "", "11. Build a birthday schedule for a list of members", "", "12. Send a personal message to a list of members", "", "13. Pair lists of players against each others", "", "14. Set operations on two lists", "", "15. Check a teams won/lost tm's per opponent", "", "16. Delete all group notes in a group", "", "17. Accept open challenges","", "18. Check signal strength", "", ""]):
         olprint2("{0: ^70}", content, "|", "|")
     olprint("*", "*", "-", 72, True)
 
     flow = ""
-    while flow not in (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "42"]):
+    while flow not in (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "42"]):
         flow = raw_input("\n\n\nEnter your choice here: ")
 
         if flow == "/help 1":
@@ -3153,6 +3154,43 @@ while pathway in (["y"]):
             turnofcomp()
 
     elif flow == "17":
+        print "\n\n"
+        targets = []
+        while flow != "n":
+            targets.append([raw_input("\n\nName of target group: "), raw_input("Name of the group you want to accept with: ")])
+            flow = raw_input("\nAdd another target group? (y/n) ")
+
+        browserchoice = selbrowch()
+        Username = raw_input("\n\nUsername: ")
+        Password = raw_input("Password: ")
+
+        browser, handle = pickbrowser(browserchoice, True)
+        browser = sellogin(Username, Password, browser)
+
+        logincookie = browser.get_cookies()
+        browser1 = mecbrowser(logincookie)
+
+        while True:
+            browser1, response = mecopner(browser1, "http://www.chess.com/groups/team_match_challenges")
+
+            soup = BeautifulSoup(response)
+
+            for x in str(soup.find_all(class_ = "content left")).replace("\n", " ").split("tr class")[2:]:
+                groupName = x[(x.index('</a> <a href="/groups/view/') + 27): x.index('</a></td>')]
+
+                for data in targets:
+                    if data[0] in groupName:
+                        matchlink = "http://www.chess.com" + x[x.index('/groups/view_team_match_challenge?id='): x.index('"><strong>View</strong>')]
+                        browser = selopner(browser, matchlink)
+
+                        Select(browser.find_element_by_id("c1")).select_by_visible_text(data[1])
+
+                        browser.find_element_by_id("c2").click()
+                        print ltime() + "  Accepted challenge from " + data[0] + " with " + data[1] + "\n\t" + matchlink
+
+            time.sleep(4)
+
+    elif flow == "18":
         if usrsys == "Linux":
             if supusr == False:
                 template = "|{0:6}|{1:15}|{2:12}|{3:12}|"
