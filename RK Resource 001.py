@@ -3181,12 +3181,18 @@ while pathway in (["y"]):
                 for data in targets:
                     if data[0] in groupName:
                         matchlink = "http://www.chess.com" + x[x.index('/groups/view_team_match_challenge?id='): x.index('"><strong>View</strong>')]
-                        browser = selopner(browser, matchlink)
+                        try:
+                            browser = selopner(browser, matchlink)
 
-                        Select(browser.find_element_by_id("c1")).select_by_visible_text(data[1])
+                            Select(browser.find_element_by_id("c1")).select_by_visible_text(data[1])
 
-                        browser.find_element_by_id("c2").click()
-                        print ltime() + "  Accepted challenge from " + data[0] + " with " + data[1] + "\n\t  " + matchlink.replace('view_team_match_challenge', 'team_match')
+                            browser.find_element_by_id("c2").click()
+                            print ltime() + "  Accepted challenge from " + data[0] + " with " + data[1] + "\n\t  " + matchlink.replace('view_team_match_challenge', 'team_match')
+                        except Exception, errormsg:
+                            if supusr is True:
+                                print repr(errormsg)
+                            print ltime() + "Failed to load " + matchlink
+                            continue
 
             time.sleep(3)
 
