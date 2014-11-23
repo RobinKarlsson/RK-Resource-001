@@ -1806,6 +1806,26 @@ def vcman(vclinklist, yourside):
     browser3.quit()
     return parmemvc
 
+def acceptChallenge(browser, soup, targets):
+    for x in str(soup.find_all(class_ = "content left")).replace("\n", " ").split("tr class")[2:]:
+        groupName = x[(x.index('</a> <a href="/groups/view/') + 27): x.index('</a></td>')].split('">')
+
+        for data in targets:
+            if data[0] in groupName:
+                matchlink = "http://www.chess.com" + x[x.index('/groups/view_team_match_challenge?id='): x.index('"><strong>View</strong>')]
+                try:
+                    browser = selopner(browser, matchlink)
+
+                    Select(browser.find_element_by_id("c1")).select_by_visible_text(data[1])
+
+                    browser.find_element_by_id("c2").click()
+                    print ltime() + "  Accepted challenge from " + data[0] + " with " + data[1] + "\n\t  " + matchlink.replace('view_team_match_challenge', 'team_match')
+                except Exception, errormsg:
+                    if supusr is True:
+                        print repr(errormsg)
+                    print ltime() + "Failed to load " + matchlink
+                    continue
+
 def memfiop(fipath, kem):
     if os.path.isfile(fipath) is True:
         if os.stat(fipath).st_size > 0:
@@ -2479,7 +2499,7 @@ for x in sys.argv:
             print "\n\n\tWARNING: couldn't import psutil, RAM and CPU checks might not work properly!!!\n\n"
 
 pathway = "y"
-makefolder((["Member Lists", "Member Lists/Config", "Invite Lists", "Invite Lists/Config", "namelists", "Webdriver", "Webdriver/Linux", "Webdriver/Mac", "Webdriver/Windows", "Webdriver/Linux/86", "Webdriver/Mac/86", "Webdriver/Windows/86", "Webdriver/Extensions", "Webdriver/Extensions/Chrome", "Webdriver/Extensions/Firefox", "Messages", "Messages/Invite Messages"]))
+makefolder((["Member Lists", "Member Lists/Config", "Invite Lists", "Invite Lists/Config", "namelists", "Webdriver", "Webdriver/Linux", "Webdriver/Mac", "Webdriver/Windows", "Webdriver/Linux/86", "Webdriver/Mac/86", "Webdriver/Windows/86", "Webdriver/Extensions", "Webdriver/Extensions/Chrome", "Webdriver/Extensions/Firefox", "Messages", "Messages/Invite Messages", ".Config"]))
 
 while pathway in (["y"]):
     olprint("*", "*", "-", 72, True)
@@ -3154,11 +3174,36 @@ while pathway in (["y"]):
             turnofcomp()
 
     elif flow == "17":
-        print "\n\n"
         targets = []
-        while flow != "n":
-            targets.append([raw_input("\n\nName of target group: "), raw_input("Name of the group you want to accept with: ")])
-            flow = raw_input("\nAdd another target group? (y/n) ")
+
+        while flow not in (["1", "2", "3"]):
+            flow = raw_input("\n\nWhat would you like to do?\n 1. Manually select groups you want to accept challenges from\n 2. Accept open challenges as per the config file\n 3. Add targets to config file\n\nChoose wisely, young padawan: ")
+
+        if flow == "1":
+            while flow != "n":
+                targets.append([raw_input("\n\nName of target group: "), raw_input("Name of the group you want to accept with: ")])
+                flow = raw_input("\nAdd another target group? (y/n) ")
+
+        else:
+            if os.path.isfile(".Config/17") is True:
+                with open(".Config/17", "rb") as placeholder:
+                    for x in placeholder.read().split("\n\n")[1:]:
+                        targets.append(x.split("\n"))
+            else:
+                open(".Config/17", "wb").close()
+
+            print "\nCurrent targets in config file:"
+            for x in targets:
+                print " - Open challenges from " + x[0] + " will be accepted by " + x[1]
+
+            if flow == "3":
+                while True:
+                    flow = raw_input("\nAdd another target group? (y/n) ")
+                    if flow == "n":
+                        break
+                    with open(".Config/17", "ab") as placeholder:
+                        placeholder.write("\n\n" + raw_input("Name of target group: ") + "\n" + raw_input("Name of the group you want to accept with: "))
+                continue
 
         browserchoice = selbrowch()
         Username = raw_input("\n\nUsername: ")
@@ -3174,25 +3219,7 @@ while pathway in (["y"]):
             browser1, response = mecopner(browser1, "http://www.chess.com/groups/team_match_challenges")
 
             soup = BeautifulSoup(response)
-
-            for x in str(soup.find_all(class_ = "content left")).replace("\n", " ").split("tr class")[2:]:
-                groupName = x[(x.index('</a> <a href="/groups/view/') + 27): x.index('</a></td>')].split('">')
-
-                for data in targets:
-                    if data[0] in groupName:
-                        matchlink = "http://www.chess.com" + x[x.index('/groups/view_team_match_challenge?id='): x.index('"><strong>View</strong>')]
-                        try:
-                            browser = selopner(browser, matchlink)
-
-                            Select(browser.find_element_by_id("c1")).select_by_visible_text(data[1])
-
-                            browser.find_element_by_id("c2").click()
-                            print ltime() + "  Accepted challenge from " + data[0] + " with " + data[1] + "\n\t  " + matchlink.replace('view_team_match_challenge', 'team_match')
-                        except Exception, errormsg:
-                            if supusr is True:
-                                print repr(errormsg)
-                            print ltime() + "Failed to load " + matchlink
-                            continue
+            acceptChallenge(browser, soup, targets)
 
             time.sleep(3)
 
