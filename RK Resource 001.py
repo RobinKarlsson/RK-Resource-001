@@ -3176,7 +3176,8 @@ while pathway in (["y"]):
             soup = BeautifulSoup(response)
 
             for x in str(soup.find_all(class_ = "content left")).replace("\n", " ").split("tr class")[2:]:
-                groupName = x[(x.index('</a> <a href="/groups/view/') + 27): x.index('</a></td>')]
+                groupName = x[(x.index('</a> <a href="/groups/view/') + 27): x.index('</a></td>')].split('">')
+                print groupName
 
                 for data in targets:
                     if data[0] in groupName:
@@ -3186,9 +3187,9 @@ while pathway in (["y"]):
                         Select(browser.find_element_by_id("c1")).select_by_visible_text(data[1])
 
                         browser.find_element_by_id("c2").click()
-                        print ltime() + "  Accepted challenge from " + data[0] + " with " + data[1] + "\n\t" + matchlink
+                        print ltime() + "  Accepted challenge from " + data[0] + " with " + data[1] + "\n\t  " + matchlink.replace('view_team_match_challenge', 'team_match')
 
-            time.sleep(4)
+            time.sleep(3)
 
     elif flow == "18":
         if usrsys == "Linux":
