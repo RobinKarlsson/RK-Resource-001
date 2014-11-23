@@ -3177,7 +3177,6 @@ while pathway in (["y"]):
 
             for x in str(soup.find_all(class_ = "content left")).replace("\n", " ").split("tr class")[2:]:
                 groupName = x[(x.index('</a> <a href="/groups/view/') + 27): x.index('</a></td>')].split('">')
-                print groupName
 
                 for data in targets:
                     if data[0] in groupName:
