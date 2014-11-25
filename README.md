@@ -12,6 +12,20 @@ Windows users can now download a prepacked, executable version of the script fro
 
 And can thus skip step 1 - 2 in the instructions
 
+
+*** binary Dependencies for executable version ***
+
+ - OLEAUT32.dll, C:\Windows\system32\OLEAUT32.dll
+ - USER32.dll, C:\Windows\system32\USER32.dll
+ - SHELL32.dll, C:\Windows\system32\SHELL32.dll
+ - KERNEL32.dll, C:\Windows\system32\KERNEL32.dll
+ - ADVAPI32.dll, C:\Windows\system32\ADVAPI32.dll
+ - WS2_32.dll, C:\Windows\system32\WS2_32.dll
+ - GDI32.dll, C:\Windows\system32\GDI32.dll
+ - VERSION.dll, C:\Windows\system32\VERSION.dll
+ - ole32.dll, C:\Windows\system32\ole32.dll
+ - 
+
 ===============
 
 Requirements
@@ -258,7 +272,11 @@ Ratings can be Live Standard, Live Blitz, Live Bullet, Online chess, 960 or tact
 
 
  16) Delete all group notes in a group
+ 
+
+
+ 17) Accept open challenges 
 
 
 
- 17) Check network strength
+ 18) Check network strength
