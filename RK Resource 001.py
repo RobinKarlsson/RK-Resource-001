@@ -540,6 +540,10 @@ def noteposter(target, msg, interval, nationalt, shutdown):
         if name == " ":
             name = mem
 
+            if "_" in name:
+                if isint(name.split("_")[1]) is True:
+                    name = name.split("_")[0]
+
         browser2 = selopner(browser2, "http://www.chess.com/members/view/" + mem + "#usernotes_post")
         counter = 1
 
@@ -712,6 +716,10 @@ def pmdriver(target, choice):
         name = namechecker(soup)
         if name == " ":
             name = membername2
+
+            if "_" in name:
+                if isint(name.split("_")[1]) is True:
+                    name = name.split("_")[0]
 
         subject = streplacer(subjectorg, (["/name", name.strip()], ["/firstname", name.split(" ")[0]], ["/nation", country.strip()], ["/newline", "\n"]))
 
@@ -1346,6 +1354,13 @@ def olprint2(tlen, middle, right, left):
     print tlen.format(middle),
     print left
 
+def isint(number):
+    try:
+        number = int(number)
+        return True
+    except ValueError:
+        return False
+
 def inviter(targetlist, endless):
     invitenum = 120
     choice2 = ""
@@ -1553,6 +1568,10 @@ def inviter(targetlist, endless):
 
                 if name == " ":
                     name = member
+
+                    if "_" in name:
+                        if isint(name.split("_")[1]) is True:
+                            name = name.split("_")[0]
 
                 browser2 = selopner(browser2, groupinv)
 
