@@ -948,6 +948,39 @@ def tmparchecker(pagelist, targetname):
 
     return tmpar, timeoutlist, winssdic, losedic
 
+def latestTMsOnsite(browser):
+    targetlst = []
+
+    for x in xrange(1, 101):
+        targetpage = "http://www.chess.com/groups/team_matches?page=" + str(x)
+        print ltime() + "checking: " + targetpage
+        browser, response = mecopner(browser, targetpage)
+
+        soup = BeautifulSoup(response)
+
+        counter = 1
+        for content in soup.find_all("td"):
+            if not '<td style="padding: 0' in str(content):
+                if counter <= 4:
+                    content = content.text.strip()
+                    if counter == 3:
+                        content = int(content)
+                    counter += 1
+
+                else:
+                    content = str(content.contents[0])
+                    content = "http://www.chess.com" + content[9: content.index('"><')]
+                    counter = 1
+
+                targetlst.append(content)
+
+        soup.decompose()
+        response.close()
+        browser.clear_history()
+        gc.collect()
+
+    return sorted(zip(*[iter(targetlst)] * 5), key = itemgetter(2), reverse = True)
+
 def memspider(target, silent, browser):
     if silent == False:
         print "\n\nTime      Page\n"
@@ -2530,12 +2563,12 @@ while pathway in (["y"]):
         olprint2("{0: ^70}", content, "|", "|")
     olprint("|", "|", "-", 72, True)
 
-    for content in (["", "", "Options", "", "Type /help or /help <number> for more info", "Type /Upgrade to update to the latest version", "", "", "1. Extract the memberslist of one or more groups", "", "2. Build a csv file with data on a list of members", "", "3. Send invites for a group", "", "4. Posts per member in a groups finished votechess matches", "", "5. Build a csv file of a groups team match participants", "", "6. Filter a list of members for those who fill a few requirements", "", "7. Presentation of csv-files from options 2 and 5", "", "8. Send personal notes to a list of members", "", "9. Look for members who has recenty left your group", "", "10. Count number of group notes per member in the last 100 notes pages", "", "11. Build a birthday schedule for a list of members", "", "12. Send a personal message to a list of members", "", "13. Pair lists of players against each others", "", "14. Set operations on two lists", "", "15. Check a teams won/lost tm's per opponent", "", "16. Delete all group notes in a group", "", "17. Accept open challenges","", "18. Check signal strength", "", ""]):
+    for content in (["", "", "Options", "", "Type /help or /help <number> for more info", "Type /Upgrade to update to the latest version", "", "", "1. Extract the memberslist of one or more groups", "", "2. Build a csv file with data on a list of members", "", "3. Send invites for a group", "", "4. Posts per member in a groups finished votechess matches", "", "5. Build a csv file of a groups team match participants", "", "6. Filter a list of members for those who fill a few requirements", "", "7. Presentation of csv-files from options 2 and 5", "", "8. Send personal notes to a list of members", "", "9. Look for members who has recenty left your group", "", "10. Count number of group notes per member in the last 100 notes pages", "", "11. Build a birthday schedule for a list of members", "", "12. Send a personal message to a list of members", "", "13. Pair lists of players against each others", "", "14. Set operations on two lists", "", "15. Check a teams won/lost tm's per opponent", "", "16. Delete all group notes in a group", "", "17. Accept open challenges","", "18. Get the 1000 latest team matches on cc sorted by size", "", "19. Check signal strength", "", ""]):
         olprint2("{0: ^70}", content, "|", "|")
     olprint("*", "*", "-", 72, True)
 
     flow = ""
-    while flow not in (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "42"]):
+    while flow not in (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "42"]):
         flow = raw_input("\n\n\nEnter your choice here: ")
 
         if flow == "/help 1":
@@ -2570,7 +2603,7 @@ while pathway in (["y"]):
             print "\n\nCount number of wins, losses and draws per opponent in a teams team match archive"
         elif flow == "/help 16":
             print "\n\nDeletes all group notes from a specified group\n\nRequires login and admin privilege to access and delete notes"
-        elif flow == "/help 17":
+        elif flow == "/help 19":
             print "\n\nPrints your network signal strength continuously every 0.5 seconds"
         elif flow == "/help":
             print "\n\n\nTo add extensions/addons to the scripts chrome or firefox browser you need to download the extension in crx format for chrome or xpi for firefox. Once the addon is downloaded, place it in the Webdriver/Extensions/Chrome or Webdriver/Extensions/Firefox folder.\n\nIt's recommended to use the adblock plus extension\n\n\n\n\nTo use the scripts ability to determine a members gender you will need to have a list of male and female first names in the namelists folder. male names should be stored in a file called 'male' and female names in a file called 'female'.\n\nFor best performance the names should be in the format:\nname1\nname2\nname3\netc\n\nIt's also recommended to sort the names based on how commonly they are used"
@@ -3243,6 +3276,10 @@ while pathway in (["y"]):
             time.sleep(3)
 
     elif flow == "18":
+        for x in latestTMsOnsite(mecbrowser("")):
+            print x[0], "vs", x[1], ":", x[2], "players, score:", x[3], ". link: ", x[4], "\n"
+
+    elif flow == "19":
         if usrsys == "Linux":
             if supusr == False:
                 template = "|{0:6}|{1:15}|{2:12}|{3:12}|"
