@@ -1203,17 +1203,16 @@ def misc1(sortedlines2):
     sortedlines2 = streplacer(str(sortedlines2), (["'", ""], ["set(", ""], [")", ""], ["(", ""], ["[", ""], ["]", ""]))
     return sortedlines2
 
-def remove_doublets(filename):
+def readFile(filename):
     target = ""
     if os.path.isfile(filename) is True:
         if os.stat(filename).st_size > 0:
-            for target in csv.reader(open(filename, "rb")):
-                placeholder = target
+            with open(filename, "rb") as placeholder:
+                target = placeholder.read().replace(" ", "").split(",")
     else:
         open(filename, "wb").close()
-        target = ""
-    res = streplacer(str(OrderedDict.fromkeys((line for line in target if line)).keys()), (["' ", ""], ["'", ""], [",", ""], ["]", ""], ["[", ""], ["  ", " "])).split()
-    return res
+        target = []
+    return target
 
 def evenpairing(lst1, lst2):
     playlst = list()
@@ -1550,22 +1549,22 @@ def inviter(targetlist, endless):
 
             notToInvite = condic["Comma seperated list of usernames that should not be invited"].replace(" ", "").split(",")
 
-            memalrinv = remove_doublets(alrfile)
+            memalrinv = readFile(alrfile)
 
             usedfile = priofile
-            memtinv = remove_doublets(priofile)
+            memtinv = readFile(priofile)
             priolst = True
             deserterlst = False
             standardlst = False
 
             if len(memtinv) == 0:
-                memtinv = remove_doublets(leftfile)
+                memtinv = readFile(leftfile)
                 deserterlst = True
                 priolst = False
                 usedfile = leftfile
 
             if len(memtinv) == 0:
-                memtinv = remove_doublets(infile)
+                memtinv = readFile(infile)
                 usedfile = infile
                 memtinv = [x for x in memtinv if x not in memalrinv]
                 standardlst = True
@@ -2438,12 +2437,12 @@ def file_or_input(mult, fdiag1, fdiag2, idiag1, idiag2):
 
         while list1 not in flist:
             list1 = raw_input(fdiag1)
-        list1 = remove_doublets(list1)
+        list1 = readFile(list1)
 
         if mult == True:
             while list2 not in flist:
                 list2 = raw_input(fdiag2)
-            list2 = remove_doublets(list2)
+            list2 = readFile(list2)
 
     elif choice == "1":
         list1 = streplacer(raw_input(idiag1), ([" ", ""], ["(", ""], [")", ""], ["]", ""], ["[", ""], ["'", ""])).split(",")
