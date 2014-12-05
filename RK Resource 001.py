@@ -1553,13 +1553,14 @@ def inviter(targetlist, endless):
             deserterlst = False
             standardlst = False
 
-            if len(memtinv) == 0:
+            if memtinv == ['']:
+                
                 memtinv = readFile(leftfile)
                 deserterlst = True
                 priolst = False
                 usedfile = leftfile
 
-            if len(memtinv) == 0:
+            if memtinv == ['']:
                 memtinv = readFile(infile)
                 usedfile = infile
                 memtinv = [x for x in memtinv if x not in memalrinv]
@@ -1567,7 +1568,7 @@ def inviter(targetlist, endless):
                 invfilter = True
                 deserterlst = False
 
-            if len(memtinv) == 0:
+            if memtinv == ['']:
                 print "\n\n" + ltime() + "Warning, empty invites list: " + infile
                 continue
 
@@ -2646,7 +2647,7 @@ for x in sys.argv:
 
 pathway = "y"
 makefolder(([".Config", ".Config/TimeoutsCheck", ".Config/Invites", ".Config/Member Lists", "Data", "Data/.TimeoutsCheck", "Data/Invite Lists", "Data/.Member Lists", "Data/.namelists", "Data/Messages", "Data/Messages/Invite Messages", "Data/Webdriver", "Data/Webdriver/Linux", "Data/Webdriver/Mac", "Data/Webdriver/Windows", "Data/Webdriver/Linux/86", "Data/Webdriver/Mac/86", "Data/Webdriver/Windows/86", "Data/Webdriver/Extensions", "Data/Webdriver/Extensions/Chrome", "Data/Webdriver/Extensions/Firefox"]))
-print readFile("Data/Invite Lists/Andromeda")
+
 while pathway in (["y"]):
     olprint("*", "*", "-", 72, True)
     for content in (["", "", "", "RK Resource 001", "version 0.9.1 Beta", "", "", ""]):
