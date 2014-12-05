@@ -1554,7 +1554,6 @@ def inviter(targetlist, endless):
             standardlst = False
 
             if memtinv == ['']:
-                
                 memtinv = readFile(leftfile)
                 deserterlst = True
                 priolst = False
@@ -1568,7 +1567,7 @@ def inviter(targetlist, endless):
                 invfilter = True
                 deserterlst = False
 
-            if memtinv == ['']:
+            if memtinv == []:
                 print "\n\n" + ltime() + "Warning, empty invites list: " + infile
                 continue
 
