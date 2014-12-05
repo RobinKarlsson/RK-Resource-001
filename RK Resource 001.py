@@ -1204,11 +1204,11 @@ def readFile(filename):
     if os.path.isfile(filename) is True:
         if os.stat(filename).st_size > 0:
             with open(filename, "rb") as placeholder:
-                target = placeholder.read().replace(" ", "").split(",")
+                target = placeholder.read()
     else:
         open(filename, "wb").close()
-        target = []
-    return target
+        return []
+    return target.replace(" ", "").split(",")
 
 def evenpairing(lst1, lst2):
     playlst = list()
@@ -2646,7 +2646,7 @@ for x in sys.argv:
 
 pathway = "y"
 makefolder(([".Config", ".Config/TimeoutsCheck", ".Config/Invites", ".Config/Member Lists", "Data", "Data/.TimeoutsCheck", "Data/Invite Lists", "Data/.Member Lists", "Data/.namelists", "Data/Messages", "Data/Messages/Invite Messages", "Data/Webdriver", "Data/Webdriver/Linux", "Data/Webdriver/Mac", "Data/Webdriver/Windows", "Data/Webdriver/Linux/86", "Data/Webdriver/Mac/86", "Data/Webdriver/Windows/86", "Data/Webdriver/Extensions", "Data/Webdriver/Extensions/Chrome", "Data/Webdriver/Extensions/Firefox"]))
-
+print readFile("Data/Invite Lists/Andromeda")
 while pathway in (["y"]):
     olprint("*", "*", "-", 72, True)
     for content in (["", "", "", "RK Resource 001", "version 0.9.1 Beta", "", "", ""]):
