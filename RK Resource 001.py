@@ -3,7 +3,7 @@
 # developed by Robin Karlsson
 # contact email: "r.robin.karlsson@gmail.com"
 # contact chess.com profile: "http://www.chess.com/members/view/RobinKarlsson"
-# version 0.9 dev
+# version 0.9.1 Beta
 
 import os
 from os.path import isfile, join
@@ -154,6 +154,18 @@ def csvsoworker(memlist, choicepath):
 
         print "\n\n" + streplacer(str(memlist2), (["'", ""], ["[", ""], ["]", ""]))
 
+def getOldTimeouts(groupname):
+    timeoutsList = []
+    fname = "Data/.TimeoutsCheck/" + groupname
+
+    if os.path.isfile(fname):
+        with open(fname, "rb") as placeholder:
+                for line in placeholder.readlines():
+                    timeoutsList.append(line[0: -1].split(","))
+        return timeoutsList
+    else:
+        return []
+
 def debugout():
     if usrsys != "Windows":
         try:
@@ -252,16 +264,16 @@ def pickbrowser(browserchoice, adext):
         if browserchoice == "1":
             fopt = webdriver.FirefoxProfile()
             if adext == True:
-                for fname in os.listdir("Webdriver/Extensions/Firefox"):
+                for fname in os.listdir("Data/Webdriver/Extensions/Firefox"):
                     if fname.endswith(".xpi"):
                         try:
-                            fopt.add_extension(os.path.abspath("Webdriver/Extensions/Firefox/" + fname))
+                            fopt.add_extension(os.path.abspath("Data/Webdriver/Extensions/Firefox/" + fname))
                             if "adblock" in fname:
                                 handle = True
                         except Exception, errormsg:
                             if supusr is True:
                                 print repr(errormsg)
-                            print ltime() + "Failed to load " + os.path.abspath("Webdriver/Extensions/Firefox/" + fname)
+                            print ltime() + "Failed to load " + os.path.abspath("Data/Webdriver/Extensions/Firefox/" + fname)
 
             try:
                 browser = webdriver.Firefox(fopt)
@@ -276,19 +288,19 @@ def pickbrowser(browserchoice, adext):
         elif browserchoice == "2":
             copt = Options()
             if adext == True:
-                for fname in os.listdir("Webdriver/Extensions/Chrome"):
+                for fname in os.listdir("Data/Webdriver/Extensions/Chrome"):
                     if fname.endswith(".crx"):
                         try:
-                            copt.add_extension(os.path.abspath("Webdriver/Extensions/Chrome/" + fname))
+                            copt.add_extension(os.path.abspath("Data/Webdriver/Extensions/Chrome/" + fname))
                             if "adblock" in fname:
                                 handle = True
                         except Exception, errormsg:
                             if supusr is True:
                                 print repr(errormsg)
-                            print ltime() + "Failed to load " + os.path.abspath("Webdriver/Extensions/Chrome/" + fname)
+                            print ltime() + "Failed to load " + os.path.abspath("Data/Webdriver/Extensions/Chrome/" + fname)
 
             if usrsys == "Linux":
-                chromepath = os.path.abspath("Webdriver/Linux/86/chromedriver")
+                chromepath = os.path.abspath("Data/Webdriver/Linux/86/chromedriver")
                 os.environ["webdriver.chrome.driver"] = chromepath
                 try:
                     browser = webdriver.Chrome(chromepath, chrome_options = copt)
@@ -300,33 +312,33 @@ def pickbrowser(browserchoice, adext):
                 break
 
             elif usrsys == "Windows":
-                chromepath = os.path.abspath("Webdriver/Windows/86/chromedriver.exe")
+                chromepath = os.path.abspath("Data/Webdriver/Windows/86/chromedriver.exe")
                 os.environ["webdriver.chrome.driver"] = chromepath
                 browser = webdriver.Chrome(chromepath, chrome_options = copt)
                 break
 
             elif usrsys == "Darwin":
-                chromepath = os.path.abspath("Webdriver/Mac/86/chromedriver")
+                chromepath = os.path.abspath("Data/Webdriver/Mac/86/chromedriver")
                 os.environ["webdriver.chrome.driver"] = chromepath
                 browser = webdriver.Chrome(chromepath, chrome_options = copt)
                 break
 
         elif browserchoice == "3":
             if usrsys == "Linux":
-                browser = webdriver.PhantomJS(os.path.abspath("Webdriver/Linux/86/phantomjs"))
+                browser = webdriver.PhantomJS(os.path.abspath("Data/Webdriver/Linux/86/phantomjs"))
                 break
 
             elif usrsys == "Windows":
-                browser = webdriver.PhantomJS(os.path.abspath("Webdriver/Windows/86/phantomjs.exe"))
+                browser = webdriver.PhantomJS(os.path.abspath("Data/Webdriver/Windows/86/phantomjs.exe"))
                 break
 
             elif usrsys == "Darwin":
-                browser = webdriver.PhantomJS(os.path.abspath("Webdriver/Mac/86/phantomjs"))
+                browser = webdriver.PhantomJS(os.path.abspath("Data/Webdriver/Mac/86/phantomjs"))
                 break
 
         elif browserchoice == "4":
             if usrsys == "Windows":
-                browser = webdriver.Ie(os.path.abspath("Webdriver/Windows/86/IEDriverServer.exe"))
+                browser = webdriver.Ie(os.path.abspath("Data/Webdriver/Windows/86/IEDriverServer.exe"))
                 break
 
         browserchoice = raw_input("\nSomething went wrong, please send this to the developer: " + browserchoice + "   " + str(getplatform()) + "\n\nTry and pick another browser\n 1. Firefox\n 2. Chrome\nEnter choice: ")
@@ -419,8 +431,7 @@ def resource01(evenmtch, mtchlist):
         ctrl = True
     return mtchlist
 
-def gettmlinks(targetname):
-    browser = mecbrowser("")
+def gettmlinks(browser, targetname, stopAt):
     linklist = gettmlinklist(targetname, browser)
 
     linkarchive = linklist.pop(-1)
@@ -438,6 +449,14 @@ def gettmlinks(targetname):
         souplinks = re.findall("/groups/team_match(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]i|(?:%[0-9a-fA-F][0-9a-fA-F]))+", str(soup.find_all("a")))
 
         for link in souplinks:
+            if stopAt == str(link):
+                soup.decompose()
+                response.close()
+                browser.clear_history()
+                gc.collect()
+
+                return linklist
+
             linklist.append("http://www.chess.com" + link)
 
         soup.decompose()
@@ -449,7 +468,6 @@ def gettmlinks(targetname):
             break
         pointer += 1
 
-    linklist = list(set(linklist))
     return linklist
 
 def birthdsorter(birthdaylist):
@@ -589,11 +607,11 @@ def pmdriver(target, choice):
 
     msgchoice = ""
     while msgchoice not in (["1", "2"]):
-        msgchoice = raw_input("\nGet the message from\n 1. File in the Messages folder\n 2. Input\nEnter choice: ")
+        msgchoice = raw_input("\nGet the message from\n 1. File in the Data/Messages folder\n 2. Input\nEnter choice: ")
 
     if msgchoice == "1":
         msgfile = raw_input("\nName of the file containing your invites message: ")
-        msglist = fileopen("Messages/" + msgfile, True)
+        msglist = fileopen("Data/Messages/" + msgfile, True)
 
     elif msgchoice == "2":
         choicepm = "y"
@@ -815,7 +833,42 @@ def nineworker(infile, inid, logincookie, key):
         placeholder.write(com2(key, str(un).replace("'", "").replace("[", "").replace("]", ""), 256, []))
     return memlist
 
-def tmparchecker(pagelist, targetname):
+def getTmTimouts(browser, groupname, tmpage):
+    browser, response = mecopner(browser, tmpage)
+    soup = BeautifulSoup(response)
+
+    soupgroup = re.findall("/groups/home/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", str(soup.find_all(class_ = "default border-top alternate")))
+
+    soup = soup.find_all("tr")
+    timeouters = []
+
+    try:
+        if groupname == str(soupgroup[0]).replace("/groups/home/", ""):
+            for placeholder in soup:
+                placeholder = str(placeholder)
+
+                if "menu-icons timeline right-8" in placeholder:
+                    timeouts = placeholder.count('class="menu-icons timeline right-8" title="Timeout"')
+                    timeouter = str(re.findall("http://www.chess.com/members/view/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", placeholder)[0]).replace("http://www.chess.com/members/view/", "")
+                    timeouters.append([tmpage, timeouter, str(timeouts)])
+
+        elif groupname == str(soupgroup[1]).replace("/groups/home/", ""):
+            for placeholder in soup:
+                placeholder = str(placeholder)
+
+                if "menu-icons timeline left-8" in placeholder:
+                    timeouts = placeholder.count('class="menu-icons timeline left-8" title="Timeout"')
+                    timeouter = str(re.findall("http://www.chess.com/members/view/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", placeholder)[3]).replace("http://www.chess.com/members/view/", "")
+                    timeouters.append([tmpage, timeouter, str(timeouts)])
+
+        else:
+            sys.exit("\n\n" + ltime() + "failed to find your group!!!\n")
+    except IndexError:
+        None
+
+    return timeouters
+
+def tmparchecker(browser, pagelist, targetname):
     tmyear = enterint("\nOnly check tm's that has been open for registration since year, leave empty to skip (YYYY) ")
     if tmyear != "":
         tmmonth = enterint("\nOnly check tm's that has been open for registration since month (MM) ")
@@ -825,7 +878,6 @@ def tmparchecker(pagelist, targetname):
     timeoutlist = list()
     winssdic = dict()
     losedic = dict()
-    browser = mecbrowser("")
     print "\n\n"
 
     for page in pagelist:
@@ -939,7 +991,7 @@ def tmparchecker(pagelist, targetname):
                 print "\n\n" + ltime() + "failed to find your group in this match: " + page + "!!!\n"
 
         except IndexError:
-            placeholder = list()
+            None
 
         soup.decompose()
         response.close()
@@ -1064,20 +1116,20 @@ def createfileifmissing(filename, ismsg):
                 mfile.write("<Text>\nHello this is an example message\n<Image>\nhttp://d1lalstwiwz2br.cloudfront.net/images_users/avatars/RobinKarlsson_large.4.jpeg\n<Video>\nhttp://www.youtube.com/watch?v=GY8YBF8dHQo")
 
 def createconfig(name, ID):
-    invconpath = "Member Lists/Config/" + name + ".ini"
+    invconpath = ".Config/Member Lists/" + name + ".ini"
     if os.path.isfile(invconpath) is True:
         membersleftinvfile = configopen(invconpath, True)["Members who has left invites file (optional)"]
     else:
         membersleftinvfile = name + " members who has left"
 
-    with open("Invite Lists/Config/" + name + ".ini", "wb") as setupfile:
-        setupfile.write("What to use if members nation is set to International==\nMin online chess rating==\nMax online chess rating==\nMin 960 chess rating==\nMax 960 chess rating==\nMin online chess games plaid==\nMin online chess win-ratio==\nLast logged in within days==\nMember on chess.com for days==\nBorn after date (YYYY-MM-DD)==\nBorn before date (YYYY-MM-DD)==\nMax timeout-ratio allowed==\nMax number of groups member can be in==\nMin number of groups member can be in==\nMin number of activity points allowed==\nMin time/move (days-hours-minutes)==\nMax time/move (days-hours-minutes)==\nOnly invite those with a custom avatar (y/n)==\nMember should be from nation==\nGender (m/f)==\nLink to groups invite members page==http://www.chess.com/groups/invite_members?id=" + ID + "\nFile containing the main invites list==Invite Lists/" + name + "\nFile containing those who should receive priority invites (circumvents filter)==Invite Lists/" + name + " priority\nInvites file for those who has left the group==Invite Lists/" + membersleftinvfile + "\nFile containing those who has received an invite==Invite Lists/" + name + " already invited\nFile containing your invites message for members who has left your group==Messages/Invite Messages/" + name + " Deserter message\nFile containing your invites message for standard and priority invites lists==Messages/Invite Messages/" + name + " Standard Message\nComma seperated list of usernames that should not be invited==")
-    createfileifmissing("Messages/Invite Messages/" + name + " Standard Message", True)
-    createfileifmissing("Messages/Invite Messages/" + name + " Deserter message", True)
-    createfileifmissing("Invite Lists/" + name + " already invited", False)
-    createfileifmissing("Invite Lists/" + name + " members who has left", False)
-    createfileifmissing("Invite Lists/" + name + " priority", False)
-    createfileifmissing("Invite Lists/" + name, False)
+    with open(".Config/Invites/" + name + ".ini", "wb") as setupfile:
+        setupfile.write("What to use if members nation is set to International==\nMin online chess rating==\nMax online chess rating==\nMin 960 chess rating==\nMax 960 chess rating==\nMin online chess games plaid==\nMin online chess win-ratio==\nLast logged in within days==\nMember on chess.com for days==\nBorn after date (YYYY-MM-DD)==\nBorn before date (YYYY-MM-DD)==\nMax timeout-ratio allowed==\nMax number of groups member can be in==\nMin number of groups member can be in==\nMin number of activity points allowed==\nMin time/move (days-hours-minutes)==\nMax time/move (days-hours-minutes)==\nOnly invite those with a custom avatar (y/n)==\nMember should be from nation==\nGender (m/f)==\nLink to groups invite members page==http://www.chess.com/groups/invite_members?id=" + ID + "\nFile containing the main invites list==Data/Invite Lists/" + name + "\nFile containing those who should receive priority invites (circumvents filter)==Data/Invite Lists/" + name + " priority\nInvites file for those who has left the group==Data/Invite Lists/" + membersleftinvfile + "\nFile containing those who has received an invite==Data/Invite Lists/" + name + " already invited\nFile containing your invites message for members who has left your group==Data/Messages/Invite Messages/" + name + " Deserter message\nFile containing your invites message for standard and priority invites lists==Data/Messages/Invite Messages/" + name + " Standard Message\nComma seperated list of usernames that should not be invited==")
+    createfileifmissing("Data/Messages/Invite Messages/" + name + " Standard Message", True)
+    createfileifmissing("Data/Messages/Invite Messages/" + name + " Deserter message", True)
+    createfileifmissing("Data/Invite Lists/" + name + " already invited", False)
+    createfileifmissing("Data/Invite Lists/" + name + " members who has left", False)
+    createfileifmissing("Data/Invite Lists/" + name + " priority", False)
+    createfileifmissing("Data/Invite Lists/" + name, False)
 
 def configopen(filename, forinvites):
     if os.path.isfile(filename) is True:
@@ -1426,7 +1478,7 @@ def inviter(targetlist, endless):
                     browser2 = sellogin(Username, Password, browser2)
                     counter = 1
 
-            condic = configopen("Invite Lists/Config/" + target, True)
+            condic = configopen(".Config/Invites/" + target, True)
             invitenum2 = invitenum
             memint = list()
 
@@ -1878,6 +1930,26 @@ def acceptChallenge(browser, soup, targets):
                     print ltime() + "Failed to load " + matchlink
                     continue
 
+def getNewStopAt(browser, targetname):
+    browser, response = mecopner(browser, "http://www.chess.com/groups/matches/" + targetname + "?show_all_current=1")
+    soup = BeautifulSoup(response)
+    tmarchive = re.findall("/groups/team_match_archive(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", str(soup.find_all("a")))[0]
+
+    soup.decompose()
+
+    browser, response = mecopner(browser, "http://www.chess.com" + tmarchive + "&page=1")
+
+    soup = BeautifulSoup(response)
+    souplinks = re.findall("/groups/team_match(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]i|(?:%[0-9a-fA-F][0-9a-fA-F]))+", str(soup.find_all("a")))
+
+    soup = BeautifulSoup(response)
+    response.close()
+    browser.clear_history()
+    gc.collect()
+
+    for link in souplinks:
+        return link
+
 def memfiop(fipath, kem):
     if os.path.isfile(fipath) is True:
         if os.stat(fipath).st_size > 0:
@@ -2108,13 +2180,13 @@ def memberprocesser(silent, browser, target, minpoints, minrat, maxrat, mingames
                 Found = "n"
 
                 if memgender == "f":
-                    with open("namelists/female", "rb") as fnlist:
+                    with open("Data/.namelists/female", "rb") as fnlist:
                         for line in fnlist:
                             if name in line:
                                 Found = "y"
                                 break
                 elif memgender == "m":
-                    with open("namelists/male", "rb") as mnlist:
+                    with open("Data/.namelists/male", "rb") as mnlist:
                         for line in mnlist:
                             if name in line:
                                 Found = "y"
@@ -2264,6 +2336,33 @@ def ratingchecker(soup):
             except ValueError:
                 None
     return ratinglist
+
+def compareOldNew(oldTuple, newTuple):
+    timeoutsDict = {}
+
+    for match in newTuple:
+        for table in match:
+            if table in oldTuple:
+                continue
+
+            indexOld = [x for x, tup in enumerate(oldTuple) if tup[0] == table[0] and tup[1] == table[1]]
+            if indexOld:
+                if table[1] in timeoutsDict:
+                    timeoutsDict[table[1]] += 1
+                else:
+                    timeoutsDict[table[1]] = 1
+
+                oldTuple[indexOld[0]][2] = table[2]
+
+            else:
+                if table[1] in timeoutsDict:
+                    timeoutsDict[table[1]] += int(table[2])
+                else:
+                    timeoutsDict[table[1]] = int(table[2])
+
+                oldTuple.append(table)
+
+    return oldTuple, timeoutsDict
 
 def memsin(soup):
     memsi = ""
@@ -2551,11 +2650,11 @@ for x in sys.argv:
             print "\n\n\tWARNING: couldn't import psutil, RAM and CPU checks might not work properly!!!\n\n"
 
 pathway = "y"
-makefolder((["Member Lists", "Member Lists/Config", "Invite Lists", "Invite Lists/Config", "namelists", "Webdriver", "Webdriver/Linux", "Webdriver/Mac", "Webdriver/Windows", "Webdriver/Linux/86", "Webdriver/Mac/86", "Webdriver/Windows/86", "Webdriver/Extensions", "Webdriver/Extensions/Chrome", "Webdriver/Extensions/Firefox", "Messages", "Messages/Invite Messages", ".Config"]))
+makefolder(([".Config", ".Config/TimeoutsCheck", ".Config/Invites", ".Config/Member Lists", "Data", "Data/.TimeoutsCheck", "Data/Invite Lists", "Data/.Member Lists", "Data/.namelists", "Data/Messages", "Data/Messages/Invite Messages", "Data/Webdriver", "Data/Webdriver/Linux", "Data/Webdriver/Mac", "Data/Webdriver/Windows", "Data/Webdriver/Linux/86", "Data/Webdriver/Mac/86", "Data/Webdriver/Windows/86", "Data/Webdriver/Extensions", "Data/Webdriver/Extensions/Chrome", "Data/Webdriver/Extensions/Firefox"]))
 
 while pathway in (["y"]):
     olprint("*", "*", "-", 72, True)
-    for content in (["", "", "", "RK Resource 001", "version 0.9", "", "", ""]):
+    for content in (["", "", "", "RK Resource 001", "version 0.9.1 Beta", "", "", ""]):
         olprint2("{0: ^70}", content, "|", "|")
     olprint("|", "|", "-", 72, True)
 
@@ -2563,12 +2662,12 @@ while pathway in (["y"]):
         olprint2("{0: ^70}", content, "|", "|")
     olprint("|", "|", "-", 72, True)
 
-    for content in (["", "", "Options", "", "Type /help or /help <number> for more info", "Type /Upgrade to update to the latest version", "", "", "1. Extract the memberslist of one or more groups", "", "2. Build a csv file with data on a list of members", "", "3. Send invites for a group", "", "4. Posts per member in a groups finished votechess matches", "", "5. Build a csv file of a groups team match participants", "", "6. Filter a list of members for those who fill a few requirements", "", "7. Presentation of csv-files from options 2 and 5", "", "8. Send personal notes to a list of members", "", "9. Look for members who has recenty left your group", "", "10. Count number of group notes per member in the last 100 notes pages", "", "11. Build a birthday schedule for a list of members", "", "12. Send a personal message to a list of members", "", "13. Pair lists of players against each others", "", "14. Set operations on two lists", "", "15. Check a teams won/lost tm's per opponent", "", "16. Delete all group notes in a group", "", "17. Accept open challenges","", "18. Get the 1000 latest team matches on cc sorted by size", "", "19. Check signal strength", "", ""]):
+    for content in (["", "", "Options", "", "Type /help or /help <number> for more info", "Type /Upgrade to update to the latest version", "", "", "1. Extract the memberslist of one or more groups", "", "2. Build a csv file with data on a list of members", "", "3. Send invites for a group", "", "4. Posts per member in a groups finished votechess matches", "", "5. Build a csv file of a groups team match participants", "", "6. Filter a list of members for those who fill a few requirements", "", "7. Presentation of csv-files from options 2 and 5", "", "8. Send personal notes to a list of members", "", "9. Look for members who has recenty left your group", "", "10. Count number of group notes per member in the last 100 notes pages", "", "11. Build a birthday schedule for a list of members", "", "12. Send a personal message to a list of members", "", "13. Pair lists of players against each others", "", "14. Set operations on two lists", "", "15. Check a teams won/lost tm's per opponent", "", "16. Delete all group notes in a group", "", "17. Accept open challenges","", "18. Get the 1000 latest team matches on cc sorted by size", "", "19. Check groups for new timeouts", "", "20. Check signal strength", "", ""]):
         olprint2("{0: ^70}", content, "|", "|")
     olprint("*", "*", "-", 72, True)
 
     flow = ""
-    while flow not in (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "42"]):
+    while flow not in (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "42"]):
         flow = raw_input("\n\n\nEnter your choice here: ")
 
         if flow == "/help 1":
@@ -2576,7 +2675,7 @@ while pathway in (["y"]):
         elif flow == "/help 2":
             print "\n\nBuild an excell compatible csv file with the following data on a list of members.\n\n Column 1: Username\n Column 2: Real name (if available on members homepage)\n Column 3. Live Standard rating\n Column 4. Live Blitz rating\n Column 5. Live Bullet rating\n Column 6. Online Chess rating\n Column 7. 960 rating\n Column 8. Tactics rating\n Column 9. Timeout-ratio\n Column 10. Last online\n Column 11. Member since\n Column 12. Time per move\n Column 13. Number of groups member is in\n Column 14. Points\n Column 15. Number of online chess games played\n Column 16. Number of online chess games won\n Column 17. Number of online chess games lost\n Column 18. Number of Online chess games drawn\n Column 19. Win ratio for online chess\n Column 20. Member nation (if available on members homepage)\n Column 21. If member has a custom avatar\n\nThis data can be presented and sorted using option 7 in the main script"
         elif flow == "/help 3":
-            print "\n\nSend personalized invites for one or more groups. The invites can include text (with member name and nation, to personalize the message), pictures and videos.\n\nTo use this function you need to have a text document with a comma seperated list of members in the folder called 'Invite Lists'. The script sends an invite to each member in that file and creates a second file in the Invite Lists folder, with the usernames of those who has received an invite\n\n\nMembers who are present in the groups 'already invited' file will be skipped when sending invites. To block the script from inviting specific members you can add their names to the already invited file for the group in question, and they will be effectivily blocked\n\nWhen running the inviter with the option to only invite those who fill a few requirements the script will remove those who didn't fill the requirements from your invites list\n\nRequires the script to log in on chess.com, to send the invites from your account"
+            print "\n\nSend personalized invites for one or more groups. The invites can include text (with member name and nation, to personalize the message), pictures and videos.\n\nTo use this function you need to have a text document with a comma seperated list of members in the folder called 'Data/Invite Lists'. The script sends an invite to each member in that file and creates a second file in the Invite Lists folder, with the usernames of those who has received an invite\n\n\nMembers who are present in the groups 'already invited' file will be skipped when sending invites. To block the script from inviting specific members you can add their names to the already invited file for the group in question, and they will be effectivily blocked\n\nWhen running the inviter with the option to only invite those who fill a few requirements the script will remove those who didn't fill the requirements from your invites list\n\nRequires the script to log in on chess.com, to send the invites from your account"
         elif flow == "/help 4":
             print "\n\nGoes through a groups finished, non thematic votechess matches and counts number of posts per member\n\nRequires the script to log in on chess.com, to acess comments in games"
         elif flow == "/help 5":
@@ -2603,10 +2702,10 @@ while pathway in (["y"]):
             print "\n\nCount number of wins, losses and draws per opponent in a teams team match archive"
         elif flow == "/help 16":
             print "\n\nDeletes all group notes from a specified group\n\nRequires login and admin privilege to access and delete notes"
-        elif flow == "/help 19":
+        elif flow == "/help 20":
             print "\n\nPrints your network signal strength continuously every 0.5 seconds"
         elif flow == "/help":
-            print "\n\n\nTo add extensions/addons to the scripts chrome or firefox browser you need to download the extension in crx format for chrome or xpi for firefox. Once the addon is downloaded, place it in the Webdriver/Extensions/Chrome or Webdriver/Extensions/Firefox folder.\n\nIt's recommended to use the adblock plus extension\n\n\n\n\nTo use the scripts ability to determine a members gender you will need to have a list of male and female first names in the namelists folder. male names should be stored in a file called 'male' and female names in a file called 'female'.\n\nFor best performance the names should be in the format:\nname1\nname2\nname3\netc\n\nIt's also recommended to sort the names based on how commonly they are used"
+            print "\n\n\nTo add extensions/addons to the scripts chrome or firefox browser you need to download the extension in crx format for chrome or xpi for firefox. Once the addon is downloaded, place it in the Data/Webdriver/Extensions/Chrome or Data/Webdriver/Extensions/Firefox folder.\n\nIt's recommended to use the adblock plus extension\n\n\n\n\nTo use the scripts ability to determine a members gender you will need to have a list of male and female first names in the Data/.namelists folder. male names should be stored in a file called 'male' and female names in a file called 'female'.\n\nFor best performance the names should be in the format:\nname1\nname2\nname3\netc\n\nIt's also recommended to sort the names based on how commonly they are used"
 
         elif flow == "/Upgrade":
             update001()
@@ -2667,36 +2766,36 @@ while pathway in (["y"]):
         if flow == "2":
             name = raw_input("\n\nGroup name: ")
             createconfig(name, str(enterint("Group ID: ")))
-            print "\n\nThe following files have been created\n\n  - /Messages/Invite Messages/" + name + " Standard Message (used to invite members from the standard and VIP invites lists)\n  - /Messages/Invite Messages/" + name + " Deserters Message (Used to reinvite those who have left " + name + ")\n  - Invite Lists/" + name + " (main invites list)\n  - Invite Lists/" + name + " priority (used for those whom you want to invite asap, circumvents any filters)\n  - Invite Lists/" + name + " members who has left (here you can place members who has left " + name + " to reinvite them using the invites message from /Messages/Invite Messages/" + name + " Deserters Message)\n  - Invite Lists/" + name + " already invited (stores the names of those who has received an invite from the script, members in this list wont receive an invite even if their names are in the standard invites list)\n\nTo use the inviter you need to first create a invites message for the script to use and put members whom you want to invite in the invites lists\nChanges to the filter used by " + name + " can be made by modifying the file Invite Lists/Config/" + name + "\n\n\n\n\nNames in the priority invites list will be invited before those in the list of members who has left and the standard list, without the use of any filters. Names in the invites list of members who has left will be invited before those in the standard list and with the deserters invites message\n\n"
+            print "\n\nThe following files have been created\n\n  - /Data/Messages/Invite Messages/" + name + " Standard Message (used to invite members from the standard and VIP invites lists)\n  - /Data/Messages/Invite Messages/" + name + " Deserters Message (Used to reinvite those who have left " + name + ")\n  - Data/Invite Lists/" + name + " (main invites list)\n  - Data/Invite Lists/" + name + " priority (used for those whom you want to invite asap, circumvents any filters)\n  - Data/Invite Lists/" + name + " members who has left (here you can place members who has left " + name + " to reinvite them using the invites message from /Data/Messages/Invite Messages/" + name + " Deserters Message)\n  - Data/Invite Lists/" + name + " already invited (stores the names of those who has received an invite from the script, members in this list wont receive an invite even if their names are in the standard invites list)\n\nTo use the inviter you need to first create a invites message for the script to use and put members whom you want to invite in the invites lists\nChanges to the filter used by " + name + " can be made by modifying the file .Config/Invites/" + name + "\n\n\n\n\nNames in the priority invites list will be invited before those in the list of members who has left and the standard list, without the use of any filters. Names in the invites list of members who has left will be invited before those in the standard list and with the deserters invites message\n\n"
 
         elif flow == "3":
             count = 1
             flist = []
-            for x in sorted([x for x in os.listdir("Invite Lists") if isfile(join("Invite Lists", x))]):
+            for x in sorted([x for x in os.listdir("Data/Invite Lists") if isfile(join("Data/Invite Lists", x))]):
                 if x[-1] == "~":
                     continue
                 print " " + str(count) + ". " + x
                 flist.append(x)
                 count += 1
 
-            with open("Invite Lists/" + flist[enterint("\nWhich file do you want to inspect: ") - 1], "rb") as f:
+            with open("Data/Invite Lists/" + flist[enterint("\nWhich file do you want to inspect: ") - 1], "rb") as f:
                 print f.read()
 
         elif flow == "4":
             count = 1
             flist = []
-            for x in sorted([x for x in os.listdir("Invite Lists") if isfile(join("Invite Lists", x))]):
+            for x in sorted([x for x in os.listdir("Data/Invite Lists") if isfile(join("Data/Invite Lists", x))]):
                 if "~" in x or "already invited" in x or "members who has left" in x:
                     continue
                 print " " + str(count) + ". " + x
                 flist.append(x)
                 count += 1
 
-            with open("Invite Lists/" + flist[enterint("\nWhich file do you want to add names to: ") - 1], "ab") as f:
+            with open("Data/Invite Lists/" + flist[enterint("\nWhich file do you want to add names to: ") - 1], "ab") as f:
                 f.write(", " + raw_input("\nEnter a comma seperated list of usernames to be added: "))
 
         else:
-            inifilelist = getfilelist("Invite Lists/Config", ".ini")
+            inifilelist = getfilelist(".Config/Invites", ".ini")
             print "\n\nwhich group would you like to send invites for?\n 0 Infinite loop over all groups"
             for fname in inifilelist:
                 print "", fname[0], fname[1].replace(".ini", "")
@@ -2726,6 +2825,7 @@ while pathway in (["y"]):
             print "\n"
 
     elif flow == "5":
+        browser = mecbrowser("")
         pathtm = ""
         while pathtm not in (["1", "2"]):
             pathtm = raw_input(" 1. Check all tm's for a group\n 2. Check a single tm\nYour choice: ")
@@ -2735,7 +2835,7 @@ while pathway in (["y"]):
 
         if pathtm == "1":
             targetnameorgf = targetnameorg
-            pagelist = gettmlinks(targetname)
+            pagelist = list(set(gettmlinks(browser, targetname, None)))
         elif pathtm == "2":
             pathtm = ""
             while pathtm not in (["1", "2"]):
@@ -2744,7 +2844,7 @@ while pathway in (["y"]):
             targetnameorgf = "team match: " + pagelist + " ... "
             pagelist = (["http://www.chess.com/groups/team_match?id=" + pagelist])
 
-        tmpar, tmtimeout, winssdic, losedic = tmparchecker(pagelist, targetname)
+        tmpar, tmtimeout, winssdic, losedic = tmparchecker(browser, pagelist, targetname)
 
         if pathtm == "1":
             tmparcount = Counter(tmpar)
@@ -2936,20 +3036,20 @@ while pathway in (["y"]):
             name = raw_input("\n\nGroup name: ")
             Key = raw_input("Encryption key: ")
 
-            invconpath = "Invite Lists/Config/" + name + ".ini"
+            invconpath = ".Config/Invites/" + name + ".ini"
             membersleftinvfile = "\nMembers who has left invites file (optional)=="
             if os.path.isfile(invconpath) is True:
                 membersleftinvfile = membersleftinvfile + configopen(invconpath, True)["Invites file for those who has left the group"]
             else:
-                membersleftinvfile = membersleftinvfile + "Invite Lists/" + name + " members who has left"
+                membersleftinvfile = membersleftinvfile + "Data/Invite Lists/" + name + " members who has left"
 
-            with open("Member Lists/Config/" + name + ".ini", "wb") as setupfile:
-                setupfile.write("Group ID==" + str(enterint("Group ID: ")) + "\nEncryption Key==" + Key + "\nMemberslist file==Member Lists/" + name + membersleftinvfile)
+            with open(".Config/Member Lists/" + name + ".ini", "wb") as setupfile:
+                setupfile.write("Group ID==" + str(enterint("Group ID: ")) + "\nEncryption Key==" + Key + "\nMemberslist file==Data/.Member Lists/" + name + membersleftinvfile)
 
-            print "\n\nThe following files have been created\n\n  - /Messages/Invite Messages/" + name + " Standard Message (used to invite members from the standard and VIP invites lists)\n  - /Messages/Invite Messages/" + name + " Deserters Message (Used to reinvite those who have left " + name + ")\n  - Invite Lists/" + name + " (main invites list)\n  - Invite Lists/" + name + " priority (used for those whom you want to invite asap, circumvents any filters)\n  - Invite Lists/" + name + " members who has left (here you can place members who has left " + name + " to reinvite them using the invites message from /Messages/Invite Messages/" + name + " Deserters Message)\n  - Invite Lists/" + name + " already invited (stores the names of those who has received an invite from the script, members in this list wont receive an invite even if their names are in the standard invites list)\n\nTo use the inviter you need to first create a invites message for the script to use and put members whom you want to invite in the invites lists\nChanges to the filter used by " + name + " can be made by modifying the file Invite Lists/Config/" + name + "\n\n"
+            print "\n\nThe following files have been created\n\n  - /Data/Messages/Invite Messages/" + name + " Standard Message (used to invite members from the standard and VIP invites lists)\n  - /Data/Messages/Invite Messages/" + name + " Deserters Message (Used to reinvite those who have left " + name + ")\n  - Data/Invite Lists/" + name + " (main invites list)\n  - Data/Invite Lists/" + name + " priority (used for those whom you want to invite asap, circumvents any filters)\n  - Data/Invite Lists/" + name + " members who has left (here you can place members who has left " + name + " to reinvite them using the invites message from /Data/Messages/Invite Messages/" + name + " Deserters Message)\n  - Data/Invite Lists/" + name + " already invited (stores the names of those who has received an invite from the script, members in this list wont receive an invite even if their names are in the standard invites list)\n\nTo use the inviter you need to first create a invites message for the script to use and put members whom you want to invite in the invites lists\nChanges to the filter used by " + name + " can be made by modifying the file .Config/Invites/" + name + "\n\n"
             continue
 
-        filelist = getfilelist("Member Lists", ".ini")
+        filelist = getfilelist(".Config/Member Lists", ".ini")
         print "\n\nWhich group do you wish to check?\n 0 Loop over all groups"
         for fname in filelist:
             print "", fname[0], fname[1][0:-4]
@@ -2963,7 +3063,7 @@ while pathway in (["y"]):
         logincookie = login()
 
         for target in targetlst:
-            condic = configopen("Member Lists/Config/" + target[1], True)
+            condic = configopen(".Config/Member Lists/" + target[1], True)
             memlist = nineworker(condic["Memberslist file"], str(condic["Group ID"]), logincookie, str(condic["Encryption Key"]))
 
             deserters = streplacer(str(memlist), (["'", ""], ["[", ""], ["]", ""]))
@@ -3280,6 +3380,62 @@ while pathway in (["y"]):
             print x[0], "vs", x[1], ":", x[2], "players, score:", x[3], ". link: ", x[4], "\n"
 
     elif flow == "19":
+        while flow not in (["1", "2"]):
+            flow = raw_input("\n\nChoose your path wisely, monkey boy ;)\n 1. Check groups for timeouts\n 2. Add new group\n\nThe moment of truth is upon you: ")
+
+        if flow == "1":
+            browser = mecbrowser("")
+            inifilelist = getfilelist(".Config/TimeoutsCheck", ".ini")
+
+            for cfile in inifilelist:
+                timeoutsList = []
+                condic = configopen(".Config/TimeoutsCheck/" + cfile[1], False)
+
+                groupnameorg = cfile[1].replace(".ini", "")
+                groupname = condic["Group name"]
+                lastCheck = condic["Last check"]
+                stopAt = condic["Stop at"]
+
+                if stopAt == "":
+                    stopAt = None
+                if lastCheck == "":
+                    lastCheck = "beginning of time"
+
+                newStop = getNewStopAt(browser, groupname)
+                timeoutsListOld = getOldTimeouts(groupnameorg)
+
+                links = gettmlinks(browser, groupname, stopAt)
+
+                for tmpage in list(set(links)):
+                    timeouts = getTmTimouts(browser, groupname, tmpage)
+
+                    if len(timeouts) != 0:
+                        timeoutsList.append(timeouts)
+
+                newResults, timeoutsDict = compareOldNew(timeoutsListOld, timeoutsList)
+
+                print "\n\n\n\n\t\t\t" + groupnameorg + "\n"
+                print "".join(element.ljust(31) for element in ["Member name", "timeouts since " + lastCheck])
+                for member, timeouts in sorted(timeoutsDict.items(), key = itemgetter(1), reverse = True):
+                    print "".join(element.ljust(32) for element in [member, str(timeouts)])
+
+                with open("Data/.TimeoutsCheck/" + groupnameorg, "wb") as placeholder:
+                    for line in newResults:
+                        placeholder.write(line[0] + "," + line[1] + "," + line[2] + "\n")
+
+                with open(".Config/TimeoutsCheck/" + groupnameorg + ".ini", "wb") as placeholder:
+                    placeholder.write("Group name==" + groupname + "\nLast check==" + time.strftime("%Y-%m-%d %H:%M") + "\nStop at==" + newStop)
+
+        elif flow == "2":
+            gnameorg = raw_input("\n\nName of the group you want to add: ")
+            gname = re.sub(r"[^a-z A-Z 0-9 -]","", gnameorg)
+            gname = gname.replace(" ", "-").lower()
+
+            with open(".Config/TimeoutsCheck/" + gnameorg + ".ini", "wb") as placeholder:
+                placeholder.write("Group name==" + gname + "\nLast check==" + "\nStop at==")
+
+
+    elif flow == "20":
         if usrsys == "Linux":
             if supusr == False:
                 template = "|{0:6}|{1:15}|{2:12}|{3:12}|"
