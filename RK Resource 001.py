@@ -1199,10 +1199,6 @@ def login():
     browser.quit()
     return logincookie
 
-def misc1(sortedlines2):
-    sortedlines2 = streplacer(str(sortedlines2), (["'", ""], ["set(", ""], [")", ""], ["(", ""], ["[", ""], ["]", ""]))
-    return sortedlines2
-
 def readFile(filename):
     target = ""
     if os.path.isfile(filename) is True:
@@ -1702,8 +1698,8 @@ def inviter(targetlist, endless):
                             break
 
             updinvlist = set(memtinv).difference(set(memint))
-            updinvlist = misc1(updinvlist)
-            memint = misc1(memint)
+            updinvlist = ", ".join(updinvlist)
+            memint = ", ".join(memint)
 
             with open(usedfile, "wb") as placeholder2:
                 placeholder2.write(updinvlist)
@@ -2732,7 +2728,7 @@ while pathway in (["y"]):
 
         if remmem == "y":
             un1 = memremoverf(un1, logincookie)
-        un1 = misc1(un1)
+        un1 = ", ".join(un1)
 
         choice6 = ""
         while choice6 not in (["1", "2"]):
