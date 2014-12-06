@@ -155,16 +155,22 @@ def csvsoworker(memlist, choicepath):
         print "\n\n" + streplacer(str(memlist2), (["'", ""], ["[", ""], ["]", ""]))
 
 def getOldTimeouts(groupname):
+    timeoutsDictOld = {}
     timeoutsList = []
     fname = "Data/.TimeoutsCheck/" + groupname
 
     if os.path.isfile(fname):
         with open(fname, "rb") as placeholder:
                 for line in placeholder.readlines():
-                    timeoutsList.append(line[0: -1].split(","))
-        return timeoutsList
-    else:
-        return []
+                    line = line[0: -1].split(",")
+                    timeoutsList.append(line)
+
+                    if line[1] in timeoutsDictOld:
+                        timeoutsDictOld[line[1]] += int(line[2])
+                    else:
+                        timeoutsDictOld[line[1]] = int(line[2])
+
+    return timeoutsList, timeoutsDictOld
 
 def debugout():
     if usrsys != "Windows":
@@ -2333,7 +2339,8 @@ def ratingchecker(soup):
     return ratinglist
 
 def compareOldNew(oldTuple, newTuple):
-    timeoutsDict = {}
+    timeoutsDictNew = {}
+    timeoutsDictAlltime = {}
 
     for match in newTuple:
         for table in match:
@@ -2342,22 +2349,22 @@ def compareOldNew(oldTuple, newTuple):
 
             indexOld = [x for x, tup in enumerate(oldTuple) if tup[0] == table[0] and tup[1] == table[1]]
             if indexOld:
-                if table[1] in timeoutsDict:
-                    timeoutsDict[table[1]] += 1
+                if table[1] in timeoutsDictNew:
+                    timeoutsDictNew[table[1]] += 1
                 else:
-                    timeoutsDict[table[1]] = 1
+                    timeoutsDictNew[table[1]] = 1
 
                 oldTuple[indexOld[0]][2] = table[2]
 
             else:
-                if table[1] in timeoutsDict:
-                    timeoutsDict[table[1]] += int(table[2])
+                if table[1] in timeoutsDictNew:
+                    timeoutsDictNew[table[1]] += int(table[2])
                 else:
-                    timeoutsDict[table[1]] = int(table[2])
+                    timeoutsDictNew[table[1]] = int(table[2])
 
                 oldTuple.append(table)
 
-    return oldTuple, timeoutsDict
+    return oldTuple, timeoutsDictNew
 
 def memsin(soup):
     memsi = ""
@@ -3394,10 +3401,10 @@ while pathway in (["y"]):
                 if stopAt == "":
                     stopAt = None
                 if lastCheck == "":
-                    lastCheck = "beginning of time"
+                    lastCheck = "all time"
 
                 newStop = getNewStopAt(browser, groupname)
-                timeoutsListOld = getOldTimeouts(groupnameorg)
+                timeoutsListOld, timeoutsDictFull = getOldTimeouts(groupnameorg)
 
                 links = gettmlinks(browser, groupname, stopAt)
 
@@ -3407,19 +3414,20 @@ while pathway in (["y"]):
                     if len(timeouts) != 0:
                         timeoutsList.append(timeouts)
 
-                newResults, timeoutsDict = compareOldNew(timeoutsListOld, timeoutsList)
+                newResults, timeoutsDictNew = compareOldNew(timeoutsListOld, timeoutsList)
+                timeoutsDictFull = Counter(timeoutsDictFull) + Counter(timeoutsDictNew)
 
                 print "\n\n\n\n\t\t\t" + groupnameorg + "\n"
-                print "".join(element.ljust(31) for element in ["Member name", "timeouts since " + lastCheck])
-                for member, timeouts in sorted(timeoutsDict.items(), key = itemgetter(1), reverse = True):
-                    print "".join(element.ljust(32) for element in [member, str(timeouts)])
+                print "".join(element.ljust(31) for element in ["Member name", "Timeouts since " + lastCheck, "Timeouts total"])
+                for member, timeouts in sorted(timeoutsDictNew.items(), key = itemgetter(1), reverse = True):
+                    print "".join(element.ljust(32) for element in [member, str(timeouts), str(timeoutsDictFull[member])])
 
                 with open("Data/.TimeoutsCheck/" + groupnameorg, "wb") as placeholder:
                     for line in newResults:
                         placeholder.write(line[0] + "," + line[1] + "," + line[2] + "\n")
 
                 with open(".Config/TimeoutsCheck/" + groupnameorg + ".ini", "wb") as placeholder:
-                    placeholder.write("Group name==" + groupname + "\nLast check==" + time.strftime("%Y-%m-%d %H:%M") + "\nStop at==" + newStop)
+                    placeholder.write("Group name==" + groupname + "\nLast check==" + time.strftime("%Y-%m-%d") + "\nStop at==" + newStop)
 
         elif flow == "2":
             gnameorg = raw_input("\n\nName of the group you want to add: ")
