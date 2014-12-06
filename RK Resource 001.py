@@ -1058,10 +1058,19 @@ def memspider(target, silent, browser):
                 if supusr is True:
                     debugout()
 
-            for link in browser.links(url_regex="chess.com/members/view/"):
-                ltext = link.text
-                if ltext != "View Profile":
-                    usrlist.append(ltext.replace("[IMG]", ""))
+            if "chess.com/tournaments/players" in pointer:
+                for link in browser.links(url_regex="chess.com/tournaments/player_summary"):
+                    ltext = link.text
+
+                    if ltext != "View Profile":
+                        usrlist.append(ltext.replace("[IMG]", ""))
+
+            else:
+                for link in browser.links(url_regex="chess.com/members/view/"):
+                    ltext = link.text
+
+                    if ltext != "View Profile":
+                        usrlist.append(ltext.replace("[IMG]", ""))
 
             if "next-on" not in p2:
                 break
