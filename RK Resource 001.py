@@ -1223,7 +1223,12 @@ def readFile(filename):
     else:
         open(filename, "wb").close()
         return []
-    return target.replace(" ", "").split(",")
+
+    target = target.replace(" ", "").split(",")
+    while "" in target:
+        target.remove("")
+
+    return target
 
 def evenpairing(lst1, lst2):
     playlst = list()
