@@ -1481,6 +1481,7 @@ def inviter(targetlist, endless):
 
         for target in targetlist:
             target = target[1]
+
             invgroup = target[0:-4]
             if browserchoice == "1":
                 counter += 1
@@ -1615,7 +1616,7 @@ def inviter(targetlist, endless):
                     already_picked.append(picked)
 
             for member in already_picked:
-                if member in notToInvite:
+                if member in notToInvite or member == "":
                     memtinv.remove(member)
                     continue
 
