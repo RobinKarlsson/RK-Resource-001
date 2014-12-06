@@ -1225,8 +1225,6 @@ def readFile(filename):
         return []
 
     target = target.replace(" ", "").split(",")
-    while "" in target:
-        target.remove("")
 
     return target
 
