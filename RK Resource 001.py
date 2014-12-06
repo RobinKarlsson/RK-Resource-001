@@ -701,6 +701,8 @@ def pmdriver(target, choice):
 
     counter = 1
     for membername2 in memtpm:
+        if membername2 == "":
+            continue
         membername = "http://www.chess.com/members/view/" + membername2
 
         browser1, response = mecopner(browser1, membername)
@@ -2665,7 +2667,7 @@ for x in sys.argv:
             print "\n\n\tWARNING: couldn't import psutil, RAM and CPU checks might not work properly!!!\n\n"
 
 pathway = "y"
-makefolder(([".Config", ".Config/TimeoutsCheck", ".Config/Invites", ".Config/Member Lists", "Data", "Data/.TimeoutsCheck", "Data/Invite Lists", "Data/.Member Lists", "Data/.namelists", "Data/Messages", "Data/Messages/Invite Messages", "Data/Webdriver", "Data/Webdriver/Linux", "Data/Webdriver/Mac", "Data/Webdriver/Windows", "Data/Webdriver/Linux/86", "Data/Webdriver/Mac/86", "Data/Webdriver/Windows/86", "Data/Webdriver/Extensions", "Data/Webdriver/Extensions/Chrome", "Data/Webdriver/Extensions/Firefox"]))
+makefolder(([".Config", ".Config/TimeoutsCheck", ".Config/Notes Poster", ".Config/Invites", ".Config/Member Lists", "Data", "Data/.TimeoutsCheck", "Data/Invite Lists", "Data/.Member Lists", "Data/.namelists", "Data/Messages", "Data/Messages/Invite Messages", "Data/Webdriver", "Data/Webdriver/Linux", "Data/Webdriver/Mac", "Data/Webdriver/Windows", "Data/Webdriver/Linux/86", "Data/Webdriver/Mac/86", "Data/Webdriver/Windows/86", "Data/Webdriver/Extensions", "Data/Webdriver/Extensions/Chrome", "Data/Webdriver/Extensions/Firefox"]))
 
 while pathway in (["y"]):
     olprint("*", "*", "-", 72, True)
@@ -2677,12 +2679,12 @@ while pathway in (["y"]):
         olprint2("{0: ^70}", content, "|", "|")
     olprint("|", "|", "-", 72, True)
 
-    for content in (["", "", "Options", "", "Type /help or /help <number> for more info", "Type /Upgrade to update to the latest version", "", "", "1. Extract the memberslist of one or more groups", "", "2. Build a csv file with data on a list of members", "", "3. Send invites for a group", "", "4. Posts per member in a groups finished votechess matches", "", "5. Build a csv file of a groups team match participants", "", "6. Filter a list of members for those who fill a few requirements", "", "7. Presentation of csv-files from options 2 and 5", "", "8. Send personal notes to a list of members", "", "9. Look for members who has recenty left your group", "", "10. Count number of group notes per member in the last 100 notes pages", "", "11. Build a birthday schedule for a list of members", "", "12. Send a personal message to a list of members", "", "13. Pair lists of players against each others", "", "14. Set operations on two lists", "", "15. Check a teams won/lost tm's per opponent", "", "16. Delete all group notes in a group", "", "17. Accept open challenges","", "18. Get the 1000 latest team matches on cc sorted by size", "", "19. Check groups for new timeouts", "", "20. Check signal strength", "", ""]):
+    for content in (["", "", "Options", "", "Type /help or /help <number> for more info", "Type /Upgrade to update to the latest version", "", "", "1. Extract the memberslist of one or more groups", "", "2. Build a csv file with data on a list of members", "", "3. Send invites for a group", "", "4. Posts per member in a groups finished votechess matches", "", "5. Build a csv file of a groups team match participants", "", "6. Filter a list of members for those who fill a few requirements", "", "7. Presentation of csv-files from options 2 and 5", "", "8. Send personal notes to a list of members", "", "9. Look for members who has recenty left your group", "", "10. Count number of group notes per member in the last 100 notes pages", "", "11. Build a birthday schedule for a list of members", "", "12. Send a personal message to a list of members", "", "13. Pair lists of players against each others", "", "14. Set operations on two lists", "", "15. Check a teams won/lost tm's per opponent", "", "16. Delete all group notes in a group", "", "17. Accept open challenges","", "18. Get the 1000 latest team matches on cc sorted by size", "", "19. Check groups for new timeouts", "", "20. Post notes to groups", "", "21. Check signal strength", "", ""]):
         olprint2("{0: ^70}", content, "|", "|")
     olprint("*", "*", "-", 72, True)
 
     flow = ""
-    while flow not in (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "42"]):
+    while flow not in (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "42"]):
         flow = raw_input("\n\n\nEnter your choice here: ")
 
         if flow == "/help 1":
@@ -3450,8 +3452,54 @@ while pathway in (["y"]):
             with open(".Config/TimeoutsCheck/" + gnameorg + ".ini", "wb") as placeholder:
                 placeholder.write("Group name==" + gname + "\nLast check==" + "\nStop at==")
 
-
     elif flow == "20":
+        while flow not in (["1", "2"]):
+            flow = raw_input("\n\nChoose your path, young padawan\n 1. Post in groups\n 2. Add new group or edit an existing one\n\nYour path is: ")
+
+        if flow == "1":
+            inifilelist = getfilelist(".Config/Notes Poster", ".data")
+
+            sleepTime = enterint("\n\nTime to wait between posts: ")
+            browserchoice = selbrowch()
+            
+            Username = raw_input("\n\nUsername: ")
+            Password = raw_input("Password: ")
+
+            browser, handle = pickbrowser(browserchoice, True)
+            browser = sellogin(Username, Password, browser)
+
+            for cfile in inifilelist:
+                with open(".Config/Notes Poster/" + cfile[1], "rb") as placeholder:
+                    note = random.choice(placeholder.read().split("\n\n")[1:])
+
+
+                browser = selopner(browser, "http://www.chess.com/groups/notes/" + cfile[1])
+                browser.find_element_by_id("c17").send_keys(note)
+                browser.find_element_by_id("c18").click()
+
+                time.sleep(sleepTime)
+
+            browser.quit()
+
+        elif flow == "2":
+            gname = re.sub(r"[^a-z A-Z 0-9 -]","", raw_input("\n\nName of the group you want to add/edit: "))
+            gname = gname.replace(" ", "-").lower()
+
+            if not os.path.isfile(".Config/Notes Poster/" + gname + ".data"):
+                open(".Config/Notes Poster/" + gname + ".data", "wb").close()
+
+            while True:
+                flow = raw_input("Add new note? (y/n) ")
+
+                if flow == "n":
+                    break
+
+                newNote = raw_input("Enter note: ")
+
+                with open(".Config/Notes Poster/" + gname + ".data", "ab") as placeholder:
+                    placeholder.write("\n\n" + newNote)
+
+    elif flow == "21":
         if usrsys == "Linux":
             if supusr == False:
                 template = "|{0:6}|{1:15}|{2:12}|{3:12}|"
