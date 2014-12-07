@@ -1964,7 +1964,8 @@ def getNewStopAt(browser, targetname):
     gc.collect()
 
     for link in souplinks:
-        return link
+        if "/groups/team_match?id=" in link:
+            return link
 
 def memfiop(fipath, kem):
     if os.path.isfile(fipath) is True:
