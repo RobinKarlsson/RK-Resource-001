@@ -2,7 +2,7 @@ Developed by Robin Karlsson
 
 contact: r.robin.karlsson@gmail.com
 
-   chess.com/members/view/AayeRoot
+   http://www.chess.com/members/view/AayeRoot
 
 ===============
 
