@@ -2,7 +2,7 @@
 # RK resource 001
 # developed by Robin Karlsson
 # contact email: "r.robin.karlsson@gmail.com"
-# contact chess.com profile: "http://www.chess.com/members/view/RobinKarlsson"
+# contact chess.com profile: "http://www.chess.com/members/view/AayeRoot"
 # version 0.9.1 Beta
 
 import os
