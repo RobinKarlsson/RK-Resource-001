@@ -2036,7 +2036,7 @@ def memberprocesser(silent, browser, target, minpoints, minrat, maxrat, mingames
             if timemax != "" or timemin != "":
                 timeoutratio = timeoutchecker(soup)
 
-                if timemax != ""
+                if timemax != "":
                     if timeoutratio > timemax:
                         soup.decompose()
                         gc.collect()
