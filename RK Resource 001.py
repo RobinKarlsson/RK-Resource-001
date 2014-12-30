@@ -2,7 +2,7 @@
 # RK resource 001
 # developed by Robin Karlsson
 # contact email: "r.robin.karlsson@gmail.com"
-# contact chess.com profile: "http://www.chess.com/members/view/AayeRoot"
+# contact chess.com profile: "http://www.chess.com/members/view/SudoRoot"
 # version 0.9.1 Beta
 
 import os
@@ -695,7 +695,7 @@ def pmdriver(target, choice):
         memtpm = target
 
     if choice2 == "y":
-        minpoints, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat = memprmenu()
+        minpoints, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemin, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat = memprmenu()
 
     print "\n\n"
 
@@ -715,7 +715,7 @@ def pmdriver(target, choice):
             debugout()
 
         if choice2 == "y":
-            passmemfil = memberprocesser(True, browser1, ([membername2]), minpoints, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat)
+            passmemfil = memberprocesser(True, browser1, ([membername2]), minpoints, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemin, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat)
 
             if membername2 not in passmemfil:
                 continue
@@ -1375,6 +1375,7 @@ def memprmenu():
         olderday = ""
 
     timemax = enterint("\nMax timeoutratio allowed. leave empty to skip: ")
+    timemin = enterint("\nMin timeoutratio allowed. leave empty to skip: ")
     maxgroup = enterint("\nMax number of groups member may be in. leave empty to skip: ")
     mingroup = enterint("Min number of groups member may be in. leave empty to skip: ")
     minpoints = enterint("Min number of activity points member may have. leave empty to skip: ")
@@ -1395,7 +1396,7 @@ def memprmenu():
     memgender = "a"
     while memgender not in (["m", "f", ""]):
         memgender = raw_input("\nMember should be gender (determined by comparing member name to a list of male and female names). leave empty to skip (m/f): ")
-    return minpoints, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat
+    return minpoints, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemin, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat
 
 def makefolder(flst):
     for folder in flst:
@@ -1548,6 +1549,7 @@ def inviter(targetlist, endless):
                 oldermonth = ""
                 olderday = ""
             timemax = condic["Max timeout-ratio allowed"]
+            timemin = ""
             maxgroup = condic["Max number of groups member can be in"]
             mingroup = condic["Min number of groups member can be in"]
             minpoints = condic["Min number of activity points allowed"]
@@ -1612,7 +1614,7 @@ def inviter(targetlist, endless):
                 invitenum2 = len(memtinv)
 
             while len(already_picked) < invitenum2:
-                picked = random.choice(memtinv)
+                picked = random.choice(memtinv).replace("\n", "")
 
                 if not picked in already_picked:
                     already_picked.append(picked)
@@ -1630,7 +1632,7 @@ def inviter(targetlist, endless):
 
                 if choice2 == "y" and standardlst == True:
                     try:
-                        passmemfil = memberprocesser(True, browser1, ([member]), minpoints, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat)
+                        passmemfil = memberprocesser(True, browser1, ([member]), minpoints, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemin, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat)
                     except UnboundLocalError:
                         continue
                     if member not in passmemfil:
@@ -1995,7 +1997,7 @@ def fileopen(filename, message):
     else:
         return msglist
 
-def memberprocesser(silent, browser, target, minpoints, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat):
+def memberprocesser(silent, browser, target, minpoints, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemin, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat):
     target = streplacer(str(target), ([" ", ""], ["(", ""], [")", ""], ["]", ""], ["[", ""], ["'", ""])).split(",")
     while "" in target:
         target.remove("")
@@ -2031,11 +2033,20 @@ def memberprocesser(silent, browser, target, minpoints, minrat, maxrat, mingames
                         gc.collect()
                         continue
 
-            if timemax != "":
-                if timeoutchecker(soup) > timemax:
-                    soup.decompose()
-                    gc.collect()
-                    continue
+            if timemax != "" or timemin != "":
+                timeoutratio = timeoutchecker(soup)
+
+                if timemax != ""
+                    if timeoutratio > timemax:
+                        soup.decompose()
+                        gc.collect()
+                        continue
+
+                if timemin != "":
+                    if timeoutratio < timemin:
+                        soup.decompose()
+                        gc.collect()
+                        continue
 
             if timovchoicemax != "" or timovchoicemin != "":
                 timemove = TimeMoveChecker(soup)
@@ -2933,8 +2944,8 @@ while pathway in (["y"]):
         membernamelist = file_or_input(False, "\n\nName of the file containing your list: ", "", "\n\nEnter list of members to check: ", "")[0]
         browser = mecbrowser("")
 
-        minpoints, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat = memprmenu()
-        passmembers = memberprocesser(False, browser, membernamelist, minpoints, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat)
+        minpoints, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemin, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat = memprmenu()
+        passmembers = memberprocesser(False, browser, membernamelist, minpoints, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemin, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat)
 
         choice6 = ""
         while choice6 not in (["1", "2"]):
@@ -3434,7 +3445,7 @@ while pathway in (["y"]):
                 timeoutsDictFull = Counter(timeoutsDictFull) + Counter(timeoutsDictNew)
 
                 print "\n\n\n\n\t\t\t" + groupnameorg + "\n"
-                print "".join(element.ljust(31) for element in ["Member name", "Timeouts since " + lastCheck, "Timeouts total"])
+                print "".join(element.ljust(31) for element in ["Member name", "Timeouts " + lastCheck + " - " + time.strftime("%d/%m"), "Timeouts total"])
                 for member, timeouts in sorted(timeoutsDictNew.items(), key = itemgetter(1), reverse = True):
                     print "".join(element.ljust(32) for element in [member, str(timeouts), str(timeoutsDictFull[member])])
 
@@ -3443,7 +3454,7 @@ while pathway in (["y"]):
                         placeholder.write(line[0] + "," + line[1] + "," + line[2] + "\n")
 
                 with open(".Config/TimeoutsCheck/" + groupnameorg + ".ini", "wb") as placeholder:
-                    placeholder.write("Group name==" + groupname + "\nLast check==" + time.strftime("%Y-%m-%d") + "\nStop at==" + newStop)
+                    placeholder.write("Group name==" + groupname + "\nLast check==" + time.strftime("%d/%m") + "\nStop at==" + newStop)
 
         elif flow == "2":
             gnameorg = raw_input("\n\nName of the group you want to add: ")
@@ -3472,7 +3483,6 @@ while pathway in (["y"]):
             for cfile in inifilelist:
                 with open(".Config/Notes Poster/" + cfile[1], "rb") as placeholder:
                     note = random.choice(placeholder.read().split("\n\n")[1:])
-
 
                 browser = selopner(browser, "http://www.chess.com/groups/notes/" + cfile[1])
                 browser.find_element_by_id("c17").send_keys(note)
