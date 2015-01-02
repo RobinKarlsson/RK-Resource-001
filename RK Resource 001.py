@@ -1230,6 +1230,20 @@ def readFile(filename):
 
     return target
 
+def readFile2(filename):
+    target = []
+    if os.path.isfile(filename) is True:
+        if os.stat(filename).st_size > 0:
+            with open(filename, "rb") as placeholder:
+                for line in placeholder:
+                    line = streplacer(line, (["\n", ""], [" ", ""]))
+                    if line != "":
+                        target.append(line)
+    else:
+        open(filename, "wb").close()
+
+    return target
+
 def evenpairing(lst1, lst2):
     playlst = list()
     for player1 in lst1[:]:
@@ -1568,29 +1582,29 @@ def inviter(targetlist, endless):
 
             notToInvite = condic["Comma seperated list of usernames that should not be invited"].replace(" ", "").split(",")
 
-            memalrinv = readFile(alrfile)
+            memalrinv = readFile2(alrfile)
 
             usedfile = priofile
-            memtinv = readFile(priofile)
+            memtinv = readFile2(priofile)
             priolst = True
             deserterlst = False
             standardlst = False
 
-            if memtinv == ['']:
-                memtinv = readFile(leftfile)
+            if len(memtinv) == 0:
+                memtinv = readFile2(leftfile)
                 deserterlst = True
                 priolst = False
                 usedfile = leftfile
 
-            if memtinv == ['']:
-                memtinv = readFile(infile)
+            if len(memtinv) == 0:
+                memtinv = readFile2(infile)
                 usedfile = infile
                 memtinv = [x for x in memtinv if x not in memalrinv]
                 standardlst = True
                 invfilter = True
                 deserterlst = False
 
-            if memtinv == []:
+            if len(memtinv) == 0:
                 print "\n\n" + ltime() + "Warning, empty invites list: " + infile
                 continue
 
@@ -1614,13 +1628,13 @@ def inviter(targetlist, endless):
                 invitenum2 = len(memtinv)
 
             while len(already_picked) < invitenum2:
-                picked = random.choice(memtinv).replace("\n", "")
+                picked = random.choice(memtinv)
 
                 if not picked in already_picked:
                     already_picked.append(picked)
 
             for member in already_picked:
-                if member in notToInvite or member == "":
+                if member in notToInvite:
                     memtinv.remove(member)
                     continue
 
@@ -1636,7 +1650,14 @@ def inviter(targetlist, endless):
                     except UnboundLocalError:
                         continue
                     if member not in passmemfil:
-                        memtinv.remove(member)
+                        try:
+                            memtinv.remove(member)
+                        except Exception, errormsg:
+                            print repr(errormsg)
+                            print "member: '" + member + "'"
+                            print ([member])
+                            print "passmem: '" + passmemfil + "'"
+                            sys.exit()
                         continue
 
                 else:
@@ -1721,15 +1742,13 @@ def inviter(targetlist, endless):
                             break
 
             updinvlist = set(memtinv).difference(set(memint))
-            updinvlist = ", ".join(updinvlist)
-            memint = ", ".join(memint)
 
             with open(usedfile, "wb") as placeholder2:
-                placeholder2.write(updinvlist)
+                placeholder2.write("\n".join(updinvlist))
 
             if len(memint) != 0:
                 with open(alrfile, "ab") as placeholder3:
-                    placeholder3.write(memint + ", ")
+                    placeholder3.write("\n" + "\n".join(memint))
 
     browser2.quit()
 
@@ -2687,7 +2706,7 @@ while pathway in (["y"]):
         olprint2("{0: ^70}", content, "|", "|")
     olprint("|", "|", "-", 72, True)
 
-    for content in (["", "", "developed by Robin Karlsson", "", "", "Contact information", "", "r.robin.karlsson@gmail.com", "http://www.chess.com/members/view/RobinKarlsson", "", ""]):
+    for content in (["", "", "developed by Robin Karlsson", "", "", "Contact information", "", "r.robin.karlsson@gmail.com", "http://www.chess.com/members/view/SudoRoot", "", ""]):
         olprint2("{0: ^70}", content, "|", "|")
     olprint("|", "|", "-", 72, True)
 
@@ -2704,7 +2723,7 @@ while pathway in (["y"]):
         elif flow == "/help 2":
             print "\n\nBuild an excell compatible csv file with the following data on a list of members.\n\n Column 1: Username\n Column 2: Real name (if available on members homepage)\n Column 3. Live Standard rating\n Column 4. Live Blitz rating\n Column 5. Live Bullet rating\n Column 6. Online Chess rating\n Column 7. 960 rating\n Column 8. Tactics rating\n Column 9. Timeout-ratio\n Column 10. Last online\n Column 11. Member since\n Column 12. Time per move\n Column 13. Number of groups member is in\n Column 14. Points\n Column 15. Number of online chess games played\n Column 16. Number of online chess games won\n Column 17. Number of online chess games lost\n Column 18. Number of Online chess games drawn\n Column 19. Win ratio for online chess\n Column 20. Member nation (if available on members homepage)\n Column 21. If member has a custom avatar\n\nThis data can be presented and sorted using option 7 in the main script"
         elif flow == "/help 3":
-            print "\n\nSend personalized invites for one or more groups. The invites can include text (with member name and nation, to personalize the message), pictures and videos.\n\nTo use this function you need to have a text document with a comma seperated list of members in the folder called 'Data/Invite Lists'. The script sends an invite to each member in that file and creates a second file in the Invite Lists folder, with the usernames of those who has received an invite\n\n\nMembers who are present in the groups 'already invited' file will be skipped when sending invites. To block the script from inviting specific members you can add their names to the already invited file for the group in question, and they will be effectivily blocked\n\nWhen running the inviter with the option to only invite those who fill a few requirements the script will remove those who didn't fill the requirements from your invites list\n\nRequires the script to log in on chess.com, to send the invites from your account"
+            print "\n\nSend personalized invites for one or more groups. The invites can include text (with member name and nation, to personalize the message), pictures and videos.\n\nTo use this function you need to have a text document with a newline seperated list of members in the 'Data/Invite Lists' folder. The script sends an invite to each member in that file and creates a second file in the Invite Lists folder, with the usernames of those who has received an invite\n\n\nMembers who are present in the groups 'already invited' file will be skipped when sending invites. To block the script from inviting specific members you can add their names to the already invited file for the group in question, and they will be effectivily blocked\n\nWhen running the inviter with the option to only invite those who fill a few requirements the script will remove those who didn't fill the requirements from your invites list\n\nRequires the script to log in on chess.com, to send the invites from your account"
         elif flow == "/help 4":
             print "\n\nGoes through a groups finished, non thematic votechess matches and counts number of posts per member\n\nRequires the script to log in on chess.com, to acess comments in games"
         elif flow == "/help 5":
@@ -2821,7 +2840,7 @@ while pathway in (["y"]):
                 count += 1
 
             with open("Data/Invite Lists/" + flist[enterint("\nWhich file do you want to add names to: ") - 1], "ab") as f:
-                f.write(", " + raw_input("\nEnter a comma seperated list of usernames to be added: "))
+                f.write("\n" + "\n".join(raw_input("\nEnter a comma seperated list of usernames to be added: ").split(",")))
 
         else:
             inifilelist = getfilelist(".Config/Invites", ".ini")
@@ -3093,15 +3112,14 @@ while pathway in (["y"]):
 
         for target in targetlst:
             condic = configopen(".Config/Member Lists/" + target[1], True)
-            memlist = nineworker(condic["Memberslist file"], str(condic["Group ID"]), logincookie, str(condic["Encryption Key"]))
+            deserters = nineworker(condic["Memberslist file"], str(condic["Group ID"]), logincookie, str(condic["Encryption Key"]))
 
-            deserters = streplacer(str(memlist), (["'", ""], ["[", ""], ["]", ""]))
-            print "\n\n" + ltime() + "Members who are no longer in " + target[1][0:-4] + ": " + deserters
+            print "\n\n" + ltime() + "Members who are no longer in " + target[1][0:-4] + ": " + ", ".join(deserters)
+
             leftfile = condic["Members who has left invites file (optional)"]
-            if os.path.isfile(leftfile) is True and deserters != "":
-                deserters = deserters + ", "
+            if os.path.isfile(leftfile) is True and len(deserters) > 0:
                 with open(leftfile, "ab") as colfile:
-                    colfile.write(deserters)
+                    colfile.write("\n" + "\n".join(deserters))
 
     elif flow == "10":
         grcheck = raw_input("group to check: ")
