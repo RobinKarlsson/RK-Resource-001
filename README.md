@@ -74,7 +74,7 @@ Miscellaneous
 
 
 
-After adding a new group for which you wish to do invites you must create an invites message! Go to the folder /Messages/Invite Messages. There should now be two files called "{Group Name} Standard message" and "{Group Name} Deserter message".
+After adding a new group for which you wish to do invites you must create an invites message! Go to the folder /Data/Messages/Invite Messages. There should now be two files called "{Group Name} Standard message" and "{Group Name} Deserter message".
 
 The Standard message will be used for members from your standard and priority invites lists, while the deserter message will be used for members from the invites list of members who has left (to find members who has left your group use option 9 in the script, if you use the same name when adding a new group for 9 as you did for the inviter members who has left your group will be automatically added to the invites list of members who has left).
 
@@ -217,7 +217,9 @@ This data can be presented and sorted using option 7 in the main script
 
 - Min number of social points
 
-- Timeout-ratio
+- Max Timeout-ratio
+
+- Min Timeout-ratio
 
 - Time per move
 
@@ -279,4 +281,16 @@ Ratings can be Live Standard, Live Blitz, Live Bullet, Online chess, 960 or tact
 
 
 
- 18) Check network strength
+ 18) Get the 1000 latest team matches on cc sorted by size 
+
+
+
+ 19) Check groups for new timeouts 
+
+
+
+ 20) Post precofigured group notes 
+
+
+
+ 21) Check network strength
