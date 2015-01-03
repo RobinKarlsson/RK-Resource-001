@@ -2826,8 +2826,11 @@ while pathway in (["y"]):
                 flist.append(x)
                 count += 1
 
-            with open("Data/Invite Lists/" + flist[enterint("\nWhich file do you want to inspect: ") - 1], "rb") as f:
-                print f.read()
+            choiceFile = flist[enterint("\nWhich file do you want to inspect: ") - 1]
+            with open("Data/Invite Lists/" + choiceFile, "rb") as f:
+                nameList = f.read()
+            print nameList
+            print "\n\nNumber of members in list: " + str(len(nameList.split("\n"))) + "\n"    
 
         elif flow == "4":
             count = 1
@@ -2839,8 +2842,11 @@ while pathway in (["y"]):
                 flist.append(x)
                 count += 1
 
-            with open("Data/Invite Lists/" + flist[enterint("\nWhich file do you want to add names to: ") - 1], "ab") as f:
-                f.write("\n" + "\n".join(raw_input("\nEnter a comma seperated list of usernames to be added: ").split(",")))
+            groupChoice = flist[enterint("\nWhich file do you want to add names to: ") - 1]
+            newMem = raw_input("\nEnter a comma seperated list of usernames to be added: ").replace(" ", "")
+
+            with open("Data/Invite Lists/" + groupChoice, "ab") as f:
+                f.write("\n" + "\n".join(newMem.split(",")))
 
         else:
             inifilelist = getfilelist(".Config/Invites", ".ini")
