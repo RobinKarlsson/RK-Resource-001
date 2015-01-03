@@ -55,7 +55,7 @@ Step 2.
 Step 3.
 A few functions in the script requires a webdriver to function properly. The firefox driver comes with the selenium library so if you have firefox installed you're good to go.
 If you prefer chrome over firefox you can download a chromedriver from http://chromedriver.storage.googleapis.com/index.html (or for ie, http://selenium-release.storage.googleapis.com/index.html).
-Place the webdriver(s) in the folder /Webdriver/YOUR_OS/86
+Place the webdriver(s) in the folder /Data/Webdriver/YOUR_OS/86
 
 
 Step 4.
