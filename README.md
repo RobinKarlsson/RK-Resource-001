@@ -89,7 +89,7 @@ The text can include newlines, references to the members nation and name given o
 
  - /firstname = gets replaced with the firstname given on members profile, username if no name is given.
 
- - /nation = gets replaced with the members nation of origin (by modifying the file "/Invite Lists/Config/{Group Name}.ini" you can chooce what to use if member nation is international, plus set a few filters that will be used by the invites)
+ - /nation = gets replaced with the members nation of origin (by modifying the file "/.Config/Invites/{Group Name}.ini" you can chooce what to use if member nation is international, plus set a few filters that will be used by the invites)
 
  - /newline = newline... do NOT add a newline by enter unless you're done with the current section!!! use the /newline command
 
