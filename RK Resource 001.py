@@ -705,12 +705,6 @@ def pmdriver(target, choice):
             continue
         membername = "http://www.chess.com/members/view/" + membername2
 
-        browser1, response = mecopner(browser1, membername)
-        soup = BeautifulSoup(response)
-
-        if membername2 not in str(soup):
-            continue
-
         if supusr is True:
             debugout()
 
@@ -718,6 +712,16 @@ def pmdriver(target, choice):
             passmemfil = memberprocesser(True, browser1, ([membername2]), minpoints, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemin, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat)
 
             if membername2 not in passmemfil:
+                continue
+
+            browser1, response = mecopner(browser1, membername)
+            soup = BeautifulSoup(response)
+
+        else:
+            browser1, response = mecopner(browser1, membername)
+            soup = BeautifulSoup(response)
+
+            if membername2 not in str(soup):
                 continue
 
         if browserchoice == "1":
@@ -1634,12 +1638,13 @@ def inviter(targetlist, endless):
                     already_picked.append(picked)
 
             for member in already_picked:
+                if supusr is True:
+                    print "\n\tMember: '" + member + "' for '" + invgroup + "'"
                 if member in notToInvite:
                     memtinv.remove(member)
+                    if supusr is True:
+                        print "\tRemoved as per no to invite"
                     continue
-
-                browser1, response = mecopner(browser1, "http://www.chess.com/members/view/" + member)
-                soup = BeautifulSoup(response)
 
                 if supusr is True:
                     debugout()
@@ -1648,10 +1653,14 @@ def inviter(targetlist, endless):
                     try:
                         passmemfil = memberprocesser(True, browser1, ([member]), minpoints, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemin, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat)
                     except UnboundLocalError:
+                        if supusr is True:
+                            print "\tFailed filter check"
                         continue
                     if member not in passmemfil:
                         try:
                             memtinv.remove(member)
+                            if supusr is True:
+                                print "\tDidnt pass filter"
                         except Exception, errormsg:
                             print repr(errormsg)
                             print "member: '" + member + "'"
@@ -1660,7 +1669,16 @@ def inviter(targetlist, endless):
                             sys.exit()
                         continue
 
+                    if supusr is True:
+                        print "\tPassed filter"
+
+                    browser1, response = mecopner(browser1, "http://www.chess.com/members/view/" + member)
+                    soup = BeautifulSoup(response)
+
                 else:
+                    browser1, response = mecopner(browser1, "http://www.chess.com/members/view/" + member)
+                    soup = BeautifulSoup(response)
+
                     if member not in str(soup):
                         memtinv.remove(member)
                         continue
@@ -1961,6 +1979,7 @@ def acceptChallenge(browser, soup, targets):
 
                     browser.find_element_by_id("c2").click()
                     print ltime() + "  Accepted challenge from " + data[0] + " with " + data[1] + "\n\t  " + matchlink.replace('view_team_match_challenge', 'team_match')
+
                 except Exception, errormsg:
                     if supusr is True:
                         print repr(errormsg)
