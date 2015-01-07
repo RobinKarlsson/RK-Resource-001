@@ -24,7 +24,6 @@ And can thus skip step 1 - 2 in the instructions
  - GDI32.dll, C:\Windows\system32\GDI32.dll
  - VERSION.dll, C:\Windows\system32\VERSION.dll
  - ole32.dll, C:\Windows\system32\ole32.dll
- - 
 
 ===============
 
@@ -168,13 +167,13 @@ This data can be presented and sorted using option 7 in the main script
  
 
  3) Send personalized invites for one or more groups. The invites can include text (with member name and nation, to personalize the message), pictures and videos.                      
-      
 
-                                                        
+
+
  4) Goes through a groups finished, non thematic votechess matches and counts number of posts per member    
-         
 
-                                             
+
+
  5) Build an excell compatible csv file with the following data on how each member who has ever played for a group has performed in the groups team matches
 
 - Column 1. Username
@@ -226,9 +225,9 @@ This data can be presented and sorted using option 7 in the main script
 - If they have a custom avatar
 
 - Gender   
-       
 
-                                                 
+
+
  7) Presentation of csv files from option 2 and 5. Can present data from the csv files sorted by any column, compare two csv files from option 5 to see what has changed or return the username of each member in the file and present it as a comma seperated list       
 
 
