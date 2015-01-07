@@ -191,7 +191,6 @@ This data can be presented and sorted using option 7 in the main script
 - Column 7. Win ratio
 
 
-
  6) Takes a comma seperated list of members and sort out those who doesn't fill a few criterias regarding:
 
 - Min online chess rating
@@ -227,7 +226,7 @@ This data can be presented and sorted using option 7 in the main script
 - Gender   
 
 
-7) Presentation of csv files from option 2 and 5. Can present data from the csv files sorted by any column, compare two csv files from option 5 to see what has changed or return the username of each member in the file and present it as a comma seperated list       
+ 7) Presentation of csv files from option 2 and 5. Can present data from the csv files sorted by any column, compare two csv files from option 5 to see what has changed or return the username of each member in the file and present it as a comma seperated list       
 
 
  8) Send personalized notes to either a comma seperated list of members or those who are present in a set of pages. The note can include text with the members real name (or username) and nation.
