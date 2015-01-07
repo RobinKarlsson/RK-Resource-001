@@ -3,7 +3,7 @@
 # developed by Robin Karlsson
 # contact email: "r.robin.karlsson@gmail.com"
 # contact chess.com profile: "http://www.chess.com/members/view/SudoRoot"
-# version 0.9.1 Beta
+# version 0.9.1.1 Beta
 
 import os
 from os.path import isfile, join
@@ -260,6 +260,7 @@ def mecbrowser(logincookie):
     browser.set_handle_redirect(True)
     browser.set_handle_gzip(True)
     browser.set_handle_referer(True)
+    browser.set_handle_refresh(True)
     browser.set_handle_robots(False)
     browser.set_handle_refresh(mechanize._http.HTTPRefreshProcessor(), max_time=1)
     return browser
@@ -705,22 +706,17 @@ def pmdriver(target, choice):
             continue
         membername = "http://www.chess.com/members/view/" + membername2
 
+        browser1, response = mecopner(browser1, membername)
+        soup = BeautifulSoup(response)
+
         if supusr is True:
             debugout()
 
         if choice2 == "y":
-            passmemfil = memberprocesser(True, browser1, ([membername2]), minpoints, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemin, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat)
-
-            if membername2 not in passmemfil:
+            if memberprocesser(soup, minpoints, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemin, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat) is False:
                 continue
 
-            browser1, response = mecopner(browser1, membername)
-            soup = BeautifulSoup(response)
-
         else:
-            browser1, response = mecopner(browser1, membername)
-            soup = BeautifulSoup(response)
-
             if membername2 not in str(soup):
                 continue
 
@@ -814,7 +810,11 @@ def pmdriver(target, choice):
 def mecopner(browser, pointl):
     while True:
         try:
+            if supusr is True:
+                print "\tAttemting to open '" + pointl + "'"
             response = browser.open(pointl)
+            if supusr is True:
+                print "\tSuccessfully opened page"
             return browser, response
         except Exception, errormsg:
             if supusr is True:
@@ -1643,42 +1643,39 @@ def inviter(targetlist, endless):
                 if member in notToInvite:
                     memtinv.remove(member)
                     if supusr is True:
-                        print "\tRemoved as per no to invite"
+                        print "\tRemoved as per config file"
                     continue
+
+                browser1, response = mecopner(browser1, "http://www.chess.com/members/view/" + member)
+                soup = BeautifulSoup(response)
 
                 if supusr is True:
                     debugout()
 
                 if choice2 == "y" and standardlst == True:
                     try:
-                        passmemfil = memberprocesser(True, browser1, ([member]), minpoints, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemin, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat)
+                        if memberprocesser(soup, minpoints, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemin, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat) is False:
+                            try:
+                                memtinv.remove(member)
+                                if supusr is True:
+                                    print "\tDidnt pass filter"
+                            except Exception, errormsg:
+                                print repr(errormsg)
+                                print "member: '" + member + "'"
+                                print ([member])
+                                print "passmem: '" + passmemfil + "'"
+                                sys.exit()
+                            continue
+
                     except UnboundLocalError:
                         if supusr is True:
                             print "\tFailed filter check"
-                        continue
-                    if member not in passmemfil:
-                        try:
-                            memtinv.remove(member)
-                            if supusr is True:
-                                print "\tDidnt pass filter"
-                        except Exception, errormsg:
-                            print repr(errormsg)
-                            print "member: '" + member + "'"
-                            print ([member])
-                            print "passmem: '" + passmemfil + "'"
-                            sys.exit()
                         continue
 
                     if supusr is True:
                         print "\tPassed filter"
 
-                    browser1, response = mecopner(browser1, "http://www.chess.com/members/view/" + member)
-                    soup = BeautifulSoup(response)
-
                 else:
-                    browser1, response = mecopner(browser1, "http://www.chess.com/members/view/" + member)
-                    soup = BeautifulSoup(response)
-
                     if member not in str(soup):
                         memtinv.remove(member)
                         continue
@@ -2035,245 +2032,169 @@ def fileopen(filename, message):
     else:
         return msglist
 
-def memberprocesser(silent, browser, target, minpoints, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemin, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat):
-    target = streplacer(str(target), ([" ", ""], ["(", ""], [")", ""], ["]", ""], ["[", ""], ["'", ""])).split(",")
-    while "" in target:
-        target.remove("")
-    passmem = list()
-    for targetx in target:
-        if silent == False:
-            if supusr is True:
-                debugout()
+def memberprocesser(soup, minpoints, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemin, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat):
+    try:
+        if membersinceyear != "" or lastloginyear != "":
+            memsinlist = memsin(soup)
+            if memsinlist == "":
+                return False
 
-            print ltime() + "checking " + targetx
+            if lastloginyear != "":
+                lonln = memsinlist[1]
+                if datetime(lonln[0], lonln[1], lonln[2]) < datetime(lastloginyear, lastloginmonth, lastloginday):
+                    return False
 
-        browser, response = mecopner(browser, "http://www.chess.com/members/view/" + targetx)
-        try:
-            if "://www.chess.com/members/view/" not in browser.geturl():
-                continue
+        if timemax != "" or timemin != "":
+            timeoutratio = timeoutchecker(soup)
 
-            soup = BeautifulSoup(response)
-            response.close()
-            browser.clear_history()
-            gc.collect()
+            if timemax != "":
+                if timeoutratio > timemax:
+                    return False
 
-            if membersinceyear != "" or lastloginyear != "":
-                memsinlist = memsin(soup)
-                if memsinlist == "":
-                    soup.decompose()
-                    gc.collect()
-                    continue
+            if timemin != "":
+                if timeoutratio < timemin:
+                    return False
 
-                if lastloginyear != "":
-                    lonln = memsinlist[1]
-                    if datetime(lonln[0], lonln[1], lonln[2]) < datetime(lastloginyear, lastloginmonth, lastloginday):
-                        soup.decompose()
-                        gc.collect()
-                        continue
+        if timovchoicemax != "" or timovchoicemin != "":
+            timemove = TimeMoveChecker(soup)
 
-            if timemax != "" or timemin != "":
-                timeoutratio = timeoutchecker(soup)
+            if timovchoicemax != "":
+                if timemove[0] > timovchoicemax[0]:
+                    return False
 
-                if timemax != "":
-                    if timeoutratio > timemax:
-                        soup.decompose()
-                        gc.collect()
-                        continue
+                if timemove[1] > timovchoicemax[1] and timemove[0] >= timovchoicemax[0]:
+                    return False
 
-                if timemin != "":
-                    if timeoutratio < timemin:
-                        soup.decompose()
-                        gc.collect()
-                        continue
+                if timemove[2] > timovchoicemax[2] and timemove[1] >= timovchoicemax[1] and timemove[0] >= timovchoicemax[0]:
+                    return False
 
-            if timovchoicemax != "" or timovchoicemin != "":
-                timemove = TimeMoveChecker(soup)
+            if timovchoicemin != "":
+                if timemove[0] < timovchoicemin[0]:
+                    return False
 
-                if timovchoicemax != "":
-                    if timemove[0] > timovchoicemax[0]:
-                        soup.decompose()
-                        gc.collect()
-                        continue
+                if timemove[1] < timovchoicemin[1] and timemove[0] <= timovchoicemin[0]:
+                    return False
 
-                    if timemove[1] > timovchoicemax[1] and timemove[0] >= timovchoicemax[0]:
-                        soup.decompose()
-                        gc.collect()
-                        continue
+                if timemove[2] < timovchoicemin[2] and timemove[1] <= timovchoicemin[1] and timemove[0] <= timovchoicemin[0]:
+                    return False
 
-                    if timemove[2] > timovchoicemax[2] and timemove[1] >= timovchoicemax[1] and timemove[0] >= timovchoicemax[0]:
-                        soup.decompose()
-                        gc.collect()
-                        continue
+        if mingames != "" or minwinrat != "":
+            gamestat = gamestats(soup)
 
-                if timovchoicemin != "":
-                    if timemove[0] < timovchoicemin[0]:
-                        soup.decompose()
-                        gc.collect()
-                        continue
+            if mingames != "":
+                if gamestat[0] < mingames:
+                    return False
 
-                    if timemove[1] < timovchoicemin[1] and timemove[0] <= timovchoicemin[0]:
-                        soup.decompose()
-                        gc.collect()
-                        continue
+            if minwinrat != "":
+                if gamestat[1] / gamestat[0]  < float(minwinrat):
+                    return False
 
-                    if timemove[2] < timovchoicemin[2] and timemove[1] <= timovchoicemin[1] and timemove[0] <= timovchoicemin[0]:
-                        soup.decompose()
-                        gc.collect()
-                        continue
+        if membersinceyear != "":
+            memsi = memsinlist[0]
 
-            if mingames != "" or minwinrat != "":
-                gamestat = gamestats(soup)
+            if datetime(memsi[0], memsi[1], memsi[2]) > datetime(membersinceyear, membersincemonth, membersinceday):
+                return False
 
-                if mingames != "":
-                    if gamestat[0] < mingames:
-                        soup.decompose()
-                        gc.collect()
-                        continue
+        if minrat != "" or maxrat != "":
+            rating = onlratingchecker(soup)
 
-                if minwinrat != "":
-                    if gamestat[1] / gamestat[0]  < float(minwinrat):
-                        soup.decompose()
-                        gc.collect()
-                        continue
+            if minrat != "":
+                if rating < minrat:
+                    return False
 
-            if membersinceyear != "":
-                memsi = memsinlist[0]
+            if maxrat != "":
+                if rating > maxrat:
+                    return False
 
-                if datetime(memsi[0], memsi[1], memsi[2]) > datetime(membersinceyear, membersincemonth, membersinceday):
-                    soup.decompose()
-                    gc.collect()
-                    continue
+        if minranrat != "" or maxranrat != "":
+            rating = ranratingchecker(soup)
 
-            if minrat != "" or maxrat != "":
-                rating = onlratingchecker(soup)
+            if minranrat != "":
+                if rating < minranrat:
+                    return False
 
-                if minrat != "":
-                    if rating < minrat:
-                        soup.decompose()
-                        gc.collect()
-                        continue
+            if maxranrat != "":
+                if rating > maxranrat:
+                    return False
 
-                if maxrat != "":
-                    if rating > maxrat:
-                        soup.decompose()
-                        gc.collect()
-                        continue
+        if minpoints != "":
+            pts = ptscheck(soup)
 
-            if minranrat != "" or maxranrat != "":
-                rating = ranratingchecker(soup)
+            if pts < minpoints:
+                return False
 
-                if minranrat != "":
-                    if rating < minranrat:
-                        soup.decompose()
-                        gc.collect()
-                        continue
+        if maxgroup != "" or mingroup != "":
+            groupcount = groupmemlister(soup)
 
-                if maxranrat != "":
-                    if rating > maxranrat:
-                        soup.decompose()
-                        gc.collect()
-                        continue
+            if maxgroup != "":
+                if groupcount > maxgroup:
+                    return False
 
-            if minpoints != "":
-                pts = ptscheck(soup)
+            if mingroup != "":
+                if groupcount < mingroup:
+                    return False
 
-                if pts < minpoints:
-                    soup.decompose()
-                    gc.collect()
-                    continue
+        if avatarch == "y":
+            if AvatarCheck(soup) == False:
+                return False
 
-            if maxgroup != "" or mingroup != "":
-                groupcount = groupmemlister(soup)
+        if youngeryear != "" or olderyear != "":
+            birthdate = birthlister(soup)
 
-                if maxgroup != "":
-                    if groupcount > maxgroup:
-                        soup.decompose()
-                        gc.collect()
-                        continue
+            if birthdate == "":
+                return False
 
-                if mingroup != "":
-                    if groupcount < mingroup:
-                        soup.decompose()
-                        gc.collect()
-                        continue
+            while "" in birthdate:
+                birthdate.remove("")
 
-            if avatarch == "y":
-                if AvatarCheck(soup) == False:
-                    soup.decompose()
-                    gc.collect()
-                    continue
+            birthdate = [int(birthdate[2]), int(birthdate[0]), int(birthdate[1])]
 
-            if youngeryear != "" or olderyear != "":
-                birthdate = birthlister(soup)
-                if birthdate == "":
-                    soup.decompose()
-                    gc.collect()
-                    continue
+            if youngeryear != "":
+                if datetime(birthdate[0], birthdate[1], birthdate[2]) < datetime(youngeryear, youngermonth, youngerday):
+                    return False
 
-                while "" in birthdate:
-                    birthdate.remove("")
+            if olderyear != "":
+                if datetime(birthdate[0], birthdate[1], birthdate[2]) > datetime(olderyear, oldermonth, olderday):
+                    return False
 
-                birthdate = [int(birthdate[2]), int(birthdate[0]), int(birthdate[1])]
+        if heritage != "":
+            nation = nationlister(soup)
 
-                if youngeryear != "":
-                    if datetime(birthdate[0], birthdate[1], birthdate[2]) < datetime(youngeryear, youngermonth, youngerday):
-                        soup.decompose()
-                        gc.collect()
-                        continue
+            if heritage not in nation:
+                return False
 
-                if olderyear != "":
-                    if datetime(birthdate[0], birthdate[1], birthdate[2]) > datetime(olderyear, oldermonth, olderday):
-                        soup.decompose()
-                        gc.collect()
-                        continue
+        if memgender != "":
+            name = namechecker(soup)
+            if name == " ":
+                return False
 
-            if heritage != "":
-                nation = nationlister(soup)
+            name = name.split(" ")[0].lower()
+            Found = "n"
 
-                if heritage not in nation:
-                    soup.decompose()
-                    gc.collect()
-                    continue
+            if memgender == "f":
+                with open("Data/.namelists/female", "rb") as fnlist:
+                    for line in fnlist:
+                        if name in line:
+                            Found = "y"
+                            break
+            elif memgender == "m":
+                with open("Data/.namelists/male", "rb") as mnlist:
+                    for line in mnlist:
+                        if name in line:
+                            Found = "y"
+                            break
 
-            if memgender != "":
-                name = namechecker(soup)
-                if name == " ":
-                    soup.decompose()
-                    gc.collect()
-                    continue
+            if Found == "n":
+                return False
 
-                name = name.split(" ")[0].lower()
-                Found = "n"
+    except Exception, errormsg:
+        if supusr is True:
+            print repr(errormsg)
+            debugout()
+        print "\n\n" + ltime() + "skipped " + targetx + "\n\n"
+        return False
 
-                if memgender == "f":
-                    with open("Data/.namelists/female", "rb") as fnlist:
-                        for line in fnlist:
-                            if name in line:
-                                Found = "y"
-                                break
-                elif memgender == "m":
-                    with open("Data/.namelists/male", "rb") as mnlist:
-                        for line in mnlist:
-                            if name in line:
-                                Found = "y"
-                                break
-                if Found == "n":
-                    soup.decompose()
-                    gc.collect()
-                    continue
-
-            passmem.append(targetx)
-            soup.decompose()
-            gc.collect()
-
-        except Exception, errormsg:
-            if supusr is True:
-                print repr(errormsg)
-                debugout()
-            print "\n\n" + ltime() + "skipped " + targetx + "\n\n"
-            continue
-
-    return passmem
+    return True
 
 def namechecker(soup):
     for placeholder in soup.find_all("strong"):
@@ -2985,18 +2906,46 @@ while pathway in (["y"]):
             print "\n\n\nThe following members has a timeoutratio above " + str(maxtmrat) + "%: " + streplacer(str(deadbeatlist), (["'", ""], ["[", ""], ["]", ""]))
 
     elif flow == "6":
+        passmembers = list()
         membernamelist = file_or_input(False, "\n\nName of the file containing your list: ", "", "\n\nEnter list of members to check: ", "")[0]
         browser = mecbrowser("")
 
         minpoints, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemin, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat = memprmenu()
-        passmembers = memberprocesser(False, browser, membernamelist, minpoints, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemin, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat)
+
+
+        target = streplacer(str(membernamelist), ([" ", ""], ["(", ""], [")", ""], ["]", ""], ["[", ""], ["'", ""])).split(",")
+
+        while "" in target:
+            target.remove("")
+
+        for targetx in target:
+            if supusr is True:
+                debugout()
+
+            print ltime() + "checking " + targetx
+
+            browser, response = mecopner(browser, "http://www.chess.com/members/view/" + targetx)
+
+            if "://www.chess.com/members/view/" not in browser.geturl():
+                print "\n\nfailed to open page, http://www.chess.com/members/view/" + targetx
+                continue
+
+            soup = BeautifulSoup(response)
+
+            if memberprocesser(soup, minpoints, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemin, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat) is True:
+                passmembers.append(targetx)
+
+            response.close()
+            browser.clear_history()
+            soup.decompose()
+            gc.collect()
 
         choice6 = ""
         while choice6 not in (["1", "2"]):
             choice6 = raw_input("\n\nDo you wish to\n 1. Print the names of those who fill your criterias onscreen\n 2. Save them to a file\n\nEnter choice here: ")
 
         if choice6 == "1":
-            print "\n\n" + streplacer(str(passmembers), (["'", ""], ["[", ""], ["]", ""]))
+            print "\n\n" + ", ".join(passmembers)
 
         if choice6 == "2":
             memfile1 = raw_input("\nName of the file to which your list will be saved: ") + ".txt"
