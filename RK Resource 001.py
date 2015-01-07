@@ -1659,6 +1659,7 @@ def inviter(targetlist, endless):
                                 memtinv.remove(member)
                                 if supusr is True:
                                     print "\tDidnt pass filter"
+
                             except Exception, errormsg:
                                 print repr(errormsg)
                                 print "member: '" + member + "'"
@@ -1735,6 +1736,7 @@ def inviter(targetlist, endless):
 
                         browser2.find_element_by_id("c18").click()
                         memint.append(member)
+                        time.sleep(0.1)
                         break
 
                     except Exception, errormsg:
