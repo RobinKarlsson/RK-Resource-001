@@ -14,6 +14,7 @@ try:
     import mechanize
 except:
     sys.exit("\n\n\tCouln't import the mechanize library, shutting down\n\n")
+mechanize._sockettimeout._GLOBAL_DEFAULT_TIMEOUT = 100
 
 import gc
 import csv
@@ -175,15 +176,15 @@ def getOldTimeouts(groupname):
 def debugout():
     if usrsys != "Windows":
         try:
-            print "RAM usage (script): " + str(ramusage()) + " MB"
+            print "\tRAM usage (script): " + str(ramusage()) + " MB"
         except Exception, errormsg:
-            print "WARNING: Couldn't access RAM usage"
+            print "\tWARNING: Couldn't access RAM usage"
             print repr(errormsg)
 
     try:
-        print "CPU usage (system): " + str(psutil.cpu_percent()) + "%"
+        print "\tCPU usage (system): " + str(psutil.cpu_percent()) + "%"
     except Exception, errormsg:
-        print "WARNING: Couldn't access CPU usage"
+        print "\tWARNING: Couldn't access CPU usage"
         print repr(errormsg)
 
     try:
@@ -197,7 +198,7 @@ def debugout():
 
         sigstrength(template)
     except Exception, errormsg:
-        print "WARNING: Couldn't access network strength"
+        print "\tWARNING: Couldn't access network strength"
         print repr(errormsg)
 
     print "\n\n"
@@ -812,7 +813,7 @@ def mecopner(browser, pointl):
         try:
             if supusr is True:
                 print "\tAttemting to open '" + pointl + "'"
-            response = browser.open(pointl)
+            response = browser.open(pointl, timeout = 12.0)
             if supusr is True:
                 print "\tSuccessfully opened page"
             return browser, response
