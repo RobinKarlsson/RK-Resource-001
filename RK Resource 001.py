@@ -2800,10 +2800,7 @@ while pathway in (["y"]):
             newMem = raw_input("\nEnter a comma seperated list of usernames to be added: ").replace(" ", "")
 
             with open("Data/Invite Lists/" + groupChoice, "ab") as f:
-                if "," in newMem:
-                    f.write("\n" + "\n".join(newMem.split(",")))
-                else:
-                    f.write("\n" + "\n".join(newMem))
+                f.write("\n" + "\n".join(newMem.split(",")))
 
         else:
             inifilelist = getfilelist(".Config/Invites", ".ini")
