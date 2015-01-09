@@ -415,8 +415,8 @@ def turnofcomp():
             if supusr is True:
                 print repr(errormsg)
 
-    elif usrsys == "Windows":
-        os.system("shutdown -h now")
+    #elif usrsys == "Windows":
+     #   os.system("shutdown -h now")
 
     elif usrsys == "Darwin":
         try:
@@ -723,11 +723,12 @@ def pmdriver(target, choice):
 
         if browserchoice == "1":
             counter += 1
-            if counter > 70:
+            if counter > 90:
                 browser0.quit()
                 browser0, handle = pickbrowser(browserchoice, True)
                 browser0 = sellogin(Username, Password, browser0)
                 counter = 1
+
         print ltime() + "sending pm to " + membername2
 
         if not membername2 in str(soup):
@@ -759,6 +760,7 @@ def pmdriver(target, choice):
         try:
             WebDriverWait(browser0, 10).until(EC.presence_of_element_located((By.ID, "c15")))
             browser0.find_element_by_name("c15").send_keys(subject)
+
         except Exception, errormsg:
             if supusr is True:
                 print repr(errormsg)
@@ -787,6 +789,7 @@ def pmdriver(target, choice):
 
                 while True:
                     browser0 = selopner(browser0, "http://www.chess.com" + memlink)
+
                     try:
                         WebDriverWait(browser0, 10).until(EC.presence_of_element_located((By.ID, "c15")))
                         browser0.find_element_by_name("c15").send_keys(subject)
@@ -813,10 +816,14 @@ def mecopner(browser, pointl):
         try:
             if supusr is True:
                 print "\tAttemting to open '" + pointl + "'"
+
             response = browser.open(pointl, timeout = 12.0)
+
             if supusr is True:
                 print "\tSuccessfully opened page"
+
             return browser, response
+
         except Exception, errormsg:
             if supusr is True:
                 print repr(errormsg)
@@ -825,7 +832,7 @@ def mecopner(browser, pointl):
             print ltime() + "something went wrong, reopening " + pointl
             time.sleep(2)
 
-def nineworker(infile, inid, logincookie, key):
+def nineworker(infile, inid, browser, key):
     memlist = list()
     target = list()
     memlistorg = memfiop(infile, key)
@@ -833,14 +840,14 @@ def nineworker(infile, inid, logincookie, key):
     for counter in range(1, 101):
         target.append("http://www.chess.com/groups/managemembers?id=" + inid + "&page=" + str(counter))
 
-    un = memspider([target], True, mecbrowser(logincookie))
+    un = sorted(memspider([target], True, browser))
 
     for member in memlistorg:
         if member not in un:
             memlist.append(member)
 
     if len(memlist) != 0:
-        memlist = notclosedcheck(memlist)
+        memlist = notclosedcheck(memlist, browser)
 
     with open(infile, "wb") as placeholder:
         placeholder.write(com2(key, str(un).replace("'", "").replace("[", "").replace("]", ""), 256, []))
@@ -1508,7 +1515,7 @@ def inviter(targetlist, endless):
             if browserchoice == "1":
                 counter += 1
                 counted = "y"
-                if counter > 70:
+                if counter > 90:
                     browser2.quit()
                     browser2, handle = pickbrowser(browserchoice, True)
                     browser2 = sellogin(Username, Password, browser2)
@@ -1689,7 +1696,7 @@ def inviter(targetlist, endless):
                     else:
                         counter += 1
 
-                    if counter > 70:
+                    if counter > 90:
                         browser2.quit()
                         browser2, handle = pickbrowser(browserchoice, True)
                         browser2 = sellogin(Username, Password, browser2)
@@ -2469,8 +2476,7 @@ def tlstcreator():
             choice1 = raw_input("\nDo you wish to process any additional targets? (y/n): ")
     return targetlist
 
-def notclosedcheck(memlist):
-    browser = mecbrowser("")
+def notclosedcheck(memlist, browser):
     memlist2 = list()
 
     for mem in memlist:
@@ -2693,6 +2699,12 @@ while pathway in (["y"]):
             print "\n\nCount number of wins, losses and draws per opponent in a teams team match archive"
         elif flow == "/help 16":
             print "\n\nDeletes all group notes from a specified group\n\nRequires login and admin privilege to access and delete notes"
+        elif flow == "/help 17":
+            print "\n\nPassive function allowing you to set up a file of target groups and specify which group each targets open challenges should be accepted by.\n\nRequires login to scan for open challenges and to accept challenges"
+        elif flow == "/help 19":
+            print "\n\nCheck added groups for new timeouts since last run.\n\nAt first run the script collects total timeouts data for each member in all ongoing and completed matches, in subsequent runs the script scans for new timeouts and updates the stored timeouts data"
+        elif flow == "/help 20":
+            print "\n\nCreate a file where you store premade messages (one file per group), when the script run it will select and post one random message from each groups file to each group\n\nLogin required to post notes from your account"
         elif flow == "/help 21":
             print "\n\nPrints your network signal strength continuously every 0.5 seconds"
         elif flow == "/help":
@@ -2751,7 +2763,6 @@ while pathway in (["y"]):
 
         while flow not in (["1", "2", "3", "4"]):
             flow = raw_input("Would you like to\n 1. Send invites for existing groups\n 2. Add a new group\n 3. Inspect an invite list\n 4. Add names to a groups invite list\n\nMake your choice, young padawan: ")
-
         print "\n"
 
         if flow == "2":
@@ -2772,8 +2783,8 @@ while pathway in (["y"]):
             choiceFile = flist[enterint("\nWhich file do you want to inspect: ") - 1]
             with open("Data/Invite Lists/" + choiceFile, "rb") as f:
                 nameList = f.read()
-            print nameList
-            print "\n\nNumber of members in list: " + str(len(nameList.split("\n"))) + "\n"    
+            print nameList.replace("\n", ", ")
+            print "\n\nNumber of members in list: " + str(len(nameList.split("\n"))) + "\n"
 
         elif flow == "4":
             count = 1
@@ -2789,7 +2800,10 @@ while pathway in (["y"]):
             newMem = raw_input("\nEnter a comma seperated list of usernames to be added: ").replace(" ", "")
 
             with open("Data/Invite Lists/" + groupChoice, "ab") as f:
-                f.write("\n" + "\n".join(newMem.split(",")))
+                if "," in newMem:
+                    f.write("\n" + "\n".join(newMem.split(",")))
+                else:
+                    f.write("\n" + "\n".join(newMem))
 
         else:
             inifilelist = getfilelist(".Config/Invites", ".ini")
@@ -3086,10 +3100,11 @@ while pathway in (["y"]):
             targetlst = [filelist[choice - 1]]
 
         logincookie = login()
+        browser = mecbrowser(logincookie)
 
         for target in targetlst:
             condic = configopen(".Config/Member Lists/" + target[1], True)
-            deserters = nineworker(condic["Memberslist file"], str(condic["Group ID"]), logincookie, str(condic["Encryption Key"]))
+            deserters = nineworker(condic["Memberslist file"], str(condic["Group ID"]), browser, str(condic["Encryption Key"]))
 
             print "\n\n" + ltime() + "Members who are no longer in " + target[1][0:-4] + ": " + ", ".join(deserters)
 
