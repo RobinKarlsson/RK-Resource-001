@@ -3492,7 +3492,7 @@ while pathway in (["y"]):
                     note = placeholder.read()
 
                 note = [x for x in note.replace("\n\n", "\n").split("\n") if x.replace("\n", "").replace(" ", "") != ""]
-                noterandom.choice(note)
+                note = random.choice(note)
 
                 browser = selopner(browser, "http://www.chess.com/groups/notes/" + cfile[1])
                 browser.find_element_by_id("c17").send_keys(note)
