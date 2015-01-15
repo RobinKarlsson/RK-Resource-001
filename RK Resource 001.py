@@ -3494,7 +3494,7 @@ while pathway in (["y"]):
                 note = [x for x in note.replace("\n\n", "\n").split("\n") if x.replace("\n", "").replace(" ", "") != ""]
                 note = random.choice(note)
 
-                browser = selopner(browser, "http://www.chess.com/groups/notes/" + cfile[1])
+                browser = selopner(browser, "http://www.chess.com/groups/notes/" + cfile[1][: -5])
                 browser.find_element_by_id("c17").send_keys(note)
                 browser.find_element_by_id("c18").click()
 
