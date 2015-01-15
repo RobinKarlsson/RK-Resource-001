@@ -830,7 +830,7 @@ def mecopner(browser, pointl):
                 debugout()
 
             print ltime() + "something went wrong, reopening " + pointl
-            time.sleep(2)
+            time.sleep(1.5)
 
 def nineworker(infile, inid, browser, key):
     memlist = list()
