@@ -2860,7 +2860,7 @@ while pathway in (["y"]):
             joined = {}
             membernamelist = list()
 
-            outputfile = open(targetnameorgf + " " + time.strftime("%Y-%m-%d %H:%M") + ".tm.csv", "wb")
+            outputfile = open(targetnameorgf + " " + time.strftime("%Y-%m-%d %H%M") + ".tm.csv", "wb")
             csvwriter = csv.writer(outputfile, delimiter = " ", quoting=csv.QUOTE_MINIMAL)
 
             for pointer in set(tmparcount.keys())|set(winssdic.keys())|set(losedic.keys())|set(tmtimeoutcount.keys()):
