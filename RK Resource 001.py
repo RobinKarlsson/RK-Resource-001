@@ -1972,6 +1972,18 @@ def vcman(vclinklist, yourside):
     browser3.quit()
     return parmemvc
 
+def sendChallenge(browser, matchName, target, myGroup, tmDescription):
+    browser = selopner(browser, "http://www.chess.com/groups/match_challenge")
+
+    #print [o.text for o in Select(browser.find_element_by_id("c14")).options]
+    Select(browser.find_element_by_id("c14")).select_by_visible_text(myGroup)
+
+    browser.find_element_by_name("c16").send_keys(target)
+    browser.find_element_by_name("c17").send_keys(matchName)
+    browser.find_element_by_name("c18").send_keys(tmDescription)
+
+    browser.find_element_by_id("c32").click()
+
 def acceptChallenge(browser, soup, targets):
     for x in str(soup.find_all(class_ = "content left")).replace("\n", " ").split("tr class")[2:]:
         groupName = x[(x.index('</a> <a href="/groups/view/') + 27): x.index('</a></td>')].split('">')
@@ -2659,7 +2671,7 @@ while pathway in (["y"]):
         olprint2("{0: ^70}", content, "|", "|")
     olprint("|", "|", "-", 72, True)
 
-    for content in (["", "", "Options", "", "Type /help or /help <number> for more info", "Type /Upgrade to update to the latest version", "", "", "1. Extract the memberslist of one or more groups", "", "2. Build a csv file with data on a list of members", "", "3. Send invites for a group", "", "4. Posts per member in a groups finished votechess matches", "", "5. Build a csv file of a groups team match participants", "", "6. Filter a list of members for those who fill a few requirements", "", "7. Presentation of csv-files from options 2 and 5", "", "8. Send personal notes to a list of members", "", "9. Look for members who has recenty left your group", "", "10. Count number of group notes per member in the last 100 notes pages", "", "11. Build a birthday schedule for a list of members", "", "12. Send a personal message to a list of members", "", "13. Pair lists of players against each others", "", "14. Set operations on two lists", "", "15. Check a teams won/lost tm's per opponent", "", "16. Delete all group notes in a group", "", "17. Accept open challenges","", "18. Get the 1000 latest team matches on cc sorted by size", "", "19. Check groups for new timeouts", "", "20. Post precofigured group notes", "", "21. Check signal strength", "", ""]):
+    for content in (["", "", "Options", "", "Type /help or /help <number> for more info", "Type /Upgrade to update to the latest version", "", "", "1. Extract the memberslist of one or more groups", "", "2. Build a csv file with data on a list of members", "", "3. Send invites for a group", "", "4. Posts per member in a groups finished votechess matches", "", "5. Build a csv file of a groups team match participants", "", "6. Filter a list of members for those who fill a few requirements", "", "7. Presentation of csv-files from options 2 and 5", "", "8. Send personal notes to a list of members", "", "9. Look for members who has recenty left your group", "", "10. Count number of group notes per member in the last 100 notes pages", "", "11. Build a birthday schedule for a list of members", "", "12. Send a personal message to a list of members", "", "13. Pair lists of players against each others", "", "14. Set operations on two lists", "", "15. Check a teams won/lost tm's per opponent", "", "16. Delete all group notes in a group", "", "17. Accept open challenges","", "18. Get the 1000 latest team matches on cc sorted by size", "", "19. Check groups for new timeouts", "", "20. Post precofigured group notes", "", "21. Send tm challenges to a group", "", "22. Check signal strength", "", ""]):
         olprint2("{0: ^70}", content, "|", "|")
     olprint("*", "*", "-", 72, True)
 
@@ -2705,7 +2717,7 @@ while pathway in (["y"]):
             print "\n\nCheck added groups for new timeouts since last run.\n\nAt first run the script collects total timeouts data for each member in all ongoing and completed matches, in subsequent runs the script scans for new timeouts and updates the stored timeouts data"
         elif flow == "/help 20":
             print "\n\nCreate a file where you store premade messages (one file per group), when the script run it will select and post one random message from each groups file to each group\n\nLogin required to post notes from your account"
-        elif flow == "/help 21":
+        elif flow == "/help 22":
             print "\n\nPrints your network signal strength continuously every 0.5 seconds"
         elif flow == "/help":
             print "\n\n\nTo add extensions/addons to the scripts chrome or firefox browser you need to download the extension in crx format for chrome or xpi for firefox. Once the addon is downloaded, place it in the Data/Webdriver/Extensions/Chrome or Data/Webdriver/Extensions/Firefox folder.\n\nIt's recommended to use the adblock plus extension\n\n\n\n\nTo use the scripts ability to determine a members gender you will need to have a list of male and female first names in the Data/.namelists folder. male names should be stored in a file called 'male' and female names in a file called 'female'.\n\nFor best performance the names should be in the format:\nname1\nname2\nname3\netc\n\nIt's also recommended to sort the names based on how commonly they are used"
@@ -3521,6 +3533,26 @@ while pathway in (["y"]):
                     placeholder.write("\n\n" + newNote)
 
     elif flow == "21":
+        target = raw_input("Target group name: ")
+        myGroup = raw_input("Name of my group: ")
+        nbMatches = enterint("Number of challenges to send: ")
+        matchName = raw_input("Name of the match(es): ")
+        tmDescription = raw_input("Match description: ")
+
+        browserchoice = selbrowch()
+        Username = raw_input("\n\nUsername: ")
+        Password = raw_input("Password: ")
+
+        browser, handle = pickbrowser(browserchoice, True)
+        browser = sellogin(Username, Password, browser)
+
+        for count in xrange(0, nbMatches):
+            sendChallenge(browser, matchName, target, myGroup, tmDescription)
+            time.sleep(2)
+
+        browser.quit()
+
+    elif flow == "22":
         if usrsys == "Linux":
             if supusr == False:
                 template = "|{0:6}|{1:15}|{2:12}|{3:12}|"
