@@ -1488,6 +1488,20 @@ def isint(number):
     except ValueError:
         return False
 
+def ingroupcheck(browser, member, group):
+    for pagenum in range(1, 101, 1):
+        browser, response = mecopner(browser, "http://www.chess.com/groups/mygroups?username=" + member + "&page=" + str(pagenum))
+        soup = BeautifulSoup(response)
+
+        for x in soup.find_all(class_ = "bottom-8"):
+            if group == x.text:
+                return True
+
+        if "next-on" not in str(soup.find_all(class_ = "next-on")):
+            break
+
+    return False
+
 def inviter(targetlist, endless):
     invitenum = 120
     choice2 = ""
@@ -2676,7 +2690,7 @@ while pathway in (["y"]):
     olprint("*", "*", "-", 72, True)
 
     flow = ""
-    while flow not in (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "42"]):
+    while flow not in (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "42"]):
         flow = raw_input("\n\n\nEnter your choice here: ")
 
         if flow == "/help 1":
@@ -2934,10 +2948,15 @@ while pathway in (["y"]):
     elif flow == "6":
         passmembers = list()
         membernamelist = file_or_input(False, "\n\nName of the file containing your list: ", "", "\n\nEnter list of members to check: ", "")[0]
-        browser = mecbrowser("")
 
         minpoints, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemin, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat = memprmenu()
+        ingroup = raw_input("\nMember should be in group (leave empty to skip, login required!!!): ")
+        if ingroup != "":
+            logincookie = login()
+        else:
+            logincookie = ""
 
+        browser = mecbrowser(logincookie)
 
         target = streplacer(str(membernamelist), ([" ", ""], ["(", ""], [")", ""], ["]", ""], ["[", ""], ["'", ""])).split(",")
 
@@ -2959,7 +2978,11 @@ while pathway in (["y"]):
             soup = BeautifulSoup(response)
 
             if memberprocesser(soup, minpoints, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemin, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat) is True:
-                passmembers.append(targetx)
+                if ingroup != "":
+                    if ingroupcheck(browser, targetx, ingroup):
+                        passmembers.append(targetx)
+                else:
+                    passmembers.append(targetx)
 
             response.close()
             browser.clear_history()
