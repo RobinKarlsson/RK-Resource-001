@@ -1998,6 +1998,56 @@ def sendChallenge(browser, matchName, target, myGroup, tmDescription):
 
     browser.find_element_by_id("c32").click()
 
+def msgFix(content):
+    content = streplacer(content, (["\n", ""], ["<text>", "<Text>"], ["<image>", "<Image>"], ["<video>", "<Video>"]))
+    content = streplacer(content, (["<Text>", "\n<Text>\n"], ["<Image>", "\n<Image>\n"], ["<Video>", "\n<Video>\n"]))
+    content = content.split("\n")
+
+    while "" in content:
+        content.remove("")
+
+    txt = False
+    img = False
+    vid = False
+
+    count = 0
+    for part in content:
+        if part == "<Text>":
+            txt = True
+            count += 1
+            continue
+        elif part == "<Image>":
+            img = True
+            count += 1
+            continue
+        elif part == "<Video>":
+            vid = True
+            count += 1
+            continue
+
+        if txt is True:
+            txt = False
+
+        elif img is True:
+            part = streplacer(part, ([" ", ""], ["/newline", ""]))
+            if not part[0:4] == "http":
+                print "the image on line %i doesn't look like an url!" %(count + 1)
+
+            content[count] = part
+            img = False
+
+        elif vid is True:
+            part = streplacer(part, ([" ", ""], ["/newline", ""]))
+            if not part[0:4] == "http" or "www.youtube." not in part:
+                print "the video on line %i doesn't look like a youtube url!" %(count + 1)
+
+            content[count] = part
+            vid = False
+
+        count += 1
+
+    return content
+
 def acceptChallenge(browser, soup, targets):
     for x in str(soup.find_all(class_ = "content left")).replace("\n", " ").split("tr class")[2:]:
         groupName = x[(x.index('</a> <a href="/groups/view/') + 27): x.index('</a></td>')].split('">')
@@ -2685,12 +2735,12 @@ while pathway in (["y"]):
         olprint2("{0: ^70}", content, "|", "|")
     olprint("|", "|", "-", 72, True)
 
-    for content in (["", "", "Options", "", "Type /help or /help <number> for more info", "Type /Upgrade to update to the latest version", "", "", "1. Extract the memberslist of one or more groups", "", "2. Build a csv file with data on a list of members", "", "3. Send invites for a group", "", "4. Posts per member in a groups finished votechess matches", "", "5. Build a csv file of a groups team match participants", "", "6. Filter a list of members for those who fill a few requirements", "", "7. Presentation of csv-files from options 2 and 5", "", "8. Send personal notes to a list of members", "", "9. Look for members who has recenty left your group", "", "10. Count number of group notes per member in the last 100 notes pages", "", "11. Build a birthday schedule for a list of members", "", "12. Send a personal message to a list of members", "", "13. Pair lists of players against each others", "", "14. Set operations on two lists", "", "15. Check a teams won/lost tm's per opponent", "", "16. Delete all group notes in a group", "", "17. Accept open challenges","", "18. Get the 1000 latest team matches on cc sorted by size", "", "19. Check groups for new timeouts", "", "20. Post precofigured group notes", "", "21. Send tm challenges to a group", "", "22. Check signal strength", "", ""]):
+    for content in (["", "", "Options", "", "Type /help or /help <number> for more info", "Type /Upgrade to update to the latest version", "", "", "1. Extract the memberslist of one or more groups", "", "2. Build a csv file with data on a list of members", "", "3. Send invites for a group", "", "4. Posts per member in a groups finished votechess matches", "", "5. Build a csv file of a groups team match participants", "", "6. Filter a list of members for those who fill a few requirements", "", "7. Presentation of csv-files from options 2 and 5", "", "8. Send personal notes to a list of members", "", "9. Look for members who has recenty left your group", "", "10. Count number of group notes per member in the last 100 notes pages", "", "11. Build a birthday schedule for a list of members", "", "12. Send a personal message to a list of members", "", "13. Pair lists of players against each others", "", "14. Set operations on two lists", "", "15. Check a teams won/lost tm's per opponent", "", "16. Delete all group notes in a group", "", "17. Accept open challenges","", "18. Get the 1000 latest team matches on cc sorted by size", "", "19. Check groups for new timeouts", "", "20. Post precofigured group notes", "", "21. Send tm challenges to a group", "", "22. Check signal strength", "", "23. Fix formating problems in textfiles (EXPERIMENTAL)","", ""]):
         olprint2("{0: ^70}", content, "|", "|")
     olprint("*", "*", "-", 72, True)
 
     flow = ""
-    while flow not in (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "42"]):
+    while flow not in (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "42"]):
         flow = raw_input("\n\n\nEnter your choice here: ")
 
         if flow == "/help 1":
@@ -3595,6 +3645,44 @@ while pathway in (["y"]):
         while True:
             sigstrength(template)
             time.sleep(0.4)
+
+    elif flow == "23":
+        while flow not in (["1", "2"]):
+            flow = raw_input("\n\nWhat would you like to try and fix?\n 1. Invites List\n 2. Invites Message\n\nChooce wisely, monkey boy: ")
+
+        if flow == "1":
+            fileList = getfilelist("Data/Invite Lists", "")
+        elif flow == "2":
+            fileList = getfilelist("Data/Messages/Invite Messages", "")
+
+        print "\n\n"
+        for fname in fileList:
+            print "", fname[0], fname[1].replace(".ini", "")
+
+        fileChoice = enterint("which file would you like to try and automatically fix (WARNING EXPERIMENTAL! backup of your file to prevent data loss)? ")
+
+        if flow == "1":
+            myFile = "Data/Invite Lists/" + fileList[fileChoice - 1][1]
+
+            with open(myFile, "rb") as f:
+                content = f.read()
+
+            content = streplacer(content, ([" ", ""], [",", "\n"])).split("\n")
+
+            while "" in content:
+                content.remove("")
+
+        elif flow == "2":
+            myFile = "Data/Messages/Invite Messages/" + fileList[fileChoice - 1][1]
+
+            with open(myFile, "rb") as f:
+                content = f.read()
+
+            content = msgFix(content)
+
+        with open(myFile, "wb") as f:
+            f.write("\n".join(content))
+
 
     elif flow == "42":
         choice = ""
