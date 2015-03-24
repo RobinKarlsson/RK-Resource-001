@@ -715,10 +715,14 @@ def pmdriver(target, choice):
 
         if choice2 == "y":
             if memberprocesser(soup, membername2, minpoints, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemin, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat) is False:
+                if supusr is True:
+                    print "\t" + membername2 + " Didnt pass filter"
                 continue
 
         else:
             if membername2 not in str(soup):
+                if supusr is True:
+                    print "\t" + membername2 + " doesnt exist"
                 continue
 
         if browserchoice == "1":
