@@ -65,7 +65,7 @@ def csvsoworker(memlist, choicepath):
             choice = ""
             print "\n\nwhat would you like to include?"
             for counter in range(len(memlist[0])):
-                print " " + str(counter) + ". " + memlist[0][counter]
+                print " %i. %s" %(counter, memlist[0][counter])
 
             choice = raw_input("Your choice: ")
             if choice not in choicelist:
@@ -101,7 +101,7 @@ def csvsoworker(memlist, choicepath):
         for pointer in ltitle:
             count2id = str(counter)
             coulist.append(count2id)
-            print " " + count2id + ". " + pointer
+            print " %s. %s" %(count2id, pointer)
             counter += 1
 
         choice2 = ""
@@ -141,10 +141,7 @@ def csvsoworker(memlist, choicepath):
         choice2 = raw_input("\n\nGet the same list in an invites friendly format? (y/n): ")
 
         if choice2 == "y":
-            print "\n\n"
-            for cpointer in memlist2:
-                print cpointer[0] + ",",
-            print "\n"
+            print "\n\n" + ", ".join(memlist2) + "\n"
 
     elif choice == "2":
         del memlist[0]
@@ -153,12 +150,12 @@ def csvsoworker(memlist, choicepath):
         for cpointer in memlist:
             memlist2.append(cpointer[0])
 
-        print "\n\n" + streplacer(str(memlist2), (["'", ""], ["[", ""], ["]", ""]))
+        print "\n\n" + ", ".join(memlist2)
 
 def getOldTimeouts(groupname):
     timeoutsDictOld = {}
     timeoutsList = []
-    fname = "Data/.TimeoutsCheck/" + groupname
+    fname = "Data/.TimeoutsCheck/%s" %groupname
 
     if os.path.isfile(fname):
         with open(fname, "rb") as placeholder:
@@ -176,13 +173,13 @@ def getOldTimeouts(groupname):
 def debugout():
     if usrsys != "Windows":
         try:
-            print "\tRAM usage (script): " + str(ramusage()) + " MB"
+            print "\tRAM usage (script): %.2f MB" %ramusage()
         except Exception, errormsg:
             print "\tWARNING: Couldn't access RAM usage"
             print repr(errormsg)
 
     try:
-        print "\tCPU usage (system): " + str(psutil.cpu_percent()) + "%"
+        print "\tCPU usage (system): %.1f%%" %psutil.cpu_percent()
     except Exception, errormsg:
         print "\tWARNING: Couldn't access CPU usage"
         print repr(errormsg)
@@ -190,11 +187,11 @@ def debugout():
     try:
         if usrsys == "Linux":
             template = "|{0:6}|{1:9}|{2:20}|{3:7}|{4:7}|{5:8}|{6:9}|"
-            print "\n" + template.format(" Time", "Interface", "ESSID".center(20), "Sig Str", "Quality", "Sig lvl", "Frequency") + "\n" + template.format("-" * 6, "-" * 9, "-" * 20, "-" * 7, "-" * 7, "-" * 8, "-" * 9)
+            print "\n%s\n%s" %(template.format(" Time", "Interface", "ESSID".center(20), "Sig Str", "Quality", "Sig lvl", "Frequency"), template.format("-" * 6, "-" * 9, "-" * 20, "-" * 7, "-" * 7, "-" * 8, "-" * 9))
 
         elif usrsys == "Windows":
             template = "|{0:6}|{1:15}|"
-            print "\n" + template.format(" Time", "Signal Strength") + "\n" + template.format("-" * 6, "-" * 15)
+            print "\n%s\n%s" %(template.format(" Time", "Signal Strength"), template.format("-" * 6, "-" * 15))
 
         sigstrength(template)
     except Exception, errormsg:
@@ -207,23 +204,23 @@ def getmeminfo(target, filename):
     browser = mecbrowser("")
 
     memlist = list()
-    outputfile = open(filename + " " + time.strftime("%Y-%m-%d %H:%M") + ".mem.csv", "wb")
+    outputfile = open("%s %s.mem.csv" %(filename, time.strftime("%Y-%m-%d %H:%M")), "wb")
     csvwriter = csv.writer(outputfile, delimiter = " ", quoting=csv.QUOTE_MINIMAL)
     csvwriter.writerow(("Username", "Real name", "Live Standard rating", "Live Blitz rating", "Live Bullet rating", "Online rating", "960 rating", "Tactics rating", "Timeout-ratio", "Last online", "Member since", "Time/move", "Groups", "Points", "Total games", "Games won", "Games lost", "Games drawn", "Win ratio", "Nation", "Custom avatar", "Site Awards", "Tournament Trophies", "Game Trophies", "Fun Trophies"))
 
     for mem in target:
-        print ltime() + "Processing " + mem
+        print "%sProcessing %s" %(ltime(), mem)
 
         if supusr is True:
             debugout()
 
-        browser, response = mecopner(browser, "http://www.chess.com/members/view/" + mem)
+        browser, response = mecopner(browser, "http://www.chess.com/members/view/%s" %mem)
         if "://www.chess.com/members/view/" not in browser.geturl():
             continue
 
         soup = BeautifulSoup(response)
 
-        browser, response = mecopner(browser, "http://www.chess.com/members/trophy_room/" + mem)
+        browser, response = mecopner(browser, "http://www.chess.com/members/trophy_room/%s" %mem)
         awardsoup = BeautifulSoup(response)
 
         sawards, tourneytrophy, gametrophy, funtrophy = getawards(awardsoup)
@@ -275,13 +272,13 @@ def pickbrowser(browserchoice, adext):
                 for fname in os.listdir("Data/Webdriver/Extensions/Firefox"):
                     if fname.endswith(".xpi"):
                         try:
-                            fopt.add_extension(os.path.abspath("Data/Webdriver/Extensions/Firefox/" + fname))
+                            fopt.add_extension(os.path.abspath("Data/Webdriver/Extensions/Firefox/%s" %fname))
                             if "adblock" in fname:
                                 handle = True
                         except Exception, errormsg:
                             if supusr is True:
                                 print repr(errormsg)
-                            print ltime() + "Failed to load " + os.path.abspath("Data/Webdriver/Extensions/Firefox/" + fname)
+                            print "%sFailed to load %s" %(ltime(), os.path.abspath("Data/Webdriver/Extensions/Firefox/%s" %fname))
 
             try:
                 browser = webdriver.Firefox(fopt)
@@ -289,7 +286,7 @@ def pickbrowser(browserchoice, adext):
             except Exception, errormsg:
                 if supusr is True:
                     print repr(errormsg)
-                print "\n\n" + ltime() + "Failed to initiate Firefox with addons, reverting to standard\n\n"
+                print "\n\n%sFailed to initiate Firefox with addons, reverting to standard\n\n" %ltime()
                 browser = webdriver.Firefox()
             break
 
@@ -299,13 +296,13 @@ def pickbrowser(browserchoice, adext):
                 for fname in os.listdir("Data/Webdriver/Extensions/Chrome"):
                     if fname.endswith(".crx"):
                         try:
-                            copt.add_extension(os.path.abspath("Data/Webdriver/Extensions/Chrome/" + fname))
+                            copt.add_extension(os.path.abspath("Data/Webdriver/Extensions/Chrome/%s" %fname))
                             if "adblock" in fname:
                                 handle = True
                         except Exception, errormsg:
                             if supusr is True:
                                 print repr(errormsg)
-                            print ltime() + "Failed to load " + os.path.abspath("Data/Webdriver/Extensions/Chrome/" + fname)
+                            print "%sFailed to load %s" %(ltime(), os.path.abspath("Data/Webdriver/Extensions/Chrome/%s" %fname))
 
             if usrsys == "Linux":
                 chromepath = os.path.abspath("Data/Webdriver/Linux/86/chromedriver")
@@ -315,7 +312,7 @@ def pickbrowser(browserchoice, adext):
                 except Exception, errormsg:
                     if supusr is True:
                         print repr(errormsg)
-                    print "\n\n" + ltime() + "Failed to initiate Chrome with extensions, reverting to standard\n\n"
+                    print "\n\n%sFailed to initiate Chrome with extensions, reverting to standard\n\n" %ltime()
                     browser = webdriver.Chrome(chromepath)
                 break
 
@@ -349,7 +346,7 @@ def pickbrowser(browserchoice, adext):
                 browser = webdriver.Ie(os.path.abspath("Data/Webdriver/Windows/86/IEDriverServer.exe"))
                 break
 
-        browserchoice = raw_input("\nSomething went wrong, please send this to the developer: " + browserchoice + "   " + str(getplatform()) + "\n\nTry and pick another browser\n 1. Firefox\n 2. Chrome\nEnter choice: ")
+        browserchoice = raw_input("\nSomething went wrong, please send this to the developer: %s   %s\n\nTry and pick another browser\n 1. Firefox\n 2. Chrome\nEnter choice: " %(browserchoice, getplatform()))
 
     if handle == True:
         time.sleep(2)
@@ -376,7 +373,7 @@ def gettmopdata(targetname):
     pointer = 1
 
     while True:
-        browser, response = mecopner(browser, str(linkarchive) + "&page=" + str(pointer))
+        browser, response = mecopner(browser, "%s&page=%i" %(linkarchive, pointer))
 
         if supusr is True:
             debugout()
@@ -446,7 +443,7 @@ def gettmlinks(browser, targetname, stopAt):
     pointer = 1
 
     while True:
-        browser, response = mecopner(browser, str(linkarchive) + "&page=" + str(pointer))
+        browser, response = mecopner(browser, "%s&page=%i" %(linkarchive, pointer))
 
         if supusr is True:
             debugout()
@@ -465,7 +462,7 @@ def gettmlinks(browser, targetname, stopAt):
 
                 return linklist
 
-            linklist.append("http://www.chess.com" + link)
+            linklist.append("http://www.chess.com%s" %link)
 
         soup.decompose()
         response.close()
@@ -486,7 +483,7 @@ def birthdsorter(birthdaylist):
     if choice == "1":
         birthdaylist = sorted(birthdaylist)
         for element in birthdaylist:
-            print str(element[1]) + "/" + str(element[0]) + " - " + element[3] + ", born " + str(element[2])
+            print "%i/%i - %s, born %i" %(element[1], element[0], element[3], element[2])
 
 def getvclinks(yourside):
     linklist = list()
@@ -495,11 +492,11 @@ def getvclinks(yourside):
     browser = mecbrowser("")
 
     for pagenum in range(1, 101):
-        browser, response = mecopner(browser, "http://www.chess.com/groups/votechess_diagrams/" + yourside + "/?sortby=completed&page=" + str(pagenum))
+        browser, response = mecopner(browser, "http://www.chess.com/groups/votechess_diagrams/%s/?sortby=completed&page=%i" %(yourside, pagenum))
         soup = BeautifulSoup(response)
         souplinks = re.findall("/votechess/game(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", str(soup.find_all("a")))
         for link in souplinks:
-            linklist.append("http://www.chess.com" + link)
+            linklist.append("http://www.chess.com%s" %link)
 
         soupbrake = str(soup.find_all(class_ = "next-on"))
 
@@ -552,8 +549,8 @@ def noteposter(target, msg, interval, nationalt, shutdown):
         if supusr is True:
             debugout()
 
-        print ltime() + "processing: " + mem
-        browser, response = mecopner(browser, "http://www.chess.com/members/view/" + mem)
+        print "%sprocessing: %s" %(ltime(), mem)
+        browser, response = mecopner(browser, "http://www.chess.com/members/view/%s" %mem)
         soup = BeautifulSoup(response)
 
         for placeholder in soup.find_all(class_ = "flag"):
@@ -570,7 +567,7 @@ def noteposter(target, msg, interval, nationalt, shutdown):
                 if isint(name.split("_")[1]) is True:
                     name = name.split("_")[0]
 
-        browser2 = selopner(browser2, "http://www.chess.com/members/view/" + mem + "#usernotes_post")
+        browser2 = selopner(browser2, "http://www.chess.com/members/view/%s#usernotes_post" %mem)
         counter = 1
 
         while True:
@@ -583,7 +580,7 @@ def noteposter(target, msg, interval, nationalt, shutdown):
                     print repr(errormsg)
                     debugout()
                 if counter == 20:
-                    print "\n\n" + ltime() + "Skipped " + mem + "\n\n"
+                    print "\n\n%sSkipped %s\n\n" %(ltime(), mem)
                     skipped.append(mem)
                     break
                 counter += 1
@@ -619,7 +616,7 @@ def pmdriver(target, choice):
 
     if msgchoice == "1":
         msgfile = raw_input("\nName of the file containing your invites message: ")
-        msglist = fileopen("Data/Messages/" + msgfile, True)
+        msglist = fileopen("Data/Messages/%s" %msgfile, True)
 
     elif msgchoice == "2":
         choicepm = "y"
@@ -642,13 +639,13 @@ def pmdriver(target, choice):
     for content in msglist:
         if content[0] == "1":
             msglistold.append(content)
-            msgstr = msgstr + content[1]
+            msgstr = "%s%s" %(msgstr, content[1])
         elif content[0] == "2":
             msglistold.append(content)
-            msgstr = msgstr + '<img src="' + content[1] + '" />'
+            msgstr = '%s<img src="%s" />' %(msgstr, content[1])
         elif content[0] == "3":
             cont = content[1]
-            msgstr = msgstr + '<iframe width="640" height="360" src="//www.youtube.com/embed/' + cont[cont.index("atch?v=") + 7:] + '?rel=0" frameborder="0" allowfullscreen></iframe>'
+            msgstr = '%s<iframe width="640" height="360" src="//www.youtube.com/embed/%s?rel=0" frameborder="0" allowfullscreen></iframe>' %(msgstr, cont[cont.index("atch?v=") + 7:])
 
     msglist = msglistold
     del msglistold
@@ -705,7 +702,7 @@ def pmdriver(target, choice):
     for membername2 in memtpm:
         if membername2 == "":
             continue
-        membername = "http://www.chess.com/members/view/" + membername2
+        membername = "http://www.chess.com/members/view/%s" %membername2
 
         browser1, response = mecopner(browser1, membername)
         soup = BeautifulSoup(response)
@@ -716,13 +713,13 @@ def pmdriver(target, choice):
         if choice2 == "y":
             if memberprocesser(soup, membername2, minpoints, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemin, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat) is False:
                 if supusr is True:
-                    print "\t" + membername2 + " Didnt pass filter"
+                    print "\t%s Didnt pass filter" %membername2
                 continue
 
         else:
             if membername2 not in str(soup):
                 if supusr is True:
-                    print "\t" + membername2 + " doesnt exist"
+                    print "\t%s doesnt exist" %membername2
                 continue
 
         if browserchoice == "1":
@@ -733,10 +730,10 @@ def pmdriver(target, choice):
                 browser0 = sellogin(Username, Password, browser0)
                 counter = 1
 
-        print ltime() + "sending pm to " + membername2
+        print "%ssending pm to %s" %(ltime(), membername2)
 
         if not membername2 in str(soup):
-            print "\n\n" + ltime() + "Failed to open page and skipped, " + membername + "\n\n"
+            print "\n\n%sFailed to open page and skipped, %s\n\n" %(ltime(), membername)
             continue
 
         for placeholder in soup.find_all(class_ = "flag"):
@@ -758,7 +755,7 @@ def pmdriver(target, choice):
         for link in soup.find_all("a", href = True):
             if link.text == "Send a Message":
                 memlink = link["href"]
-                browser0 = selopner(browser0, "http://www.chess.com" + memlink)
+                browser0 = selopner(browser0, "http://www.chess.com%s" %memlink)
                 time.sleep(2)
 
         try:
@@ -789,10 +786,10 @@ def pmdriver(target, choice):
                 if supusr is True:
                     print repr(errormsg)
                     debugout()
-                print "\n\n" + ltime() + "Retrying " + membername2
+                print "\n\n%sRetrying %s" %(ltime(), membername2)
 
                 while True:
-                    browser0 = selopner(browser0, "http://www.chess.com" + memlink)
+                    browser0 = selopner(browser0, "http://www.chess.com%s" %memlink)
 
                     try:
                         WebDriverWait(browser0, 10).until(EC.presence_of_element_located((By.ID, "c15")))
@@ -802,7 +799,7 @@ def pmdriver(target, choice):
                         if supusr is True:
                             print repr(errormsg)
                             debugout()
-                        print ltime() + "retrying"
+                        print "%sretrying" %ltime()
 
         soup.decompose()
         response.close()
@@ -819,7 +816,7 @@ def mecopner(browser, pointl):
     while True:
         try:
             if supusr is True:
-                print "\tAttemting to open '" + pointl + "'"
+                print "\tAttemting to open '%s'" %pointl
 
             response = browser.open(pointl, timeout = 12.0)
 
@@ -833,7 +830,7 @@ def mecopner(browser, pointl):
                 print repr(errormsg)
                 debugout()
 
-            print ltime() + "something went wrong, reopening " + pointl
+            print "%ssomething went wrong, reopening %s" %(ltime(), pointl)
             time.sleep(1.5)
 
 def nineworker(infile, inid, browser, key):
@@ -842,7 +839,7 @@ def nineworker(infile, inid, browser, key):
     memlistorg = memfiop(infile, key)
 
     for counter in range(1, 101):
-        target.append("http://www.chess.com/groups/managemembers?id=" + inid + "&page=" + str(counter))
+        target.append("http://www.chess.com/groups/managemembers?id=%s&page=%i" %(inid, counter))
 
     un = sorted(memspider([target], True, browser))
 
@@ -886,7 +883,7 @@ def getTmTimouts(browser, groupname, tmpage):
                     timeouters.append([tmpage, timeouter, str(timeouts)])
 
         else:
-            sys.exit("\n\n" + ltime() + "failed to find your group!!!\n")
+            sys.exit("\n\n%sfailed to find your group!!!\n" %ltime())
     except IndexError:
         None
 
@@ -907,7 +904,7 @@ def tmparchecker(browser, pagelist, targetname):
     for page in pagelist:
         if "http://www.chess.com/groups/team_match?id=" not in page:
             continue
-        print ltime() + "processing: " + page
+        print "%sprocessing: %s" %(ltime(), page)
 
         if supusr is True:
             debugout()
@@ -927,7 +924,7 @@ def tmparchecker(browser, pagelist, targetname):
             regopen = ([int(regopen[2]), int(regopen[0]), int(regopen[1])])
             print regopen
             if datetime(regopen[0], regopen[1], regopen[2]) < datetime(tmyear, tmmonth, tmday):
-                print ltime() + page + " didn't pass the timecheck"
+                print "%s%s didn't pass the timecheck" %(ltime(), page)
                 continue
 
         soupgroup = str(soup.find_all(class_ = "default border-top alternate"))
@@ -1012,7 +1009,7 @@ def tmparchecker(browser, pagelist, targetname):
                             counter += 1
 
             else:
-                print "\n\n" + ltime() + "failed to find your group in this match: " + page + "!!!\n"
+                print "\n\n%sfailed to find your group in this match: %s!!!\n" %(ltime(), page)
 
         except IndexError:
             None
@@ -1028,8 +1025,8 @@ def latestTMsOnsite(browser):
     targetlst = []
 
     for x in xrange(1, 101):
-        targetpage = "http://www.chess.com/groups/team_matches?page=" + str(x)
-        print ltime() + "checking: " + targetpage
+        targetpage = "http://www.chess.com/groups/team_matches?page=%i" %x
+        print "%schecking: %s" %(ltime(), targetpage)
         browser, response = mecopner(browser, targetpage)
 
         soup = BeautifulSoup(response)
@@ -1071,7 +1068,7 @@ def memspider(target, silent, browser):
             p2 = str(soup.find_all(class_ = "next-on"))
 
             if silent == False:
-                print ltime() + "    " + pointer
+                print "%s    %s" %(ltime(), pointer)
 
                 if supusr is True:
                     debugout()
@@ -1107,13 +1104,13 @@ def ageproc(target):
 
     flist = []
     for targetx in target:
-        print ltime() + "checking: " + targetx
+        print "%schecking: %s" %(ltime(), targetx)
 
         if supusr is True:
             debugout()
 
         tlst = [targetx]
-        browser, response = mecopner(browser, "http://www.chess.com/members/view/" + targetx)
+        browser, response = mecopner(browser, "http://www.chess.com/members/view/%s" %targetx)
 
         if "://www.chess.com/members/view/" not in browser.geturl():
             continue
@@ -1149,22 +1146,22 @@ def createfileifmissing(filename, ismsg):
                 mfile.write("<Text>\nHello this is an example message\n<Image>\nhttp://d1lalstwiwz2br.cloudfront.net/images_users/avatars/RobinKarlsson_large.4.jpeg\n<Video>\nhttp://www.youtube.com/watch?v=GY8YBF8dHQo")
 
 def createconfig(name, ID):
-    invconpath = ".Config/Member Lists/" + name + ".ini"
+    invconpath = ".Config/Member Lists/%s.ini" %name
     if os.path.isfile(invconpath) is True:
-        membersleftinvfile = configopen(invconpath, True)["Members who has left invites file (optional)"]
+        membersleftinvfile = configopen(invconpath)["Members who has left invites file (optional)"]
     else:
-        membersleftinvfile = name + " members who has left"
+        membersleftinvfile = "%s members who has left" %name
 
-    with open(".Config/Invites/" + name + ".ini", "wb") as setupfile:
-        setupfile.write("What to use if members nation is set to International==\nMin online chess rating==\nMax online chess rating==\nMin 960 chess rating==\nMax 960 chess rating==\nMin online chess games plaid==\nMin online chess win-ratio==\nLast logged in within days==\nMember on chess.com for days==\nBorn after date (YYYY-MM-DD)==\nBorn before date (YYYY-MM-DD)==\nMax timeout-ratio allowed==\nMax number of groups member can be in==\nMin number of groups member can be in==\nMin number of activity points allowed==\nMin time/move (days-hours-minutes)==\nMax time/move (days-hours-minutes)==\nOnly invite those with a custom avatar (y/n)==\nMember should be from nation==\nGender (m/f)==\nLink to groups invite members page==http://www.chess.com/groups/invite_members?id=" + ID + "\nFile containing the main invites list==Data/Invite Lists/" + name + "\nFile containing those who should receive priority invites (circumvents filter)==Data/Invite Lists/" + name + " priority\nInvites file for those who has left the group==Data/Invite Lists/" + membersleftinvfile + "\nFile containing those who has received an invite==Data/Invite Lists/" + name + " already invited\nFile containing your invites message for members who has left your group==Data/Messages/Invite Messages/" + name + " Deserter message\nFile containing your invites message for standard and priority invites lists==Data/Messages/Invite Messages/" + name + " Standard Message\nComma seperated list of usernames that should not be invited==")
-    createfileifmissing("Data/Messages/Invite Messages/" + name + " Standard Message", True)
-    createfileifmissing("Data/Messages/Invite Messages/" + name + " Deserter message", True)
-    createfileifmissing("Data/Invite Lists/" + name + " already invited", False)
-    createfileifmissing("Data/Invite Lists/" + name + " members who has left", False)
-    createfileifmissing("Data/Invite Lists/" + name + " priority", False)
-    createfileifmissing("Data/Invite Lists/" + name, False)
+    with open(".Config/Invites/%s.ini" %name, "wb") as setupfile:
+        setupfile.write("What to use if members nation is set to International==\nMin online chess rating==\nMax online chess rating==\nMin 960 chess rating==\nMax 960 chess rating==\nMin online chess games plaid==\nMin online chess win-ratio==\nLast logged in within days==\nMember on chess.com for days==\nBorn after date (YYYY-MM-DD)==\nBorn before date (YYYY-MM-DD)==\nMax timeout-ratio allowed==\nMax number of groups member can be in==\nMin number of groups member can be in==\nMin number of activity points allowed==\nMin time/move (days-hours-minutes)==\nMax time/move (days-hours-minutes)==\nOnly invite those with a custom avatar (y/n)==\nMember should be from nation==\nGender (m/f)==\nLink to groups invite members page==http://www.chess.com/groups/invite_members?id=%i\nFile containing the main invites list==Data/Invite Lists/%s\nFile containing those who should receive priority invites (circumvents filter)==Data/Invite Lists/%s priority\nInvites file for those who has left the group==Data/Invite Lists/%s\nFile containing those who has received an invite==Data/Invite Lists/%s already invited\nFile containing your invites message for members who has left your group==Data/Messages/Invite Messages/%s Deserter message\nFile containing your invites message for standard and priority invites lists==Data/Messages/Invite Messages/%s Standard Message\nComma seperated list of usernames that should not be invited==" %(ID, name, name, membersleftinvfile, name, name, name))
+    createfileifmissing("Data/Messages/Invite Messages/%s Standard Message" %name, True)
+    createfileifmissing("Data/Messages/Invite Messages/%s Deserter message" %name, True)
+    createfileifmissing("Data/Invite Lists/%s already invited" %name, False)
+    createfileifmissing("Data/Invite Lists/%s members who has left" %name, False)
+    createfileifmissing("Data/Invite Lists/%s priority" %name, False)
+    createfileifmissing("Data/Invite Lists/%s" %name, False)
 
-def configopen(filename, forinvites):
+def configopen(filename):
     if os.path.isfile(filename) is True:
         if os.stat(filename).st_size > 0:
             with open(filename, "rb") as rowlist:
@@ -1185,9 +1182,9 @@ def configopen(filename, forinvites):
                     condic[data[0]] = value
                 return condic
         else:
-            sys.exit("\n\nThe file " + filename + " is empty!!!\n\n")
+            sys.exit("\n\nThe file %s is empty!!!\n\n" %filename)
     else:
-        sys.exit("\n\n" + filename + " doesn't exist!!!\n\n")
+        sys.exit("\n\n%s doesn't exist!!!\n\n" %filename)
 
 def getawards(soup):
     results = {"Site Awards": 0, "Tournament Trophies": 0, "Game Trophies": 0, "Fun Trophies": 0}
@@ -1280,7 +1277,7 @@ def remcomelem(lst1, lst2):
 def pairsorter(browser, target, choice):
     partup = list()
     for mem in target:
-        browser, response = mecopner(browser, "http://www.chess.com/members/view/" + mem)
+        browser, response = mecopner(browser, "http://www.chess.com/members/view/%s" %mem)
 
         if supusr is True:
             debugout()
@@ -1339,10 +1336,10 @@ def notesfriendscheck(tocheck, checkfor, choice):
         templst = list()
         if choice == "1":
             for count in xrange(1, 101):
-                templst.append("http://www.chess.com/members/notes/" + member + "?page=" + str(count))
+                templst.append("http://www.chess.com/members/notes/%s?page=%i" %(member, count))
         elif choice == "2":
             for count in xrange(1, 101):
-                templst.append("http://www.chess.com/home/friends?username=" + member + "&general=&name=&country=&sortby=alphabetical&page=" + str(count))
+                templst.append("http://www.chess.com/home/friends?username=%s&general=&name=&country=&sortby=alphabetical&page=%i" %(member, count))
 
         targetdic[member] = templst
 
@@ -1436,11 +1433,11 @@ def makefolder(flst):
 def gettmlinklist(targetname, browser):
     linklist = list()
 
-    browser, response = mecopner(browser, "http://www.chess.com/groups/matches/" + targetname + "?show_all_current=1")
+    browser, response = mecopner(browser, "http://www.chess.com/groups/matches/%s?show_all_current=1" %targetname)
     soup = BeautifulSoup(response)
     souplinks = re.findall("/groups/team_match(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", str(soup.find_all("a")))
     for link in souplinks:
-        linklist.append("http://www.chess.com" + link)
+        linklist.append("http://www.chess.com%s" %link)
 
     if len(linklist) == 0:
         print "\n\n\t Invalid group name!!!\n\n"
@@ -1466,7 +1463,7 @@ def selopner(browser, pointl):
                 print repr(errormsg)
                 debugout()
 
-            print ltime() + "something went wrong, reopening " + pointl
+            print "%ssomething went wrong, reopening %s" %(ltime(), pointl)
             time.sleep(2)
 
 def sellogin(Username, Password, browser):
@@ -1494,7 +1491,7 @@ def isint(number):
 
 def ingroupcheck(browser, member, group):
     for pagenum in range(1, 101, 1):
-        browser, response = mecopner(browser, "http://www.chess.com/groups/mygroups?username=" + member + "&page=" + str(pagenum))
+        browser, response = mecopner(browser, "http://www.chess.com/groups/mygroups?username=%s&page=%i" %(member, pagenum))
         soup = BeautifulSoup(response)
 
         for x in soup.find_all(class_ = "bottom-8"):
@@ -1507,7 +1504,7 @@ def ingroupcheck(browser, member, group):
     return False
 
 def inviter(targetlist, endless):
-    invitenum = 120
+    invitenum = 140
     choice2 = ""
     while choice2 not in (["y", "n"]):
         choice2 = raw_input("\n\nOnly invite those who fill a few requirements (only names from the standard list will be affected)? (y/n) ")
@@ -1539,7 +1536,7 @@ def inviter(targetlist, endless):
                     browser2 = sellogin(Username, Password, browser2)
                     counter = 1
 
-            condic = configopen(".Config/Invites/" + target, True)
+            condic = configopen(".Config/Invites/%s" %target)
             invitenum2 = invitenum
             memint = list()
 
@@ -1635,7 +1632,7 @@ def inviter(targetlist, endless):
                 deserterlst = False
 
             if len(memtinv) == 0:
-                print "\n\n" + ltime() + "Warning, empty invites list: " + infile
+                print "\n\n%sWarning, empty invites list: %s" %(ltime(), infile)
                 continue
 
             if priolst == True or standardlst == True:
@@ -1646,12 +1643,12 @@ def inviter(targetlist, endless):
             msgstr = u""
             for content in msglist:
                 if content[0] == "1":
-                    msgstr = msgstr + content[1]
+                    msgstr = "%s%s" %(msgstr, content[1])
                 elif content[0] == "2":
-                    msgstr = msgstr + '<img src="' + content[1] + '" />'
+                    msgstr = '%s<img src="%s" />' %(msgstr, content[1])
                 elif content[0] == "3":
                     cont = content[1]
-                    msgstr = msgstr + '<iframe width="640" height="360" src="//www.youtube.com/embed/' + cont[cont.index("atch?v=") + 7:] + '?rel=0" frameborder="0" allowfullscreen></iframe>'
+                    msgstr = '%s<iframe width="640" height="360" src="//www.youtube.com/embed/%s?rel=0" frameborder="0" allowfullscreen></iframe>' %(msgstr, cont[cont.index("atch?v=") + 7:])
 
             already_picked = list()
             if invitenum2 > len(memtinv):
@@ -1665,14 +1662,14 @@ def inviter(targetlist, endless):
 
             for member in already_picked:
                 if supusr is True:
-                    print "\n\tMember: '" + member + "' for '" + invgroup + "'"
+                    print "\n\tMember: '%s' for '%s'" %(member, invgroup)
                 if member in notToInvite:
                     memtinv.remove(member)
                     if supusr is True:
                         print "\tRemoved as per config file"
                     continue
 
-                browser1, response = mecopner(browser1, "http://www.chess.com/members/view/" + member)
+                browser1, response = mecopner(browser1, "http://www.chess.com/members/view/%s" %member)
                 soup = BeautifulSoup(response)
 
                 if supusr is True:
@@ -1688,10 +1685,10 @@ def inviter(targetlist, endless):
 
                             except Exception, errormsg:
                                 print repr(errormsg)
-                                print "member: '" + member + "'"
+                                print "member: '%s'" %member
                                 print ([member])
-                                print "passmem: '" + passmemfil + "'"
-                                sys.exit()
+                                print "passmem: '%s'" %passmemfil
+                                sys.exit("Send above to the developer!!!")
                             continue
 
                     except UnboundLocalError:
@@ -1749,7 +1746,7 @@ def inviter(targetlist, endless):
 
                 while True:
                     try:
-                        print "\n" + ltime() + "Inviting " + member + " to " + invgroup
+                        print "\n%sInviting %s to %s" %(ltime(), member, invgroup)
 
                         browser2.switch_to_frame("tinymcewindow_ifr")
                         browser2.find_element_by_id("tinymce").clear()
@@ -1770,7 +1767,7 @@ def inviter(targetlist, endless):
                             print repr(errormsg)
                             debugout()
 
-                        print "\n\n" + ltime() + "Retrying " + member + " to " + invgroup + "!!!\n\n"
+                        print "\n\n%sRetrying %s to %s!!!\n\n" %(ltime(), member, invgroup)
 
                         browser2 = selopner(browser2, groupinv)
 
@@ -1819,7 +1816,7 @@ def filtmcemsgold(msglist, browser, name, country, browserchoice):
                     if supusr is True:
                         print repr(errormsg)
                         debugout()
-                    print "\n\n" + ltime() + "refreshing page\n\n"
+                    print "\n\n%srefreshing page\n\n" %ltime()
                     browser.refresh()
 
             browser.switch_to_window(browser.window_handles[0])
@@ -1845,7 +1842,7 @@ def vcman(vclinklist, yourside):
     oldnames = ([yourside])
 
     for vcmatch in vclinklist:
-        print "\n\n" + ltime() + "Checking match number " + str(vclinklist.index(vcmatch)) + " of " + str(numgames) + "\n\n"
+        print "\n\n%sChecking match number %i of %i\n\n" %(ltime(), vclinklist.index(vcmatch), numgames)
         skipmatch = False
         counter = 0
         movelist = list()
@@ -1858,13 +1855,13 @@ def vcman(vclinklist, yourside):
 
             except:
                 counter += 1
-                if counter == 10:
+                if counter == 15:
                     skipmatch = True
                     break
-                print "\n\n" + ltime() + "Reopening " + vcmatch + "\n\n"
+                print "\n\n%sReopening %s\n\n" %(ltime(), vcmatch)
 
         if skipmatch == True:
-            print"\n\n\n" + ltime()+ "Failed to load page and therefore skipped the match,  " + vcmatch + "\n\n\n"
+            print"\n\n\n%sFailed to load page and therefore skipped the match, %s\n\n\n" %(ltime(), vcmatch)
             continue
 
         browser3.find_element_by_id("c33").click()
@@ -1874,7 +1871,7 @@ def vcman(vclinklist, yourside):
         soup = BeautifulSoup(response)
 
         if '      initialSetup: "",' not in str(soup):
-            print "\n\n\n" + ltime()+ "skipped " + vcmatch + "\n\n\n"
+            print "\n\n\n%sskipped %s\n\n\n" %(ltime(), vcmatch)
             continue
 
         boardpos = str(re.findall("boardFlip: (?:[a-zA-Z]|(?:%[a-fA-F]))+", str(soup.find_all(class_ = "chess_viewer")))[0]).replace("boardFlip: ", "")
@@ -1893,7 +1890,7 @@ def vcman(vclinklist, yourside):
             else:
                 yoursidechoice = ""
                 while yoursidechoice not in (["1", "2"]):
-                    yoursidechoice = raw_input("\n\nCan't find your group in one of the games. Please specify which group is yours\n  1. " + yourpos[0] + "\n  2. " + yourpos[1] + "\nYour group is number: ")
+                    yoursidechoice = raw_input("\n\nCan't find your group in one of the games. Please specify which group is yours\n  1. %s\n  2. %s\nYour group is number: " %(yourpos[0], yourpos[1]))
 
                     if yoursidechoice == "1":
                         yourside = yourpos[0]
@@ -1928,7 +1925,7 @@ def vcman(vclinklist, yourside):
                 movelist = movelist[1::2]
 
         for pointer in movelist:
-            print "\n" + ltime() + "checking " + pointer
+            print "\n%schecking " %(ltime(), pointer)
 
             if supusr is True:
                 debugout()
@@ -1963,7 +1960,7 @@ def vcman(vclinklist, yourside):
                         break
                     time.sleep(2)
 
-                    print "\n" + ltime() + "checking " + pointer + " page " + str(nextbtn)
+                    print "\n%schecking %s page %i" %(ltime(), pointer, nextbtn)
 
                     if supusr is True:
                         debugout()
@@ -2065,22 +2062,22 @@ def acceptChallenge(browser, soup, targets):
                     Select(browser.find_element_by_id("c1")).select_by_visible_text(data[1])
 
                     browser.find_element_by_id("c2").click()
-                    print ltime() + "  Accepted challenge from " + data[0] + " with " + data[1] + "\n\t  " + matchlink.replace('view_team_match_challenge', 'team_match')
+                    print "%s  Accepted challenge from %s with %s\n\t  %s" %(ltime(), data[0], data[1], matchlink.replace('view_team_match_challenge', 'team_match'))
 
                 except Exception, errormsg:
                     if supusr is True:
                         print repr(errormsg)
-                    print ltime() + "Failed to load " + matchlink
+                    print "%sFailed to load %s" %(ltime(), matchlink)
                     continue
 
 def getNewStopAt(browser, targetname):
-    browser, response = mecopner(browser, "http://www.chess.com/groups/matches/" + targetname + "?show_all_current=1")
+    browser, response = mecopner(browser, "http://www.chess.com/groups/matches/%s?show_all_current=1" %targetname)
     soup = BeautifulSoup(response)
     tmarchive = re.findall("/groups/team_match_archive(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", str(soup.find_all("a")))[0]
 
     soup.decompose()
 
-    browser, response = mecopner(browser, "http://www.chess.com" + tmarchive + "&page=1")
+    browser, response = mecopner(browser, "http://www.chess.com%s&page=1" %tmarchive)
 
     soup = BeautifulSoup(response)
     souplinks = re.findall("/groups/team_match(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]i|(?:%[0-9a-fA-F][0-9a-fA-F]))+", str(soup.find_all("a")))
@@ -2112,10 +2109,10 @@ def fileopen(filename, message):
                 for line in rowlist:
                     msglist.append(streplacer(line, (["\n", ""], ["<Text>", "1"], ["<Image>", "2"], ["<Video>", "3"])))
         else:
-            sys.exit("\n\nThe file " + filename + " is empty!!!\n\n")
+            sys.exit("\n\nThe file %s is empty!!!\n\n" %filename)
     else:
         open(filename, "wb").close()
-        sys.exit("\n\n" + filename + " doesn't exist, it has now been created!!!\n\n")
+        sys.exit("\n\n%s doesn't exist, it has now been created!!!\n\n" %filename)
 
     if message == True:
         return [(msglist[counter],msglist[counter + 1]) for counter in range(0, len(msglist), 2)]
@@ -2281,7 +2278,7 @@ def memberprocesser(soup, targetx, minpoints, minrat, maxrat, mingames, minwinra
         if supusr is True:
             print repr(errormsg)
             debugout()
-        print "\n\n" + ltime() + "skipped " + targetx + "\n\n"
+        print "\n\n%sskipped %s\n\n" %(ltime(), targetx)
         return False
 
     return True
@@ -2483,11 +2480,11 @@ def memremoverf(inlist, logincookie):
         choice = raw_input("\nCollect this groups memberslist from\n 1. Manage members pages (requires login)\n 2. New member pages\nEnter choice: ")
 
     if choice == "1":
-        target = "http://www.chess.com/groups/managemembers?id=" + targetID + "&page="
+        target = "http://www.chess.com/groups/managemembers?id=%s&page=" %targetID
         if logincookie == "":
             logincookie = login()
     elif choice == "2":
-        target = "http://www.chess.com/groups/membersearch?allnew=1&id=" + targetID + "&page="
+        target = "http://www.chess.com/groups/membersearch?allnew=1&id=%s&page=" %targetID
 
     for counter in range(1, 101):
         templst.append(target + str(counter))
@@ -2543,7 +2540,7 @@ def tlstcreator():
                 url1 = url1[0: url1.index("&page=")]
             stop1 = enterint("\nEnter pagenumber to end on: ")
 
-            url1 = url1 + "&page="
+            url1 = "%s&page=" %url1
             for x in range(start1, stop1 + 1):
                 tlst.append(url1 + str(x))
 
@@ -2560,7 +2557,7 @@ def notclosedcheck(memlist, browser):
     memlist2 = list()
 
     for mem in memlist:
-        browser, response = mecopner(browser, "http://www.chess.com/members/view/" + mem)
+        browser, response = mecopner(browser, "http://www.chess.com/members/view/%s" %mem)
         soup = BeautifulSoup(response)
         soupstr = str(soup)
 
@@ -2581,7 +2578,7 @@ def getgrouphome(targetlst, browser):
         browser, response = mecopner(browser, target[0])
 
         for link in browser.links(url_regex="groups/home/"):
-            grouphomelist.append("http://www.chess.com" + link.url)
+            grouphomelist.append("http://www.chess.com%s" %link.url)
 
         response.close()
         browser.clear_history()
@@ -2615,13 +2612,13 @@ def getadmins(targetlst, browser):
     return list(set(superadminlist)), list(set(adminlist))
 
 def ltime():
-    return time.strftime("%H:%M") + " "
+    return "%s " %time.strftime("%H:%M")
 
 def update001():
     scriptname = os.path.basename(sys.argv[0])
     browser = mecbrowser("")
 
-    print "\n\n" + ltime() + "Downloading file(s)"
+    print "\n\n%sDownloading file(s)" %ltime()
 
     if scriptname.endswith(".py") or scriptname.endswith(".pyc"):
 
@@ -2649,7 +2646,7 @@ def update001():
         print "\n\nWARNING: Unknown file format, aborting update\n\n"
         return
 
-    print "\n\n" + ltime() + "Update complete\n\nShutting down in:\n"
+    print "\n\n%sUpdate complete\n\nShutting down in:\n" %ltime()
 
     for timer in range(5, 0, -1):
         print timer
@@ -2669,12 +2666,12 @@ def sigstrength(template):
                     essid = line[1: line.index(":")][:20]
 
                     sigfreq = line.index("Freq")
-                    sigfreq = line[sigfreq + 5: line.index("Hz")] + "Hz"
+                    sigfreq = "%sHz" %line[sigfreq + 5: line.index("Hz")]
 
                 line = [x for x in line.split()]
 
                 sigstren = line.index("Strength")
-                sigstren = line[sigstren + 1] + "%"
+                sigstren = "%s%%" %line[sigstren + 1]
 
         cmd = subprocess.Popen(["iwconfig"], stdout = subprocess.PIPE, stderr = subprocess.STDOUT).communicate()[0]
 
@@ -2706,7 +2703,7 @@ def sigstrength(template):
 
         for line in cmd[cmd.index("SHOW INTERFACES"): cmd.index("SHOW HOSTED NETWORK")].split("\n"):
             if "Signal" in line:
-                sigstren = "Signal strength: " + line.split()[2]
+                sigstren = "Signal strength: %s" %sline.split()[2]
 
         try:
             print template.format(ltime(), sigstren.center(15))
@@ -2823,10 +2820,10 @@ while pathway in (["y"]):
             choice6 = raw_input("\n\nDo you wish to\n 1. Print the extracted names onscreen\n 2. Save them to a file\n\nEnter choice here: ")
 
         if choice6 == "1":
-            print "\n\n" + un1
+            print "\n\n%s" %un1
 
         elif choice6 == "2":
-            memfile1 = raw_input("\nName of the file to which your list will be saved: ") + ".txt"
+            memfile1 = "%s.txt" %raw_input("\nName of the file to which your list will be saved: ")
             with open(memfile1, "ab") as placeholder2:
                 placeholder2.write(un1)
 
@@ -2841,14 +2838,14 @@ while pathway in (["y"]):
     elif flow == "3":
         flow = ""
 
-        while flow not in (["1", "2", "3", "4"]):
-            flow = raw_input("Would you like to\n 1. Send invites for existing groups\n 2. Add a new group\n 3. Inspect an invite list\n 4. Add names to a groups invite list\n\nMake your choice, young padawan: ")
+        while flow not in (["1", "2", "3", "4", "5"]):
+            flow = raw_input("Would you like to\n 1. Send invites for existing groups\n 2. Add a new group\n 3. Inspect an invite list\n 4. Add names to a groups invite list\n 5. Modify a groups configuration file\n\nMake your choice, young padawan: ")
         print "\n"
 
         if flow == "2":
             name = raw_input("\n\nGroup name: ")
-            createconfig(name, str(enterint("Group ID: ")))
-            print "\n\nThe following files have been created\n\n  - /Data/Messages/Invite Messages/" + name + " Standard Message (used to invite members from the standard and VIP invites lists)\n  - /Data/Messages/Invite Messages/" + name + " Deserters Message (Used to reinvite those who have left " + name + ")\n  - Data/Invite Lists/" + name + " (main invites list)\n  - Data/Invite Lists/" + name + " priority (used for those whom you want to invite asap, circumvents any filters)\n  - Data/Invite Lists/" + name + " members who has left (here you can place members who has left " + name + " to reinvite them using the invites message from /Data/Messages/Invite Messages/" + name + " Deserters Message)\n  - Data/Invite Lists/" + name + " already invited (stores the names of those who has received an invite from the script, members in this list wont receive an invite even if their names are in the standard invites list)\n\nTo use the inviter you need to first create a invites message for the script to use and put members whom you want to invite in the invites lists\nChanges to the filter used by " + name + " can be made by modifying the file .Config/Invites/" + name + "\n\n\n\n\nNames in the priority invites list will be invited before those in the list of members who has left and the standard list, without the use of any filters. Names in the invites list of members who has left will be invited before those in the standard list and with the deserters invites message\n\n"
+            createconfig(name, enterint("Group ID: "))
+            print "\n\nThe following files have been created\n\n  - /Data/Messages/Invite Messages/%s Standard Message (used to invite members from the standard and VIP invites lists)\n  - /Data/Messages/Invite Messages/%s Deserters Message (Used to reinvite those who have left %s)\n  - Data/Invite Lists/%s (main invites list)\n  - Data/Invite Lists/%s priority (used for those whom you want to invite asap, circumvents any filters)\n  - Data/Invite Lists/%s members who has left (here you can place members who has left %s to reinvite them using the invites message from /Data/Messages/Invite Messages/%s Deserters Message)\n  - Data/Invite Lists/%s already invited (stores the names of those who has received an invite from the script, members in this list wont receive an invite even if their names are in the standard invites list)\n\nTo use the inviter you need to first create a invites message for the script to use and put members whom you want to invite in the invites lists\nChanges to the filter used by %s can be made by modifying the file .Config/Invites/%s\n\n\n\n\nNames in the priority invites list will be invited before those in the list of members who has left and the standard list, without the use of any filters. Names in the invites list of members who has left will be invited before those in the standard list and with the deserters invites message\n\n" %(name, name, name, name, name, name, name, name, name, name, name)
 
         elif flow == "3":
             count = 1
@@ -2856,15 +2853,15 @@ while pathway in (["y"]):
             for x in sorted([x for x in os.listdir("Data/Invite Lists") if isfile(join("Data/Invite Lists", x))]):
                 if x[-1] == "~":
                     continue
-                print " " + str(count) + ". " + x
+                print " %i. %s" %(count, x)
                 flist.append(x)
                 count += 1
 
             choiceFile = flist[enterint("\nWhich file do you want to inspect: ") - 1]
-            with open("Data/Invite Lists/" + choiceFile, "rb") as f:
+            with open("Data/Invite Lists/%s" %choiceFile, "rb") as f:
                 nameList = f.read()
             print nameList.replace("\n", ", ")
-            print "\n\nNumber of members in list: " + str(len(nameList.split("\n"))) + "\n"
+            print "\n\nNumber of members in list: %i\n" %len(nameList.split("\n"))
 
         elif flow == "4":
             count = 1
@@ -2872,15 +2869,42 @@ while pathway in (["y"]):
             for x in sorted([x for x in os.listdir("Data/Invite Lists") if isfile(join("Data/Invite Lists", x))]):
                 if "~" in x or "already invited" in x or "members who has left" in x:
                     continue
-                print " " + str(count) + ". " + x
+                print " %i. %s" %(count, x)
                 flist.append(x)
                 count += 1
 
             groupChoice = flist[enterint("\nWhich file do you want to add names to: ") - 1]
             newMem = raw_input("\nEnter a comma seperated list of usernames to be added: ").replace(" ", "")
 
-            with open("Data/Invite Lists/" + groupChoice, "ab") as f:
+            with open("Data/Invite Lists/%s" %groupChoice, "ab") as f:
                 f.write("\n" + "\n".join(newMem.split(",")))
+
+        elif flow == "5":
+            count = 1
+            flist = []
+            for x in sorted([x for x in os.listdir(".Config/Invites") if isfile(join(".Config/Invites", x))]):
+                print " %i. %s" %(count, x)
+                flist.append(x)
+                count += 1
+
+            groupChoice = flist[enterint("\nWhich file do you want to inspect/modify: ") - 1]
+
+            with open(".Config/Invites/%s" %groupChoice, "rb") as f:
+                conelements = f.readlines()
+
+            print "\n\n\nCurrent config file setup:\n\n"
+            count = 1
+            for x in conelements:
+                print " %i. %s" %(count, x)
+                count += 1
+
+            conelement_index = enterint("\n\nWhich one do you want to change? ") - 1
+
+            conelements[conelement_index] = "%s==%s\n" %(conelements[conelement_index].split("==")[0], raw_input("\nNew value: "))
+
+            with open(".Config/Invites/%s" %groupChoice, "wb") as f:
+                for element in conelements:
+                    f.write(element)
 
         else:
             inifilelist = getfilelist(".Config/Invites", ".ini")
@@ -2901,7 +2925,7 @@ while pathway in (["y"]):
         parmemvc = vcman(vclinklist, yourside)
 
         for key, value in sorted(parmemvc.items(), key = itemgetter(1), reverse = True):
-            print "\n" + key + " has made " + str(int(value)) + " posts"
+            print "\n%s has made %i posts" %(key, value)
 
         while flow not in (["y", "n"]):
             flow = raw_input("\n\nGet the same list in an invites friendly format? (y/n) ")
@@ -2929,8 +2953,8 @@ while pathway in (["y"]):
             while pathtm not in (["1", "2"]):
                 pathtm = raw_input("\n\n 1. Check the tm for results\n 2. Check match for members with a timeout-ratio above a specific value\nYour choice: ")
             pagelist = raw_input("team match id: ")
-            targetnameorgf = "team match: " + pagelist + " ... "
-            pagelist = (["http://www.chess.com/groups/team_match?id=" + pagelist])
+            targetnameorgf = "team match: %s ... " %pagelist
+            pagelist = (["http://www.chess.com/groups/team_match?id=%s" %pagelist])
 
         tmpar, tmtimeout, winssdic, losedic = tmparchecker(browser, pagelist, targetname)
 
@@ -2940,7 +2964,7 @@ while pathway in (["y"]):
             joined = {}
             membernamelist = list()
 
-            outputfile = open(targetnameorgf + " " + time.strftime("%Y-%m-%d %H%M") + ".tm.csv", "wb")
+            outputfile = open("%s %s.tm.csv" %(targetnameorgf, time.strftime("%Y-%m-%d %H%M")), "wb")
             csvwriter = csv.writer(outputfile, delimiter = " ", quoting=csv.QUOTE_MINIMAL)
 
             for pointer in set(tmparcount.keys())|set(winssdic.keys())|set(losedic.keys())|set(tmtimeoutcount.keys()):
@@ -2984,8 +3008,8 @@ while pathway in (["y"]):
 
             deadbeatlist = list()
             for member in tmpar:
-                print ltime() + "checking " + member
-                browser, response = mecopner(browser, "http://www.chess.com/members/view/" + member)
+                print "%schecking %s" %(ltime(), member)
+                browser, response = mecopner(browser, "http://www.chess.com/members/view/%s" %member)
                 if "://www.chess.com/members/view/" not in browser.geturl():
                     continue
                 soup = BeautifulSoup(response)
@@ -2997,7 +3021,7 @@ while pathway in (["y"]):
                 browser.clear_history()
                 gc.collect()
 
-            print "\n\n\nThe following members has a timeoutratio above " + str(maxtmrat) + "%: " + streplacer(str(deadbeatlist), (["'", ""], ["[", ""], ["]", ""]))
+            print "\n\n\nThe following members has a timeoutratio above %i%%: %s" %(maxtmrat, ", ".join(deadbeatlist))
 
     elif flow == "6":
         passmembers = list()
@@ -3021,12 +3045,12 @@ while pathway in (["y"]):
             if supusr is True:
                 debugout()
 
-            print ltime() + "checking " + targetx
+            print "%schecking %s" %(ltime(), targetx)
 
-            browser, response = mecopner(browser, "http://www.chess.com/members/view/" + targetx)
+            browser, response = mecopner(browser, "http://www.chess.com/members/view/%s" %targetx)
 
             if "://www.chess.com/members/view/" not in browser.geturl():
-                print "\n\nfailed to open page, http://www.chess.com/members/view/" + targetx
+                print "\n\nfailed to open page, http://www.chess.com/members/view/%s" %targetx
                 continue
 
             soup = BeautifulSoup(response)
@@ -3071,13 +3095,13 @@ while pathway in (["y"]):
             if choicepath == "1":
                 if fname.endswith(".tm.csv"):
                     flist.append(fname)
-                    print " " + str(counter3) + ". " + fname
+                    print " %i. %s" %(counter3, fname)
                     clist.append(str(counter3))
                     counter3 += 1
             elif choicepath == "2":
                 if fname.endswith(".mem.csv"):
                     flist.append(fname)
-                    print " " + str(counter3) + ". " + fname
+                    print " %i. %s" %(counter3, fname)
                     clist.append(str(counter3))
                     counter3 += 1
 
@@ -3142,7 +3166,7 @@ while pathway in (["y"]):
 
     elif flow == "8":
         target = file_or_input(False, "\n\nName of the file containing your list of members: ", "", "\n\nEnter list of members to send notes: ", "")[0]
-        print "\n\nYou have entered " + str(len(target)) + " names\n\n"
+        print "\n\nYou have entered %i names\n\n" %len(target)
         msg = raw_input("\n\nEnter message to use (available commands: /name = member name or username, /firstname - member first name or username (if no name is available), /nation = member nation): ")
         nationalt = raw_input("\nWhat to use if member nation is international? ")
         interval = enterint("Interval between notes (s): ")
@@ -3161,17 +3185,17 @@ while pathway in (["y"]):
             name = raw_input("\n\nGroup name: ")
             Key = raw_input("Encryption key: ")
 
-            invconpath = ".Config/Invites/" + name + ".ini"
+            invconpath = ".Config/Invites/%s.ini" %name
             membersleftinvfile = "\nMembers who has left invites file (optional)=="
             if os.path.isfile(invconpath) is True:
-                membersleftinvfile = membersleftinvfile + configopen(invconpath, True)["Invites file for those who has left the group"]
+                membersleftinvfile = membersleftinvfile + configopen(invconpath)["Invites file for those who has left the group"]
             else:
-                membersleftinvfile = membersleftinvfile + "Data/Invite Lists/" + name + " members who has left"
+                membersleftinvfile = "%sData/Invite Lists/%s members who has left" %(membersleftinvfile, name)
 
-            with open(".Config/Member Lists/" + name + ".ini", "wb") as setupfile:
-                setupfile.write("Group ID==" + str(enterint("Group ID: ")) + "\nEncryption Key==" + Key + "\nMemberslist file==Data/.Member Lists/" + name + membersleftinvfile)
+            with open(".Config/Member Lists/%s.ini" %name, "wb") as setupfile:
+                setupfile.write("Group ID==%i\nEncryption Key==%s\nMemberslist file==Data/.Member Lists/%s%s" %(enterint("Group ID: "), Key, name, membersleftinvfile))
 
-            print "\n\nThe following files have been created\n\n  - /Data/Messages/Invite Messages/" + name + " Standard Message (used to invite members from the standard and VIP invites lists)\n  - /Data/Messages/Invite Messages/" + name + " Deserters Message (Used to reinvite those who have left " + name + ")\n  - Data/Invite Lists/" + name + " (main invites list)\n  - Data/Invite Lists/" + name + " priority (used for those whom you want to invite asap, circumvents any filters)\n  - Data/Invite Lists/" + name + " members who has left (here you can place members who has left " + name + " to reinvite them using the invites message from /Data/Messages/Invite Messages/" + name + " Deserters Message)\n  - Data/Invite Lists/" + name + " already invited (stores the names of those who has received an invite from the script, members in this list wont receive an invite even if their names are in the standard invites list)\n\nTo use the inviter you need to first create a invites message for the script to use and put members whom you want to invite in the invites lists\nChanges to the filter used by " + name + " can be made by modifying the file .Config/Invites/" + name + "\n\n"
+            print "\n\nThe following files have been created\n\n  - /Data/Messages/Invite Messages/%s Standard Message (used to invite members from the standard and VIP invites lists)\n  - /Data/Messages/Invite Messages/%s Deserters Message (Used to reinvite those who have left %s)\n  - Data/Invite Lists/%s (main invites list)\n  - Data/Invite Lists/%s priority (used for those whom you want to invite asap, circumvents any filters)\n  - Data/Invite Lists/%s members who has left (here you can place members who has left %s to reinvite them using the invites message from /Data/Messages/Invite Messages/%s Deserters Message)\n  - Data/Invite Lists/%s already invited (stores the names of those who has received an invite from the script, members in this list wont receive an invite even if their names are in the standard invites list)\n\nTo use the inviter you need to first create a invites message for the script to use and put members whom you want to invite in the invites lists\nChanges to the filter used by %s can be made by modifying the file .Config/Invites/%s\n\n" %(name, name, name, name, name, name, name, name, name, name, name)
             continue
 
         filelist = getfilelist(".Config/Member Lists", ".ini")
@@ -3189,10 +3213,10 @@ while pathway in (["y"]):
         browser = mecbrowser(logincookie)
 
         for target in targetlst:
-            condic = configopen(".Config/Member Lists/" + target[1], True)
+            condic = configopen(".Config/Member Lists/%s" %target[1])
             deserters = nineworker(condic["Memberslist file"], str(condic["Group ID"]), browser, str(condic["Encryption Key"]))
 
-            print "\n\n" + ltime() + "Members who are no longer in " + target[1][0:-4] + ": " + ", ".join(deserters)
+            print "\n\n%sMembers who are no longer in %s: %s" %(ltime(), target[1][0:-4], ", ".join(deserters))
 
             leftfile = condic["Members who has left invites file (optional)"]
             if os.path.isfile(leftfile) is True and len(deserters) > 0:
@@ -3203,7 +3227,7 @@ while pathway in (["y"]):
         grcheck = raw_input("group to check: ")
         grcheck = re.sub(r"[^a-z A-Z 0-9 -]","", grcheck)
         grcheck = grcheck.replace(" ", "-").lower()
-        grcheck = "http://www.chess.com/groups/notes/" + grcheck + "?page="
+        grcheck = "http://www.chess.com/groups/notes/%s?page=" %grcheck
         logincookie = login()
 
         browser = mecbrowser(logincookie)
@@ -3243,7 +3267,7 @@ while pathway in (["y"]):
         sorteddic = OrderedDict(sorted(notedic.items(), key = lambda x: x[1], reverse = True))
 
         for nam, num in sorteddic.items():
-            print nam + " has made " + str(num) + " notes"
+            print "%s has made %i notes" %(nam, num)
 
         while flow not in (["y", "n"]):
             flow = raw_input("\n\nGet the same list in an invites friendly format? (y/n) ")
@@ -3251,7 +3275,7 @@ while pathway in (["y"]):
         if flow == "y":
             print "\n\n"
             for nam, num in sorteddic.items():
-                print nam + ",",
+                print "%s," %nam,
             print "\n"
 
     elif flow == "11":
@@ -3275,11 +3299,11 @@ while pathway in (["y"]):
 
         elif gchoice == "2":
             name1org = raw_input("Name of group 1: ")
-            target1 = file_or_input(False, "\n\nName of the file containing " + name1org + "'s players: ", "", "\n\nEnter " + name1org + "'s list of players: ", "")[0]
+            target1 = file_or_input(False, "\n\nName of the file containing %s's players: " %name1org, "", "\n\nEnter %s's list of players: " %name1org, "")[0]
             while "" in target1:
                 target1.remove("")
             name2org = raw_input("Name of group 2: ")
-            target2 = file_or_input(False, "\n\nName of the file containing " + name2org + "'s players: ", "", "\n\nEnter " + name2org + "'s list of players: ", "")[0]
+            target2 = file_or_input(False, "\n\nName of the file containing %s's players: " %name2org, "", "\n\nEnter %s's list of players: " %name2org, "")[0]
             while "" in target2:
                 target2.remove("")
 
@@ -3295,7 +3319,7 @@ while pathway in (["y"]):
             partup = pairsorter(browser, target, choice)
             partup = zip(partup, partup[1:])[::2]
             for pair in partup:
-                print pair[0][0] + " (" + str(pair[0][1]) + ") - " + pair[1][0] + " (" + str(pair[1][1]) + ")"
+                print "%s (%i) - %s (%i)" %(pair[0][0], pair[0][1], pair[1][0], pair[1][1])
 
         elif gchoice == "2":
             partup1org = pairsorter(browser, target1, choice)
@@ -3314,9 +3338,9 @@ while pathway in (["y"]):
 
             pairs = evenpairing(partup1, partup2)
 
-            print name1 + " - " + name2
+            print "%s - %s" %(name1, name2)
             for pair in pairs:
-                print pair[0][0] + " (" + str(pair[0][1]) + ") - " + pair[1][0] + " (" + str(pair[1][1]) + ")"
+                print "%s (%i) - %s (%i)" %(pair[0][0], pair[0][1], pair[1][0], pair[1][1])
 
     elif flow == "14":
         choice = ""
@@ -3346,7 +3370,7 @@ while pathway in (["y"]):
             choice6 = raw_input("\n\nDo you wish to\n 1. Print the data onscreen\n 2. Save it to a file\n\nEnter choice here: ")
 
         if choice6 == "1":
-            print "\n\n" + prlst
+            print "\n\n%s" %prlst
 
         elif choice6 == "2":
             sfile = raw_input("\nName of the file to which your list will be saved: ") + ".txt"
@@ -3408,8 +3432,8 @@ while pathway in (["y"]):
         else:
             parttup = sorted(parttup, reverse = True, key = lambda tup: tup[int(prchoice) - 1])
 
-        template = "|{0:" + str(width) + "}|{1:6}|{2:6}|{3:6}|{4:6}|"
-        print "\n\n\n" + template.format(" Opponent name", "Won", "Lost", "Draw", "Total") + "\n" + template.format("-" * width, "-" * 6, "-" * 6, "-" * 6, "-" * 6)
+        template = "|{0:%i}|{1:6}|{2:6}|{3:6}|{4:6}|" %width
+        print "\n\n\n%s\n%s" %(template.format(" Opponent name", "Won", "Lost", "Draw", "Total"), template.format("-" * width, "-" * 6, "-" * 6, "-" * 6, "-" * 6))
         for tm in parttup:
             print template.format(tm[0], tm[1], tm[2], tm[3], tm[4])
 
@@ -3430,7 +3454,7 @@ while pathway in (["y"]):
         browser = sellogin(Username, Password, browser)
 
         while True:
-            browser = selopner(browser, "http://www.chess.com/groups/notes/" + gname)
+            browser = selopner(browser, "http://www.chess.com/groups/notes/%s" %gname)
 
             if supusr is True:
                 debugout()
@@ -3471,7 +3495,7 @@ while pathway in (["y"]):
 
             print "\nCurrent targets in config file:"
             for x in targets:
-                print " - Open challenges from " + x[0] + " will be accepted by " + x[1]
+                print " - Open challenges from %s will be accepted by %s" %(x[0], x[1])
 
             if flow == "3":
                 while True:
@@ -3479,7 +3503,7 @@ while pathway in (["y"]):
                     if flow == "n":
                         break
                     with open(".Config/17", "ab") as placeholder:
-                        placeholder.write("\n\n" + raw_input("Name of target group: ") + "\n" + raw_input("Name of the group you want to accept with: "))
+                        placeholder.write("\n\n%s\n%s" %(raw_input("Name of target group: "), raw_input("Name of the group you want to accept with: ")))
                 continue
 
         browserchoice = selbrowch()
@@ -3502,7 +3526,7 @@ while pathway in (["y"]):
 
     elif flow == "18":
         for x in latestTMsOnsite(mecbrowser("")):
-            print x[0], "vs", x[1], ":", x[2], "players, score:", x[3], ". link: ", x[4], "\n"
+            print "%s vs %s : %s players, score: %s. link: %s\n" %(x[0], x[1], x[2], x[3], x[4])
 
     elif flow == "19":
         while flow not in (["1", "2"]):
@@ -3514,7 +3538,7 @@ while pathway in (["y"]):
 
             for cfile in inifilelist:
                 timeoutsList = []
-                condic = configopen(".Config/TimeoutsCheck/" + cfile[1], False)
+                condic = configopen(".Config/TimeoutsCheck/%s" %cfile[1])
 
                 groupnameorg = cfile[1].replace(".ini", "")
                 groupname = condic["Group name"]
@@ -3540,25 +3564,25 @@ while pathway in (["y"]):
                 newResults, timeoutsDictNew = compareOldNew(timeoutsListOld, timeoutsList)
                 timeoutsDictFull = Counter(timeoutsDictFull) + Counter(timeoutsDictNew)
 
-                print "\n\n\n\n\t\t\t" + groupnameorg + "\n"
-                print "".join(element.ljust(31) for element in ["Member name", "Timeouts " + lastCheck + " - " + time.strftime("%d/%m"), "Timeouts total"])
+                print "\n\n\n\n\t\t\t%s\n" %groupnameorg
+                print "".join(element.ljust(31) for element in ["Member name", "Timeouts %s - %s" %(lastCheck, time.strftime("%d/%m")), "Timeouts total"])
                 for member, timeouts in sorted(timeoutsDictNew.items(), key = itemgetter(1), reverse = True):
                     print "".join(element.ljust(32) for element in [member, str(timeouts), str(timeoutsDictFull[member])])
 
-                with open("Data/.TimeoutsCheck/" + groupnameorg, "wb") as placeholder:
+                with open("Data/.TimeoutsCheck/%s" %groupnameorg, "wb") as placeholder:
                     for line in newResults:
-                        placeholder.write(line[0] + "," + line[1] + "," + line[2] + "\n")
+                        placeholder.write("%s,%s,%s\n" %(line[0], line[1], line[2]))
 
-                with open(".Config/TimeoutsCheck/" + groupnameorg + ".ini", "wb") as placeholder:
-                    placeholder.write("Group name==" + groupname + "\nLast check==" + time.strftime("%d/%m") + "\nStop at==" + newStop)
+                with open(".Config/TimeoutsCheck/%s.ini" %groupnameorg, "wb") as placeholder:
+                    placeholder.write("Group name==%s\nLast check==%s\nStop at==%s" %(groupname, time.strftime("%d/%m")), newStop)
 
         elif flow == "2":
             gnameorg = raw_input("\n\nName of the group you want to add: ")
             gname = re.sub(r"[^a-z A-Z 0-9 -]","", gnameorg)
             gname = gname.replace(" ", "-").lower()
 
-            with open(".Config/TimeoutsCheck/" + gnameorg + ".ini", "wb") as placeholder:
-                placeholder.write("Group name==" + gname + "\nLast check==" + "\nStop at==")
+            with open(".Config/TimeoutsCheck/%s.ini" %gnameorg, "wb") as placeholder:
+                placeholder.write("Group name==%s\nLast check==\nStop at==" %gname)
 
     elif flow == "20":
         while flow not in (["1", "2"]):
@@ -3577,13 +3601,13 @@ while pathway in (["y"]):
             browser = sellogin(Username, Password, browser)
 
             for cfile in inifilelist:
-                with open(".Config/Notes Poster/" + cfile[1], "rb") as placeholder:
+                with open(".Config/Notes Poster/%s" %cfile[1], "rb") as placeholder:
                     note = placeholder.read()
 
                 note = [x for x in note.replace("\n\n", "\n").split("\n") if x.replace("\n", "").replace(" ", "") != ""]
                 note = random.choice(note)
 
-                browser = selopner(browser, "http://www.chess.com/groups/notes/" + cfile[1][: -5])
+                browser = selopner(browser, "http://www.chess.com/groups/notes/%s" %cfile[1][: -5])
                 browser.find_element_by_id("c17").send_keys(note)
                 browser.find_element_by_id("c18").click()
 
@@ -3595,8 +3619,8 @@ while pathway in (["y"]):
             gname = re.sub(r"[^a-z A-Z 0-9 -]","", raw_input("\n\nName of the group you want to add/edit: "))
             gname = gname.replace(" ", "-").lower()
 
-            if not os.path.isfile(".Config/Notes Poster/" + gname + ".data"):
-                open(".Config/Notes Poster/" + gname + ".data", "wb").close()
+            if not os.path.isfile(".Config/Notes Poster/%s.data" %gname):
+                open(".Config/Notes Poster/%s.data" %gname, "wb").close()
 
             while True:
                 flow = raw_input("Add new note? (y/n) ")
@@ -3606,8 +3630,8 @@ while pathway in (["y"]):
 
                 newNote = raw_input("Enter note: ")
 
-                with open(".Config/Notes Poster/" + gname + ".data", "ab") as placeholder:
-                    placeholder.write("\n\n" + newNote)
+                with open(".Config/Notes Poster/%s.data" %gname, "ab") as placeholder:
+                    placeholder.write("\n\n%s" %newNote)
 
     elif flow == "21":
         target = raw_input("Target group name: ")
@@ -3633,17 +3657,17 @@ while pathway in (["y"]):
         if usrsys == "Linux":
             if supusr == False:
                 template = "|{0:6}|{1:15}|{2:12}|{3:12}|"
-                print "\n\n\n" + template.format(" Time", "Signal Strength", "Link Quality", "Signal Level") + "\n" + template.format("-" * 6, "-" * 15, "-" * 12, "-" * 12)
+                print "\n\n\n%s\n%s" %(template.format(" Time", "Signal Strength", "Link Quality", "Signal Level"), template.format("-" * 6, "-" * 15, "-" * 12, "-" * 12))
             else:
                 template = "|{0:6}|{1:9}|{2:20}|{3:7}|{4:7}|{5:8}|{6:9}|"
-                print "\n\n\n" + template.format(" Time", "Interface", "ESSID".center(20), "Sig Str", "Quality", "Sig lvl", "Frequency") + "\n" + template.format("-" * 6, "-" * 9, "-" * 20, "-" * 7, "-" * 7, "-" * 8, "-" * 9)
+                print "\n\n\n%s\n%s" %(template.format(" Time", "Interface", "ESSID".center(20), "Sig Str", "Quality", "Sig lvl", "Frequency"), template.format("-" * 6, "-" * 9, "-" * 20, "-" * 7, "-" * 7, "-" * 8, "-" * 9))
 
         elif usrsys == "Windows":
             template = "|{0:6}|{1:15}|"
-            print "\n\n\n" + template.format(" Time", "Signal Strength") + "\n" + template.format("-" * 6, "-" * 15)
+            print "\n\n\n%s\n%s" %( template.format(" Time", "Signal Strength"), template.format("-" * 6, "-" * 15))
 
         else:
-            print "\n\nUnfortunately this option is currently not suported on " + usrsys
+            print "\n\nUnfortunately this option is currently not suported on %s" %usrsys
             continue
 
         while True:
@@ -3666,7 +3690,7 @@ while pathway in (["y"]):
         fileChoice = enterint("which file would you like to try and automatically fix (WARNING EXPERIMENTAL! backup of your file to prevent data loss)? ")
 
         if flow == "1":
-            myFile = "Data/Invite Lists/" + fileList[fileChoice - 1][1]
+            myFile = "Data/Invite Lists/%s" %fileList[fileChoice - 1][1]
 
             with open(myFile, "rb") as f:
                 content = f.read()
@@ -3677,7 +3701,7 @@ while pathway in (["y"]):
                 content.remove("")
 
         elif flow == "2":
-            myFile = "Data/Messages/Invite Messages/" + fileList[fileChoice - 1][1]
+            myFile = "Data/Messages/Invite Messages/%s" %fileList[fileChoice - 1][1]
 
             with open(myFile, "rb") as f:
                 content = f.read()
@@ -3699,10 +3723,10 @@ while pathway in (["y"]):
 
         print "\n\nFound in:"
         for mem in present:
-            print mem + ", ",
+            print "%s, " %mem,
         print "\n\n\nNot found in:"
         for mem in notpresent:
-            print mem + ", ",
+            print "%s, " %mem,
         print "\n"
 
     gc.collect()
