@@ -141,7 +141,7 @@ def csvsoworker(memlist, choicepath):
         choice2 = raw_input("\n\nGet the same list in an invites friendly format? (y/n): ")
 
         if choice2 == "y":
-            print "\n\n" + ", ".join(memlist2) + "\n"
+            print "\n\n" + ", ".join([x[0] for x in memlist2]) + "\n"
 
     elif choice == "2":
         del memlist[0]
@@ -2728,7 +2728,7 @@ makefolder(([".Config", ".Config/TimeoutsCheck", ".Config/Notes Poster", ".Confi
 
 while pathway in (["y"]):
     olprint("*", "*", "-", 72, True)
-    for content in (["", "", "", "RK Resource 001", "version 0.9.1 Beta", "", "", ""]):
+    for content in (["", "", "", "RK Resource 001", "version 0.9.1.2 Beta", "", "", ""]):
         olprint2("{0: ^70}", content, "|", "|")
     olprint("|", "|", "-", 72, True)
 
