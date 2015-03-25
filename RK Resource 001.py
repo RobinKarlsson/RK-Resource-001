@@ -2684,6 +2684,9 @@ def sigstrength(template):
                 quality = line.strip().split("  ")
                 level = quality[1].replace("Signal level=", "")
                 quality = quality[0].replace("Link Quality=", "")
+            else:
+                quality = "n/a"
+                level = "n/a"
 
         if supusr == False:
             try:
@@ -2736,7 +2739,7 @@ while pathway in (["y"]):
         olprint2("{0: ^70}", content, "|", "|")
     olprint("|", "|", "-", 72, True)
 
-    for content in (["", "", "Options", "", "Type /help or /help <number> for more info", "Type /Upgrade to update to the latest version", "", "", "1. Extract the memberslist of one or more groups", "", "2. Build a csv file with data on a list of members", "", "3. Send invites for a group", "", "4. Posts per member in a groups finished votechess matches", "", "5. Build a csv file of a groups team match participants", "", "6. Filter a list of members for those who fill a few requirements", "", "7. Presentation of csv-files from options 2 and 5", "", "8. Send personal notes to a list of members", "", "9. Look for members who has recenty left your group", "", "10. Count number of group notes per member in the last 100 notes pages", "", "11. Build a birthday schedule for a list of members", "", "12. Send a personal message to a list of members", "", "13. Pair lists of players against each others", "", "14. Set operations on two lists", "", "15. Check a teams won/lost tm's per opponent", "", "16. Delete all group notes in a group", "", "17. Accept open challenges","", "18. Get the 1000 latest team matches on cc sorted by size", "", "19. Check groups for new timeouts", "", "20. Post precofigured group notes", "", "21. Send tm challenges to a group", "", "22. Check signal strength", "", "23. Fix formating problems in textfiles (EXPERIMENTAL)","", ""]):
+    for content in (["", "", "Options", "", "Type /help or /help <number> for more info", "Type /Upgrade to update to the latest version", "", "", "1. Extract the memberslist of one or more groups", "", "2. Build a csv file with data on a list of members", "", "3. Send invites for a group", "", "4. Posts per member in a groups finished votechess matches", "", "5. Build a csv file of a groups team match participants", "", "6. Filter a list of members for those who fill a few requirements", "", "7. Presentation of csv-files from options 2 and 5", "", "8. Send personal notes to a list of members", "", "9. Look for members who has recenty left your group", "", "10. Count number of group notes per member in the last 100 notes pages", "", "11. Build a birthday schedule for a list of members", "", "12. Send a personal message to a list of members", "", "13. Pair lists of players against each others", "", "14. Set operations on two lists", "", "15. Check a teams won/lost tm's per opponent", "", "16. Delete all group notes in a group", "", "17. Accept open challenges","", "18. Get the 1000 latest team matches on cc sorted by size", "", "19. Check groups for new timeouts", "", "20. Post preconfigured group notes", "", "21. Send tm challenges to a group", "", "22. Check signal strength", "", "23. Fix formating problems in textfiles (EXPERIMENTAL)","", ""]):
         olprint2("{0: ^70}", content, "|", "|")
     olprint("*", "*", "-", 72, True)
 
@@ -3574,7 +3577,7 @@ while pathway in (["y"]):
                         placeholder.write("%s,%s,%s\n" %(line[0], line[1], line[2]))
 
                 with open(".Config/TimeoutsCheck/%s.ini" %groupnameorg, "wb") as placeholder:
-                    placeholder.write("Group name==%s\nLast check==%s\nStop at==%s" %(groupname, time.strftime("%d/%m")), newStop)
+                    placeholder.write("Group name==%s\nLast check==%s\nStop at==%s" %(groupname, time.strftime("%d/%m"), newStop))
 
         elif flow == "2":
             gnameorg = raw_input("\n\nName of the group you want to add: ")
