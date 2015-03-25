@@ -3,7 +3,7 @@
 # developed by Robin Karlsson
 # contact email: "r.robin.karlsson@gmail.com"
 # contact chess.com profile: "http://www.chess.com/members/view/SudoRoot"
-# version 0.9.1.1 Beta
+# version 0.9.1.2 Beta
 
 import os
 from os.path import isfile, join
