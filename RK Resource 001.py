@@ -130,7 +130,7 @@ def csvsoworker(memlist, choicepath):
             elif type(memlist2[0][choice2]) is float or type(memlist2[0][choice2]) is list:
                 memlist2 = sorted(memlist2, reverse = True, key = lambda tup: tup[choice2])
 
-        print "\n\n" + "".join(element.ljust(colwidth) for element in ltitle) + "\n"
+        print "\n\n%s\n" %"".join(element.ljust(colwidth) for element in ltitle)
         llength = len(memlist2[0])
 
         for cpointer in memlist2:
@@ -141,7 +141,7 @@ def csvsoworker(memlist, choicepath):
         choice2 = raw_input("\n\nGet the same list in an invites friendly format? (y/n): ")
 
         if choice2 == "y":
-            print "\n\n" + ", ".join([x[0] for x in memlist2]) + "\n"
+            print "\n\n%s\n" %", ".join([x[0] for x in memlist2])
 
     elif choice == "2":
         del memlist[0]
@@ -150,7 +150,7 @@ def csvsoworker(memlist, choicepath):
         for cpointer in memlist:
             memlist2.append(cpointer[0])
 
-        print "\n\n" + ", ".join(memlist2)
+        print "\n\n%s" %", ".join(memlist2)
 
 def getOldTimeouts(groupname):
     timeoutsDictOld = {}
@@ -1042,7 +1042,7 @@ def latestTMsOnsite(browser):
 
                 else:
                     content = str(content.contents[0])
-                    content = "http://www.chess.com" + content[9: content.index('"><')]
+                    content = "http://www.chess.com%s" %content[9: content.index('"><')]
                     counter = 1
 
                 targetlst.append(content)
@@ -1788,7 +1788,7 @@ def inviter(targetlist, endless):
 
             if len(memint) != 0:
                 with open(alrfile, "ab") as placeholder3:
-                    placeholder3.write("\n" + "\n".join(memint))
+                    placeholder3.write("\n%s" %"\n".join(memint))
 
     browser2.quit()
 
@@ -2055,7 +2055,7 @@ def acceptChallenge(browser, soup, targets):
 
         for data in targets:
             if data[0] in groupName:
-                matchlink = "http://www.chess.com" + x[x.index('/groups/view_team_match_challenge?id='): x.index('"><strong>View</strong>')]
+                matchlink = "http://www.chess.com%s" %x[x.index('/groups/view_team_match_challenge?id='): x.index('"><strong>View</strong>')]
                 try:
                     browser = selopner(browser, matchlink)
 
@@ -2880,7 +2880,7 @@ while pathway in (["y"]):
             newMem = raw_input("\nEnter a comma seperated list of usernames to be added: ").replace(" ", "")
 
             with open("Data/Invite Lists/%s" %groupChoice, "ab") as f:
-                f.write("\n" + "\n".join(newMem.split(",")))
+                f.write("\n%s" %"\n".join(newMem.split(",")))
 
         elif flow == "5":
             count = 1
@@ -2981,13 +2981,11 @@ while pathway in (["y"]):
             for key, value in sorted(joined.items(), key = itemgetter(1), reverse = True):
                 gamesplaid = value[3] + value[2]
 
-                try:
+                if gamesplaid != 0:
                     winrat = value[2] / gamesplaid
-                except ZeroDivisionError:
-                    winrat = 0
-                try:
                     timerat = value[4] / gamesplaid
-                except ZeroDivisionError:
+                else:
+                    winrat = 0
                     timerat = 0
 
                 csvwriter.writerow((key, value[1], value[2], value[3], value[1]*2 - value[2] - value[3], value[4], winrat, timerat))
@@ -2997,11 +2995,11 @@ while pathway in (["y"]):
 
             outputfile.close()
             try:
-                print "\n\n\nTimeouts per player (number of timeouts (" + str(timeoutnum) + ") / number of players (" + str(len(joined)) + ")): " + str((timeoutnum + 0.0) / len(joined))
+                print "\n\n\nTimeouts per player (number of timeouts (%i) / number of players (%i)): %.4f" %(timeoutnum, len(joined), (timeoutnum + 0.0) / len(joined))
             except ZeroDivisionError:
                 None
             try:
-                print "Team match points won ratio (points won (" + str(ptswon).replace(".0", "") + ") / total number of points (" + str(ptslost + ptswon).replace(".0", "") + ")): " + str((ptswon + 0.0) / (ptslost + ptswon)) + "\n\n"
+                print "Team match points won ratio (points won (%.1f) / total number of points (%.1f)): %.4f\n\n" %(ptswon, ptslost + ptswon, (ptswon + 0.0) / (ptslost + ptswon))
             except ZeroDivisionError:
                 None
 
@@ -3075,7 +3073,7 @@ while pathway in (["y"]):
             choice6 = raw_input("\n\nDo you wish to\n 1. Print the names of those who fill your criterias onscreen\n 2. Save them to a file\n\nEnter choice here: ")
 
         if choice6 == "1":
-            print "\n\n" + ", ".join(passmembers)
+            print "\n\n%s" %", ".join(passmembers)
 
         if choice6 == "2":
             memfile1 = raw_input("\nName of the file to which your list will be saved: ") + ".txt"
@@ -3156,7 +3154,7 @@ while pathway in (["y"]):
                     memlist2.append((row[0], row[ichoice]))
 
             colwidth = max(len(element) for row in memlist for element in row) + 2
-            print "\n\n" + "".join(element.ljust(colwidth) for element in (memlist[0][0], memlist[0][1] + " old", memlist[0][1] + " new", "difference")) + "\n"
+            print "\n\n%s\n" %"".join(element.ljust(colwidth) for element in (memlist[0][0], memlist[0][1] + " old", memlist[0][1] + " new", "difference"))
             fmemlist = list()
             for tup in memlist2:
                 if tup not in memlist:
@@ -3224,7 +3222,7 @@ while pathway in (["y"]):
             leftfile = condic["Members who has left invites file (optional)"]
             if os.path.isfile(leftfile) is True and len(deserters) > 0:
                 with open(leftfile, "ab") as colfile:
-                    colfile.write("\n" + "\n".join(deserters))
+                    colfile.write("\n%s" %"\n".join(deserters))
 
     elif flow == "10":
         grcheck = raw_input("group to check: ")
