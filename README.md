@@ -288,4 +288,12 @@ Ratings can be Live Standard, Live Blitz, Live Bullet, Online chess, 960 or tact
 
 
 
- 21) Check network strength
+ 21) Send tm challenges to a group
+
+
+
+ 22) Check network strength
+
+
+
+ 23) Attempt to automatically fix various problems with invites lists and messages
