@@ -1248,14 +1248,13 @@ def readFile2(filename):
     if os.path.isfile(filename) is True:
         if os.stat(filename).st_size > 0:
             with open(filename, "rb") as placeholder:
-                for line in placeholder:
-                    line = streplacer(line, (["\n", ""], [" ", ""]))
+                for line in placeholder.readlines():
                     if line != "":
-                        target.append(line)
+                        target.append(streplacer(line, (["\n", ""], [" ", ""])))
     else:
         open(filename, "wb").close()
 
-    return target
+    return list(set(target))
 
 def evenpairing(lst1, lst2):
     playlst = list()
