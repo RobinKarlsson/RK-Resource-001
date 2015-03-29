@@ -1660,6 +1660,9 @@ def inviter(targetlist, endless):
                 if not picked in already_picked:
                     already_picked.append(picked)
 
+            if supusr is True:
+                print "\n\nMembers to invite: %s\n\n" %", ".join(already_picked)
+
             for member in already_picked:
                 if supusr is True:
                     print "\n\tMember: '%s' for '%s'" %(member, invgroup)
@@ -3286,6 +3289,9 @@ while pathway in (["y"]):
 
     elif flow == "12":
         target = file_or_input(False, "\n\nName of the file containing list of members to pm: ", "", "\n\nEnter list of members to pm: ", "")[0]
+
+        print "\n\n%i pm's will be sent\n" %len(target)
+
         pmdriver(target, "2")
 
     elif flow == "13":
