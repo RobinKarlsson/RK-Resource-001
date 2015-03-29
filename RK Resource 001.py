@@ -1249,7 +1249,7 @@ def readFile2(filename):
         if os.stat(filename).st_size > 0:
             with open(filename, "rb") as placeholder:
                 for line in placeholder.readlines():
-                    if line != "":
+                    if line != "\n":
                         target.append(streplacer(line, (["\n", ""], [" ", ""])))
     else:
         open(filename, "wb").close()
