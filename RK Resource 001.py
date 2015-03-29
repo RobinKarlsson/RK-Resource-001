@@ -1660,7 +1660,7 @@ def inviter(targetlist, endless):
                     already_picked.append(picked)
 
             if supusr is True:
-                print "\n\nMembers to invite: %s\n\n" %", ".join(already_picked)
+                print "\n\nMembers to invite for %s: %s\n\n" %(invgroup, ", ".join(already_picked))
 
             for member in already_picked:
                 if supusr is True:
@@ -1744,6 +1744,8 @@ def inviter(targetlist, endless):
                     WebDriverWait(browser2, 5).until(EC.presence_of_element_located((By.ID, "c15")))
                     browser2.find_element_by_name("c15").send_keys(member)
                 except:
+                    if supusr is True:
+                        print "No invites available, continuing to next group"
                     break
 
                 while True:
@@ -1755,11 +1757,17 @@ def inviter(targetlist, endless):
                         browser2.switch_to_default_content()
 
                         try:
+                            if supusr is True:
+                                print "attempting to fill out invites message"
                             filtmcemsg(msgstr, browser2, name, country, browserchoice)
                         except:
+                            if supusr is True:
+                                print "failed to set content, reversing to back up method"
                             filtmcemsgold(msglist, browser2, name, country, browserchoice)
 
                         browser2.find_element_by_id("c18").click()
+                        if supusr is True:
+                            print "Invite sent!"
                         memint.append(member)
                         time.sleep(0.1)
                         break
