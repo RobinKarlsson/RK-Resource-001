@@ -25,6 +25,7 @@ import base64
 import stat
 import re
 import time
+import pickle
 import platform as _platform
 from time import strftime, gmtime
 from datetime import datetime, date, timedelta
@@ -256,7 +257,7 @@ def mecbrowser(logincookie):
 
     browser.set_handle_equiv(True)
     browser.set_handle_redirect(True)
-    browser.set_handle_gzip(True)
+    browser.set_handle_gzip(False)
     browser.set_handle_referer(True)
     browser.set_handle_refresh(True)
     browser.set_handle_robots(False)
@@ -536,8 +537,7 @@ def noteposter(target, msg, interval, nationalt, shutdown):
         target.remove("")
 
     browserchoice = selbrowch()
-    Username = raw_input("\n\n\nUsername: ")
-    Password = raw_input("Password: ")
+    Username, Password = usrPas()
     browser2, handle = pickbrowser(browserchoice, True)
     browser2 = sellogin(Username, Password, browser2)
     logincookie = browser2.get_cookies()
@@ -675,8 +675,7 @@ def pmdriver(target, choice):
         while noadmins not in (["y", "n"]):
             noadmins = raw_input("\nInclude admins? (y/n) ")
 
-    Username = raw_input("\n\n\nUsername: ")
-    Password = raw_input("Password: ")
+    Username, Password = usrPas()
 
     browser0, handle = pickbrowser(browserchoice, True)
     browser0 = sellogin(Username, Password, browser0)
@@ -1208,6 +1207,30 @@ def getfilelist(path, endswith):
                         counter += 1
     return lst
 
+def usrPas():
+    if os.path.isfile(".Config/.LoginCred/data.dll") is True:
+        with open(".Config/.LoginCred/data.dll", "rb") as txt:
+            Username, Password = com3("Uni2D", txt.read(), 256, []).split(" ")
+
+        if supusr is True:
+            print "\n\tUsername: %s\n\tPassword: %s\n" %(Username, Password)
+    else:
+        Username = raw_input("\n\nUsername: ")
+        Password = raw_input("Password: ")
+
+        if Username == "" or Password == "":
+            return None, None
+
+        saveData = ""
+        while saveData not in (["y", "n"]):
+            saveData = raw_input("\nSave login credentials for faster login on later runs? (y/n) ")
+
+        if saveData == "y":
+            with open(".Config/.LoginCred/data.dll", "wb") as txt:
+                txt.write(com2("Uni2D", "%s %s" %(Username, Password), 256, []))
+
+    return Username, Password
+
 def filtmcemsg(msgstr, browser, name, country, browserchoice):
     msgstr = streplacer(msgstr, (["/name", name.strip()], ["/firstname", name.split(" ")[0]], ["/nation", country.strip()], ["/newline", "<br/>"]))
     
@@ -1215,17 +1238,28 @@ def filtmcemsg(msgstr, browser, name, country, browserchoice):
     browser.execute_script("tinyMCE.activeEditor.setContent('{0}')".format(msgstr))
 
 def login():
-    Username = raw_input("Username: ")
-    Password = raw_input("Password: ")
+    if os.path.isfile(".Config/.LoginCred/cookie.dll") is True:
+        logincookie = pickle.load(open(".Config/.LoginCred/cookie.dll", "rb"))
 
-    if Username == "" or Password == "":
+        if tryCookie(logincookie) is True:
+            return logincookie
+
+    Username, Password = usrPas()
+
+    if Username == None:
         return ""
+
+    saveData = ""
+    while saveData not in (["y", "n"]):
+        saveData = raw_input("\nSave login cookies for faster login on later runs? (y/n) ")
 
     browserchoice = selbrowch()
     browser, handle = pickbrowser(browserchoice, True)
     browser = sellogin(Username, Password, browser)
 
     logincookie = browser.get_cookies()
+    if saveData == "y":
+        pickle.dump(logincookie , open(".Config/.LoginCred/cookie.dll", "wb"))
     browser.quit()
     return logincookie
 
@@ -1509,8 +1543,7 @@ def inviter(targetlist, endless):
         choice2 = raw_input("\n\nOnly invite those who fill a few requirements (only names from the standard list will be affected)? (y/n) ")
 
     browserchoice = selbrowch()
-    Username = raw_input("\n\n\nUsername: ")
-    Password = raw_input("Password: ")
+    Username, Password = usrPas()
     browser2, handle = pickbrowser(browserchoice, True)
     browser2 = sellogin(Username, Password, browser2)
     logincookie = browser2.get_cookies()
@@ -1839,11 +1872,31 @@ def filtmcemsgold(msglist, browser, name, country, browserchoice):
             alert.accept()
             time.sleep(1)
 
+def tryCookie(logincookie):
+    browser = mecbrowser(logincookie)
+    browser, response = mecopner(browser, "http://www.chess.com/messages")
+    currentURL = response.geturl()
+
+    response.close()
+    browser.clear_history()
+    browser.close()
+    gc.collect()
+
+    if "www.chess.com/login" in currentURL:
+        if supusr is True:
+            print "\tInvalid login cookie\n\t%s\n" %currentURL
+        return False
+    else:
+        if supusr is True:
+            print "\tValid login cookie\n\t%s\n" %currentURL
+        return True
+
 def vcman(vclinklist, yourside):
     numgames = len(vclinklist)
     browserchoice = selbrowch()
     browser3, handle = pickbrowser(browserchoice, True)
-    browser3 = sellogin(raw_input("Username: "), raw_input("Password: "), browser3)
+    Username, Password = usrPas()
+    browser3 = sellogin(Username, Password, browser3)
 
     logincookie = browser3.get_cookies()
     browser1 = mecbrowser(logincookie)
@@ -2737,7 +2790,7 @@ for x in sys.argv:
             print "\n\n\tWARNING: couldn't import psutil, RAM and CPU checks might not work properly!!!\n\n"
 
 pathway = "y"
-makefolder(([".Config", ".Config/TimeoutsCheck", ".Config/Notes Poster", ".Config/Invites", ".Config/Member Lists", "Data", "Data/.TimeoutsCheck", "Data/Invite Lists", "Data/.Member Lists", "Data/.namelists", "Data/Messages", "Data/Messages/Invite Messages", "Data/Webdriver", "Data/Webdriver/Linux", "Data/Webdriver/Mac", "Data/Webdriver/Windows", "Data/Webdriver/Linux/86", "Data/Webdriver/Mac/86", "Data/Webdriver/Windows/86", "Data/Webdriver/Extensions", "Data/Webdriver/Extensions/Chrome", "Data/Webdriver/Extensions/Firefox"]))
+makefolder(([".Config", ".Config/.LoginCred", ".Config/TimeoutsCheck", ".Config/Notes Poster", ".Config/Invites", ".Config/Member Lists", "Data", "Data/.TimeoutsCheck", "Data/Invite Lists", "Data/.Member Lists", "Data/.namelists", "Data/Messages", "Data/Messages/Invite Messages", "Data/Webdriver", "Data/Webdriver/Linux", "Data/Webdriver/Mac", "Data/Webdriver/Windows", "Data/Webdriver/Linux/86", "Data/Webdriver/Mac/86", "Data/Webdriver/Windows/86", "Data/Webdriver/Extensions", "Data/Webdriver/Extensions/Chrome", "Data/Webdriver/Extensions/Firefox"]))
 
 while pathway in (["y"]):
     olprint("*", "*", "-", 72, True)
@@ -3462,8 +3515,7 @@ while pathway in (["y"]):
             shutdown = raw_input("\nShut down computer when complete (might require elevated privileges)? (y/n) ")
 
         browserchoice = selbrowch()
-        Username = raw_input("\n\nUsername: ")
-        Password = raw_input("Password: ")
+        Username, Password = usrPas()
         browser, handle = pickbrowser(browserchoice, True)
         browser = sellogin(Username, Password, browser)
 
@@ -3521,8 +3573,7 @@ while pathway in (["y"]):
                 continue
 
         browserchoice = selbrowch()
-        Username = raw_input("\n\nUsername: ")
-        Password = raw_input("Password: ")
+        Username, Password = usrPas()
 
         browser, handle = pickbrowser(browserchoice, True)
         browser = sellogin(Username, Password, browser)
@@ -3608,8 +3659,7 @@ while pathway in (["y"]):
             sleepTime = enterint("\n\nTime to wait between posts: ")
             browserchoice = selbrowch()
             
-            Username = raw_input("\n\nUsername: ")
-            Password = raw_input("Password: ")
+            Username, Password = usrPas()
 
             browser, handle = pickbrowser(browserchoice, True)
             browser = sellogin(Username, Password, browser)
@@ -3655,8 +3705,7 @@ while pathway in (["y"]):
         tmDescription = raw_input("Match description: ")
 
         browserchoice = selbrowch()
-        Username = raw_input("\n\nUsername: ")
-        Password = raw_input("Password: ")
+        Username, Password = usrPas()
 
         browser, handle = pickbrowser(browserchoice, True)
         browser = sellogin(Username, Password, browser)
