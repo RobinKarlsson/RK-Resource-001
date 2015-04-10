@@ -1893,9 +1893,9 @@ def tryCookie(logincookie):
 
 def vcman(vclinklist, yourside):
     numgames = len(vclinklist)
+    Username, Password = usrPas()
     browserchoice = selbrowch()
     browser3, handle = pickbrowser(browserchoice, True)
-    Username, Password = usrPas()
     browser3 = sellogin(Username, Password, browser3)
 
     logincookie = browser3.get_cookies()
@@ -1988,7 +1988,7 @@ def vcman(vclinklist, yourside):
                 movelist = movelist[1::2]
 
         for pointer in movelist:
-            print "\n%schecking " %(ltime(), pointer)
+            print "\n%schecking %s" %(ltime(), pointer)
 
             if supusr is True:
                 debugout()
