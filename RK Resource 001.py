@@ -888,6 +888,34 @@ def getTmTimouts(browser, groupname, tmpage):
 
     return timeouters
 
+def getTmParticipants(browser, targetURL):
+    lineup1 = list()
+    lineup2 = list()
+
+    browser, response = mecopner(browser, targetURL)
+    soup = BeautifulSoup(response)
+    souppar = soup.find_all(class_ = "align-left")
+
+    group1, group2 = re.findall("/groups/home/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", str(soup.find_all(class_ = "default border-top alternate")))
+
+    for placeholder in souppar[0::4]:
+        try:
+            placeholder = str(placeholder.text)
+        except UnicodeEncodeError:
+            break
+        if "(" in placeholder:
+            lineup1.append(streplacer(placeholder, ([" ", ""], [")", ""])).split("("))
+
+    for placeholder in souppar[3::4]:
+        try:
+            placeholder = str(placeholder.text)
+        except UnicodeEncodeError:
+            break
+        if "(" in placeholder:
+            lineup2.append(streplacer(placeholder, ([" ", ""], [")", ""])).split("("))
+
+    return group1[13:].replace("-", " "), lineup1, group2[13:].replace("-", " "), lineup2
+
 def tmparchecker(browser, pagelist, targetname):
     tmyear = enterint("\nOnly check tm's that has been open for registration since year, leave empty to skip (YYYY) ")
     if tmyear != "":
@@ -1289,6 +1317,9 @@ def readFile2(filename):
         open(filename, "wb").close()
 
     return list(set(target))
+
+def balancetm(lst1, lst2):
+    "still need to be built"
 
 def evenpairing(lst1, lst2):
     playlst = list()
@@ -3356,8 +3387,10 @@ while pathway in (["y"]):
 
     elif flow == "13":
         gchoice = ""
-        while gchoice not in (["1", "2"]):
-            gchoice = raw_input("\n\n 1. Pair a list of members against each others\n 2. Pair two lists of members to play each others\nChoice: ")
+        while gchoice not in (["1", "2", "3"]):
+            gchoice = raw_input("\n\n 1. Pair a list of members against each others\n 2. Pair two lists of members to play each others\n 3. find a fair play solution for a tm\nChoice: ")
+
+        browser = mecbrowser("")
 
         if gchoice == "1":
             target = file_or_input(False, "\n\nName of the file containing your list of players: ", "", "\n\nEnter list of players: ", "")[0]
@@ -3376,7 +3409,12 @@ while pathway in (["y"]):
 
             target1, target2 = remcomelem(target1, target2)
 
-        browser = mecbrowser("")
+        elif gchoice == "3":
+            group1, lineup1, group2, lineup2 = getTmParticipants(browser, "http://www.chess.com/groups/team_match?id=515314")
+
+            balancetm(lineup1, lineup2)
+            pathway = runagain()
+            continue
 
         choice = ""
         while choice not in (["1", "2", "3", "4", "5", "6"]):
