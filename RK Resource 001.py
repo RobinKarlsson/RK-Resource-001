@@ -903,7 +903,7 @@ def getTmParticipants(browser, targetURL):
             placeholder = str(placeholder.text)
         except UnicodeEncodeError:
             break
-        if "(" in placeholder:
+        if "(" in placeholder and "(Waiting...)" not in placeholder:
             lineup1.append(streplacer(placeholder, ([" ", ""], [")", ""])).split("("))
 
     for placeholder in souppar[3::4]:
@@ -911,7 +911,7 @@ def getTmParticipants(browser, targetURL):
             placeholder = str(placeholder.text)
         except UnicodeEncodeError:
             break
-        if "(" in placeholder:
+        if "(" in placeholder and "(Waiting...)" not in placeholder:
             lineup2.append(streplacer(placeholder, ([" ", ""], [")", ""])).split("("))
 
     return group1[13:].replace("-", " "), lineup1, group2[13:].replace("-", " "), lineup2
