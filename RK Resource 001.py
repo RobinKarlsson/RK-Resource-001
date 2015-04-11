@@ -1318,8 +1318,16 @@ def readFile2(filename):
 
     return list(set(target))
 
-def balancetm(lst1, lst2):
-    "still need to be built"
+def balancetm(group1, lineup1, group2, lineup2, ratingrange):
+    print "\n\n\n%s\t%s" %(group1, group2)
+    for player in lineup1:
+        for member in lineup2:
+            ratingdif = int(player[1]) - int(member[1])
+            if -ratingrange <= ratingdif <= ratingrange :
+                print "%s (%s) vs %s (%s)" %(player[0], player[1], member[0], member[1])
+                lineup2.remove(member)
+                break
+            
 
 def evenpairing(lst1, lst2):
     playlst = list()
@@ -3410,9 +3418,14 @@ while pathway in (["y"]):
             target1, target2 = remcomelem(target1, target2)
 
         elif gchoice == "3":
-            group1, lineup1, group2, lineup2 = getTmParticipants(browser, "http://www.chess.com/groups/team_match?id=515314")
+            tmURL = raw_input("\n\nlink to tm: ")
+            ratingrange = enterint("Rating range: ")
+            group1, lineup1, group2, lineup2 = getTmParticipants(browser, tmURL)
 
-            balancetm(lineup1, lineup2)
+            if len(lineup1) > len(lineup2):
+                balancetm(group1, lineup1, group2, lineup2, ratingrange)
+            else:
+                balancetm(group2, lineup2, group1, lineup1, ratingrange)
             pathway = runagain()
             continue
 
