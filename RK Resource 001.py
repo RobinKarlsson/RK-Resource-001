@@ -568,6 +568,7 @@ def noteposter(target, msg, interval, nationalt, shutdown):
                     name = name.split("_")[0]
 
         browser2 = selopner(browser2, "http://www.chess.com/members/view/%s#usernotes_post" %mem)
+        time.sleep(interval)
         counter = 1
 
         while True:
@@ -584,14 +585,12 @@ def noteposter(target, msg, interval, nationalt, shutdown):
                     skipped.append(mem)
                     break
                 counter += 1
-                time.sleep(1)
+                time.sleep(2)
 
         soup.decompose()
         response.close()
         browser.clear_history()
         gc.collect()
-
-        time.sleep(interval)
 
     if len(skipped) != 0:
         print "skipped the following members:"
@@ -1319,7 +1318,7 @@ def readFile2(filename):
     return list(set(target))
 
 def balancetm(group1, lineup1, group2, lineup2, ratingrange):
-    print "\n\n\n%s\t%s" %(group1, group2)
+    print "\n\n\n%s vs %s" %(group1, group2)
     for player in lineup1:
         for member in lineup2:
             ratingdif = int(player[1]) - int(member[1])
