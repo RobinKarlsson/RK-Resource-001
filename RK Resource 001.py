@@ -850,7 +850,7 @@ def nineworker(infile, inid, browser, key):
 
     with open(infile, "wb") as placeholder:
         placeholder.write(com2(key, str(un).replace("'", "").replace("[", "").replace("]", ""), 256, []))
-    return memlist
+    return memlist, len(un), len(memlistorg)
 
 def getTmTimouts(browser, groupname, tmpage):
     browser, response = mecopner(browser, tmpage)
@@ -3316,9 +3316,9 @@ while pathway in (["y"]):
 
         for target in targetlst:
             condic = configopen(".Config/Member Lists/%s" %target[1])
-            deserters = nineworker(condic["Memberslist file"], str(condic["Group ID"]), browser, str(condic["Encryption Key"]))
+            deserters, newcount, oldcount = nineworker(condic["Memberslist file"], str(condic["Group ID"]), browser, str(condic["Encryption Key"]))
 
-            print "\n\n%sMembers who are no longer in %s: %s" %(ltime(), target[1][0:-4], ", ".join(deserters))
+            print "\n\n%sMembers who are no longer in %s: %s\nNumber of members on last run: %i\nNumber of members now: %i" %(ltime(), target[1][0:-4], ", ".join(deserters), oldcount, newcount)
 
             leftfile = condic["Members who has left invites file (optional)"]
             if os.path.isfile(leftfile) is True and len(deserters) > 0:
