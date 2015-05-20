@@ -3792,7 +3792,7 @@ while pathway in (["y"]):
 
         for count in xrange(0, nbMatches):
             sendChallenge(browser, matchName, target, myGroup, tmDescription)
-            time.sleep(2)
+            time.sleep(300)
 
         browser.quit()
 
