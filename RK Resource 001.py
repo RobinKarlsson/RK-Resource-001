@@ -602,6 +602,36 @@ def noteposter(target, msg, interval, nationalt, shutdown):
     if shutdown == "y":
         turnofcomp()
 
+def msgcomfix(msg):
+    msg = msg.split(" ")
+    for i in range(len(msg)):
+        if "/" in msg[i]:
+            if "/name" in msg[i] or "/firstname" in msg[i] or "/nation" in msg[i] or "/newline" in msg[i]:
+                continue
+
+            unsupCmd = ""
+            while unsupCmd not in (["y", "n"]):
+                unsupCmd = raw_input("\n\n\n%s is not a recognised command, do you wish to replace it? (y/n) " %msg[i])
+
+            if unsupCmd == "y":
+                while unsupCmd not in ([1, 2, 3, 4]):
+                    unsupCmd = enterint("\nWhat would you like to replace it with?\n 1. /name - members name or username (if name is unavailable)\n 2. /firstname - member first name or username (if no name is available)\n 3. /nation - members nation of origin\n 4. /newline - pagebreak\nYour choice: ")
+
+                if unsupCmd == 1:
+                    print "\n\nReplaced %s with /name\n\n" %msg[i]
+                    msg[i] = "/name"
+                elif unsupCmd == 2:
+                    print "\n\nReplaced %s with /firstname\n\n" %msg[i]
+                    msg[i] = "/firstname"
+                elif unsupCmd == 3:
+                    print "\n\nReplaced %s with /nation\n\n" %msg[i]
+                    msg[i] = "/nation"
+                elif unsupCmd == 4:
+                    print "\n\nReplaced %s with /newline\n\n" %msg[i]
+                    msg[i] = "/newline"
+
+    return " ".join(msg)
+
 def pmdriver(target, choice):
     while "" in target:
         target.remove("")
@@ -623,7 +653,7 @@ def pmdriver(target, choice):
             while choicepm not in(["1", "2", "3"]):
                 choicepm = raw_input("\n\nAdd a snippet containing\n 1. Text\n 2. Image\n 3. Youtube Video\nYour choice: ")
             if choicepm == "1":
-                text = raw_input("Enter the text: ")
+                text = msgcomfix(raw_input("Enter the text: "))
             elif choicepm == "2":
                 text = raw_input("Enter url of the image: ")
             elif choicepm == "3":
@@ -3269,7 +3299,7 @@ while pathway in (["y"]):
     elif flow == "8":
         target = file_or_input(False, "\n\nName of the file containing your list of members: ", "", "\n\nEnter list of members to send notes: ", "")[0]
         print "\n\nYou have entered %i names\n\n" %len(target)
-        msg = raw_input("\n\nEnter message to use (available commands: /name = member name or username, /firstname - member first name or username (if no name is available), /nation = member nation): ")
+        msg = msgcomfix(raw_input("\n\nEnter message to use (available commands: /name = member name or username, /firstname - member first name or username (if no name is available), /nation = member nation): "))
         nationalt = raw_input("\nWhat to use if member nation is international? ")
         interval = enterint("Interval between notes (s): ")
 
