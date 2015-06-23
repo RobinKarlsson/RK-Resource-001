@@ -606,7 +606,7 @@ def msgcomfix(msg):
     msg = msg.split(" ")
     for i in range(len(msg)):
         if "/" in msg[i]:
-            if "/name" in msg[i] or "/firstname" in msg[i] or "/nation" in msg[i] or "/newline" in msg[i]:
+            if "/name" in msg[i] or "/firstname" in msg[i] or "/nation" in msg[i] or "/newline" in msg[i] or "http://" in msg[i] or "https://" in msg[i]:
                 continue
 
             unsupCmd = ""
@@ -1348,13 +1348,15 @@ def readFile2(filename):
     return list(set(target))
 
 def balancetm(group1, lineup1, group2, lineup2, ratingrange):
+    x = 1
     print "\n\n\n%s vs %s" %(group1, group2)
     for player in lineup1:
         for member in lineup2:
             ratingdif = int(player[1]) - int(member[1])
             if -ratingrange <= ratingdif <= ratingrange :
-                print "%s (%s) vs %s (%s)" %(player[0], player[1], member[0], member[1])
+                print "  %i. %s (%s) vs %s (%s)" %(x, player[0], player[1], member[0], member[1])
                 lineup2.remove(member)
+                x += 1
                 break
             
 
