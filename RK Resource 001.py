@@ -1359,11 +1359,9 @@ def balancetm(group1, lineup1, group2, lineup2, ratingrange):
             ratingdif = abs(int(player[1]) - int(lineup2[i][1]))
 
             if ratingrange >= ratingdif:
-                print player, lineup2[1], ratingdif
 
                 try:
                     if ratingrange < abs(int(player[1]) - int(lineup2[i + 1][1])):
-                        print 1
                         print "\n %i. %s (%s) vs %s (%s)" %(board, player[0], player[1], lineup2[i - 1][0], lineup2[i - 1][1])
                         board += 1
                         mem_i = i + 1
@@ -1375,7 +1373,6 @@ def balancetm(group1, lineup1, group2, lineup2, ratingrange):
                     break
 
                 if ratingdif >= oldif:
-                    print 2
                     print "\n %i. %s (%s) vs %s (%s)" %(board, player[0], player[1], lineup2[i - 1][0], lineup2[i - 1][1])
                     oldif = ratingdif
                     board += 1
