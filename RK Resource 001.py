@@ -3,7 +3,7 @@
 # developed by Robin Karlsson
 # contact email: "r.robin.karlsson@gmail.com"
 # contact chess.com profile: "http://www.chess.com/members/view/SudoRoot"
-# version 0.9.1.2 Beta
+# version 0.9.1.3 Alfa
 
 import os
 from os.path import isfile, join
@@ -722,7 +722,7 @@ def pmdriver(target, choice):
         memtpm = target
 
     if choice2 == "y":
-        minpoints, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemin, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat = memprmenu()
+        minpoints, minrat, maxrat, mingames, mincurrent, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemin, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat = memprmenu()
 
     print "\n\n"
 
@@ -739,7 +739,7 @@ def pmdriver(target, choice):
             debugout()
 
         if choice2 == "y":
-            if memberprocesser(soup, membername2, minpoints, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemin, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat) is False:
+            if memberprocesser(soup, membername2, minpoints, minrat, maxrat, mingames, mincurrent, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemin, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat) is False:
                 if supusr is True:
                     print "\t%s Didnt pass filter" %membername2
                 continue
@@ -1209,7 +1209,7 @@ def createconfig(name, ID):
         membersleftinvfile = "%s members who has left" %name
 
     with open(".Config/Invites/%s.ini" %name, "wb") as setupfile:
-        setupfile.write("What to use if members nation is set to International==\nMin online chess rating==\nMax online chess rating==\nMin 960 chess rating==\nMax 960 chess rating==\nMin online chess games plaid==\nMin online chess win-ratio==\nLast logged in within days==\nMember on chess.com for days==\nBorn after date (YYYY-MM-DD)==\nBorn before date (YYYY-MM-DD)==\nMax timeout-ratio allowed==\nMax number of groups member can be in==\nMin number of groups member can be in==\nMin number of activity points allowed==\nMin time/move (days-hours-minutes)==\nMax time/move (days-hours-minutes)==\nOnly invite those with a custom avatar (y/n)==\nMember should be from nation==\nGender (m/f)==\nLink to groups invite members page==http://www.chess.com/groups/invite_members?id=%i\nFile containing the main invites list==Data/Invite Lists/%s\nFile containing those who should receive priority invites (circumvents filter)==Data/Invite Lists/%s priority\nInvites file for those who has left the group==Data/Invite Lists/%s\nFile containing those who has received an invite==Data/Invite Lists/%s already invited\nFile containing your invites message for members who has left your group==Data/Messages/Invite Messages/%s Deserter message\nFile containing your invites message for standard and priority invites lists==Data/Messages/Invite Messages/%s Standard Message\nComma seperated list of usernames that should not be invited==" %(ID, name, name, membersleftinvfile, name, name, name))
+        setupfile.write("What to use if members nation is set to International==\nMin online chess rating==\nMax online chess rating==\nMin 960 chess rating==\nMax 960 chess rating==\nMin online chess games plaid==\nMin current online chess games==\nMin online chess win-ratio==\nLast logged in within days==\nMember on chess.com for days==\nBorn after date (YYYY-MM-DD)==\nBorn before date (YYYY-MM-DD)==\nMax timeout-ratio allowed==\nMax number of groups member can be in==\nMin number of groups member can be in==\nMin number of activity points allowed==\nMin time/move (days-hours-minutes)==\nMax time/move (days-hours-minutes)==\nOnly invite those with a custom avatar (y/n)==\nMember should be from nation==\nGender (m/f)==\nLink to groups invite members page==http://www.chess.com/groups/invite_members?id=%i\nFile containing the main invites list==Data/Invite Lists/%s\nFile containing those who should receive priority invites (circumvents filter)==Data/Invite Lists/%s priority\nInvites file for those who has left the group==Data/Invite Lists/%s\nFile containing those who has received an invite==Data/Invite Lists/%s already invited\nFile containing your invites message for members who has left your group==Data/Messages/Invite Messages/%s Deserter message\nFile containing your invites message for standard and priority invites lists==Data/Messages/Invite Messages/%s Standard Message\nComma seperated list of usernames that should not be invited==" %(ID, name, name, membersleftinvfile, name, name, name))
     createfileifmissing("Data/Messages/Invite Messages/%s Standard Message" %name, True)
     createfileifmissing("Data/Messages/Invite Messages/%s Deserter message" %name, True)
     createfileifmissing("Data/Invite Lists/%s already invited" %name, False)
@@ -1348,17 +1348,42 @@ def readFile2(filename):
     return list(set(target))
 
 def balancetm(group1, lineup1, group2, lineup2, ratingrange):
-    x = 1
+    mem_i = 0
+    board = 1
+
     print "\n\n\n%s vs %s" %(group1, group2)
     for player in lineup1:
-        for member in lineup2:
-            ratingdif = int(player[1]) - int(member[1])
-            if -ratingrange <= ratingdif <= ratingrange :
-                print "  %i. %s (%s) vs %s (%s)" %(x, player[0], player[1], member[0], member[1])
-                lineup2.remove(member)
-                x += 1
-                break
-            
+        oldif = 4000
+
+        for i in range(mem_i, len(lineup2)):
+            ratingdif = abs(int(player[1]) - int(lineup2[i][1]))
+
+            if ratingrange >= ratingdif:
+                print player, lineup2[1], ratingdif
+
+                try:
+                    if ratingrange < abs(int(player[1]) - int(lineup2[i + 1][1])):
+                        print 1
+                        print "\n %i. %s (%s) vs %s (%s)" %(board, player[0], player[1], lineup2[i - 1][0], lineup2[i - 1][1])
+                        board += 1
+                        mem_i = i + 1
+                        break
+                except IndexError:
+                    print "\n %i. %s (%s) vs %s (%s)" %(board, player[0], player[1], lineup2[i][0], lineup2[i][1])
+                    board += 1
+                    mem_i = i + 1
+                    break
+
+                if ratingdif >= oldif:
+                    print 2
+                    print "\n %i. %s (%s) vs %s (%s)" %(board, player[0], player[1], lineup2[i - 1][0], lineup2[i - 1][1])
+                    oldif = ratingdif
+                    board += 1
+                    mem_i = i
+                    break
+
+                else:
+                    oldif = ratingdif
 
 def evenpairing(lst1, lst2):
     playlst = list()
@@ -1470,6 +1495,7 @@ def memprmenu():
     minranrat = enterint("Min (960) rating allowed. leave empty to skip: ")
     maxranrat = enterint("Max (960) rating allowed. leave empty to skip: ")
     mingames = enterint("\nMin number of games played (online chess). leave empty to skip : ")
+    mincurrent = enterint("Min number of currently ongoing games (online chess). leave empty to skip : ")
     minwinrat = raw_input("Min win-ratio (online chess). leave empty to skip : ")
 
     lastloginyear = enterint("\nLast logged in year. leave empty to skip (YYYY): ")
@@ -1526,7 +1552,7 @@ def memprmenu():
     memgender = "a"
     while memgender not in (["m", "f", ""]):
         memgender = raw_input("\nMember should be gender (determined by comparing member name to a list of male and female names). leave empty to skip (m/f): ")
-    return minpoints, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemin, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat
+    return minpoints, minrat, maxrat, mingames, mincurrent, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemin, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat
 
 def makefolder(flst):
     for folder in flst:
@@ -1650,6 +1676,12 @@ def inviter(targetlist, endless):
             minranrat = condic["Min 960 chess rating"]
             maxranrat = condic["Max 960 chess rating"]
             mingames = condic["Min online chess games plaid"]
+            try:
+                mincurrent = condic["Min current online chess games=="]
+            except:
+                if supusr is True:
+                    print "\n\nPlease add the line 'Min current online chess games==' to your invites config file(s)\n\n"
+                mincurrent = ""
             minwinrat = condic["Min online chess win-ratio"]
             lastlogin = condic["Last logged in within days"]
             if lastlogin != "":
@@ -1782,7 +1814,7 @@ def inviter(targetlist, endless):
 
                 if choice2 == "y" and standardlst == True:
                     try:
-                        if memberprocesser(soup, member, minpoints, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemin, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat) is False:
+                        if memberprocesser(soup, member, minpoints, minrat, maxrat, mingames, mincurrent, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemin, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat) is False:
                             try:
                                 memtinv.remove(member)
                                 if supusr is True:
@@ -2252,7 +2284,7 @@ def fileopen(filename, message):
     else:
         return msglist
 
-def memberprocesser(soup, targetx, minpoints, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemin, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat):
+def memberprocesser(soup, targetx, minpoints, minrat, maxrat, mingames, mincurrent, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemin, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat):
     try:
         if membersinceyear != "" or lastloginyear != "":
             memsinlist = memsin(soup)
@@ -2308,6 +2340,10 @@ def memberprocesser(soup, targetx, minpoints, minrat, maxrat, mingames, minwinra
             if minwinrat != "":
                 if gamestat[1] / gamestat[0]  < float(minwinrat):
                     return False
+
+        if mincurrent != "":
+            if currentonlinegames(soup) < mincurrent:
+                return False
 
         if membersinceyear != "":
             memsi = memsinlist[0]
@@ -2415,6 +2451,11 @@ def memberprocesser(soup, targetx, minpoints, minrat, maxrat, mingames, minwinra
         return False
 
     return True
+
+def currentonlinegames(soup):
+    for placeholder in soup.find_all(class_ = "section-title"):
+        if "Current Games" in str(placeholder):
+            return int(streplacer(placeholder.text, (["Current Games (", ""], [")", ""])).strip())
 
 def namechecker(soup):
     for placeholder in soup.find_all("strong"):
@@ -2862,9 +2903,15 @@ for x in sys.argv:
 pathway = "y"
 makefolder(([".Config", ".Config/.LoginCred", ".Config/TimeoutsCheck", ".Config/Notes Poster", ".Config/Invites", ".Config/Member Lists", "Data", "Data/.TimeoutsCheck", "Data/Invite Lists", "Data/.Member Lists", "Data/.namelists", "Data/Messages", "Data/Messages/Invite Messages", "Data/Webdriver", "Data/Webdriver/Linux", "Data/Webdriver/Mac", "Data/Webdriver/Windows", "Data/Webdriver/Linux/86", "Data/Webdriver/Mac/86", "Data/Webdriver/Windows/86", "Data/Webdriver/Extensions", "Data/Webdriver/Extensions/Chrome", "Data/Webdriver/Extensions/Firefox"]))
 
+if os.path.isfile(".Config/.LoginCred/data.dll") is True:
+    with open(".Config/.LoginCred/data.dll", "rb") as txt:
+        usrname = ", %s" %txt.read()
+else:
+    usrname = ""
+
 while pathway in (["y"]):
     olprint("*", "*", "-", 72, True)
-    for content in (["", "", "", "RK Resource 001", "version 0.9.1.2 Beta", "", "", ""]):
+    for content in (["", "", "", "RK Resource 001", "version 0.9.1.3 Alfa", "", "", ""]):
         olprint2("{0: ^70}", content, "|", "|")
     olprint("|", "|", "-", 72, True)
 
@@ -2878,7 +2925,7 @@ while pathway in (["y"]):
 
     flow = ""
     while flow not in (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "42"]):
-        flow = raw_input("\n\n\nEnter your choice here: ")
+        flow = raw_input("\n\n\nEnter your choice here%s: " %usrname)
 
         if flow == "/help 1":
             print "\n\nCreates a list of members from one or more groups. Has the option to remove those who're also members of a specific group (using the members list built in option 9). The list can either be saved to a file or be directly printed onscreen\n\nOptional login if you wish to extract members from pages that arent public (for example the manage members page)"
@@ -3161,7 +3208,7 @@ while pathway in (["y"]):
         passmembers = list()
         membernamelist = file_or_input(False, "\n\nName of the file containing your list: ", "", "\n\nEnter list of members to check: ", "")[0]
 
-        minpoints, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemin, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat = memprmenu()
+        minpoints, minrat, maxrat, mingames, mincurrent, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemin, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat = memprmenu()
         ingroup = raw_input("\nMember should be in group (leave empty to skip, login required!!!): ")
         if ingroup != "":
             logincookie = login()
@@ -3189,7 +3236,7 @@ while pathway in (["y"]):
 
             soup = BeautifulSoup(response)
 
-            if memberprocesser(soup, targetx, minpoints, minrat, maxrat, mingames, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemin, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat) is True:
+            if memberprocesser(soup, targetx, minpoints, minrat, maxrat, mingames, mincurrent, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemin, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat) is True:
                 if ingroup != "":
                     if ingroupcheck(browser, targetx, ingroup):
                         passmembers.append(targetx)
