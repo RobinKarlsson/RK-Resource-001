@@ -2902,7 +2902,7 @@ makefolder(([".Config", ".Config/.LoginCred", ".Config/TimeoutsCheck", ".Config/
 
 if os.path.isfile(".Config/.LoginCred/data.dll") is True:
     with open(".Config/.LoginCred/data.dll", "rb") as txt:
-        usrname = ", %s" %txt.read()
+        usrname = ", %s" %com3("Uni2D", txt.read(), 256, []).split(" ")[0]
 else:
     usrname = ""
 
