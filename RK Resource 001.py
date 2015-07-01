@@ -1357,20 +1357,18 @@ def balancetm(lineup1, lineup2, ratingrange):
 
         for i in range(mem_i, len(lineup2)):
             ratingdif = abs(int(player[1]) - int(lineup2[i][1]))
-
             if ratingrange >= ratingdif:
 
-                try:
+                if i != len(lineup2) - 1:
                     if ratingrange < abs(int(player[1]) - int(lineup2[i + 1][1])):
-                        pairs.append([player, lineup2[i - 1]])
+                        x = i - 1
+                        if x == -1:
+                            x = 0
+
+                        pairs.append([player, lineup2[x]])
                         offset += ratingdif
                         mem_i = i + 1
                         break
-                except IndexError:
-                    pairs.append([player, lineup2[i]])
-                    offset += ratingdif
-                    mem_i = i + 1
-                    break
 
                 if ratingdif >= oldif:
                     pairs.append([player, lineup2[i - 1]])
@@ -3502,10 +3500,6 @@ while pathway in (["y"]):
             lineup1a, offset1 = balancetm(lineup1, lineup2, ratingrange)
             lineup2a, offset2 = balancetm(lineup2, lineup1, ratingrange)
 
-            print lineup1a
-            print "\n"
-            print lineup2a
-
             if offset2 < offset1:
                 temp = group2
                 group2 = group1
@@ -3519,8 +3513,6 @@ while pathway in (["y"]):
             print "\n\n\n%s vs %s" %(group1, group2)
             for i, pair in enumerate(lineup):
                 print "\n %i. %s (%s) vs %s (%s)" %(i + 1, pair[0][0], pair[0][1], pair[1][0], pair[1][1])
-
-            print "\n\nTotal rating difference: %i point in favour of %s\n" %(offset, group1)
 
             pathway = runagain()
             continue
