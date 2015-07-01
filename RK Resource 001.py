@@ -1347,11 +1347,11 @@ def readFile2(filename):
 
     return list(set(target))
 
-def balancetm(group1, lineup1, group2, lineup2, ratingrange):
+def balancetm(lineup1, lineup2, ratingrange):
     mem_i = 0
-    board = 1
+    offset = 0
+    pairs = []
 
-    print "\n\n\n%s vs %s" %(group1, group2)
     for player in lineup1:
         oldif = 4000
 
@@ -1362,25 +1362,27 @@ def balancetm(group1, lineup1, group2, lineup2, ratingrange):
 
                 try:
                     if ratingrange < abs(int(player[1]) - int(lineup2[i + 1][1])):
-                        print "\n %i. %s (%s) vs %s (%s)" %(board, player[0], player[1], lineup2[i - 1][0], lineup2[i - 1][1])
-                        board += 1
+                        pairs.append([player, lineup2[i - 1]])
+                        offset += ratingdif
                         mem_i = i + 1
                         break
                 except IndexError:
-                    print "\n %i. %s (%s) vs %s (%s)" %(board, player[0], player[1], lineup2[i][0], lineup2[i][1])
-                    board += 1
+                    pairs.append([player, lineup2[i]])
+                    offset += ratingdif
                     mem_i = i + 1
                     break
 
                 if ratingdif >= oldif:
-                    print "\n %i. %s (%s) vs %s (%s)" %(board, player[0], player[1], lineup2[i - 1][0], lineup2[i - 1][1])
+                    pairs.append([player, lineup2[i - 1]])
                     oldif = ratingdif
-                    board += 1
+                    offset += ratingdif
                     mem_i = i
                     break
 
                 else:
                     oldif = ratingdif
+
+    return pairs, offset
 
 def evenpairing(lst1, lst2):
     playlst = list()
@@ -3497,10 +3499,29 @@ while pathway in (["y"]):
             ratingrange = enterint("Rating range: ")
             group1, lineup1, group2, lineup2 = getTmParticipants(browser, tmURL)
 
-            if len(lineup1) > len(lineup2):
-                balancetm(group1, lineup1, group2, lineup2, ratingrange)
+            lineup1a, offset1 = balancetm(lineup1, lineup2, ratingrange)
+            lineup2a, offset2 = balancetm(lineup2, lineup1, ratingrange)
+
+            print lineup1a
+            print "\n"
+            print lineup2a
+
+            if offset2 < offset1:
+                temp = group2
+                group2 = group1
+                group1 = temp
+                lineup = lineup2a
+                offset = offset2
             else:
-                balancetm(group2, lineup2, group1, lineup1, ratingrange)
+                lineup = lineup1a
+                offset = offset1
+
+            print "\n\n\n%s vs %s" %(group1, group2)
+            for i, pair in enumerate(lineup):
+                print "\n %i. %s (%s) vs %s (%s)" %(i + 1, pair[0][0], pair[0][1], pair[1][0], pair[1][1])
+
+            print "\n\nTotal rating difference: %i point in favour of %s\n" %(offset, group1)
+
             pathway = runagain()
             continue
 
