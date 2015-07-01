@@ -1361,13 +1361,10 @@ def balancetm(lineup1, lineup2, ratingrange):
 
                 if i != len(lineup2) - 1:
                     if ratingrange < abs(int(player[1]) - int(lineup2[i + 1][1])):
-                        x = i - 1
-                        if x == -1:
-                            x = 0
 
-                        pairs.append([player, lineup2[x]])
+                        pairs.append([player, lineup2[i]])
                         offset += ratingdif
-                        mem_i = i + 1
+                        mem_i = i
                         break
 
                 if ratingdif >= oldif:
