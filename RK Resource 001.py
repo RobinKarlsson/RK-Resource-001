@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 # RK resource 001
 # developed by Robin Karlsson
-# contact email: "r.robin.karlsson@gmail.com"
-# contact chess.com profile: "http://www.chess.com/members/view/SudoRoot"
+# contact: http://www.chess.com/members/view/SudoRoot
 # version 0.9.1.3 Alfa
 
 import os
@@ -2909,7 +2908,7 @@ while pathway in (["y"]):
         olprint2("{0: ^70}", content, "|", "|")
     olprint("|", "|", "-", 72, True)
 
-    for content in (["", "", "developed by Robin Karlsson", "", "", "Contact information", "", "r.robin.karlsson@gmail.com", "http://www.chess.com/members/view/SudoRoot", "", ""]):
+    for content in (["", "", "developed by Robin Karlsson", "", "", "Contact information", "", "http://www.chess.com/members/view/SudoRoot", "", ""]):
         olprint2("{0: ^70}", content, "|", "|")
     olprint("|", "|", "-", 72, True)
 
