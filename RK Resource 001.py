@@ -931,12 +931,14 @@ def getTmParticipants(browser, targetURL):
     souppar = soup.find_all(class_ = "align-left")
 
     group1, group2 = re.findall("/groups/home/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", str(soup.find_all(class_ = "default border-top alternate")))
+    group1 = group1[13:].replace("-", " ")
+    group2 = group2[13:].replace("-", " ")
 
     for x in souppar:
         x = x.text
         if x == "":
             continue
-        if "Waiting" in x:
+        if "Waiting" in x or "Ready!" in x:
             break
 
         if x.strip() == "":
@@ -958,12 +960,16 @@ def getTmParticipants(browser, targetURL):
         if team1:
             lineup1.append(x)
             count = 0
+            if supusr is True:
+                print "%s added to %s's lineup" %(x[0], group1)
         else:
             lineup2.append(x)
+            if supusr is True:
+                print "%s added to %s's lineup" %(x[0], group2)
             if not team2:
                 team1 = True
 
-    return group1[13:].replace("-", " "), lineup1, group2[13:].replace("-", " "), lineup2
+    return group1, lineup1, group2, lineup2
 
 def tmparchecker(browser, pagelist, targetname):
     tmyear = enterint("\nOnly check tm's that has been open for registration since year, leave empty to skip (YYYY) ")
