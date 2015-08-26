@@ -2932,7 +2932,7 @@ else:
 
 while pathway in (["y"]):
     olprint("*", "*", "-", 72, True)
-    for content in (["", "", "", "RK Resource 001", "version 0.9.1.3 Alfa", "", "", ""]):
+    for content in (["", "", "", "RK Resource 001", "version 0.9.1.4 Alfa", "", "", ""]):
         olprint2("{0: ^70}", content, "|", "|")
     olprint("|", "|", "-", 72, True)
 
