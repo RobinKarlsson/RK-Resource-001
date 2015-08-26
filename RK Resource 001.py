@@ -269,7 +269,7 @@ def pickbrowser(browserchoice, adext):
     while True:
         if browserchoice == "1":
             fopt = webdriver.FirefoxProfile()
-            if adext == True:
+            if adext:
                 for fname in os.listdir("Data/Webdriver/Extensions/Firefox"):
                     if fname.endswith(".xpi"):
                         try:
@@ -293,7 +293,7 @@ def pickbrowser(browserchoice, adext):
 
         elif browserchoice == "2":
             copt = Options()
-            if adext == True:
+            if adext:
                 for fname in os.listdir("Data/Webdriver/Extensions/Chrome"):
                     if fname.endswith(".crx"):
                         try:
@@ -349,7 +349,7 @@ def pickbrowser(browserchoice, adext):
 
         browserchoice = raw_input("\nSomething went wrong, please send this to the developer: %s   %s\n\nTry and pick another browser\n 1. Firefox\n 2. Chrome\nEnter choice: " %(browserchoice, getplatform()))
 
-    if handle == True:
+    if handle:
         time.sleep(2)
         browser.switch_to_window(browser.window_handles[-1])
     return browser, handle
@@ -432,7 +432,7 @@ def ramusage():
 def resource01(evenmtch, mtchlist):
     ctrl = False
     for element in evenmtch:
-        if ctrl == True:
+        if ctrl:
             mtchlist.append(str(element.text.encode("utf8")).split("\n"))
         ctrl = True
     return mtchlist
@@ -739,7 +739,7 @@ def pmdriver(target, choice):
             debugout()
 
         if choice2 == "y":
-            if memberprocesser(soup, membername2, minpoints, minrat, maxrat, mingames, mincurrent, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemin, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat) is False:
+            if not memberprocesser(soup, membername2, minpoints, minrat, maxrat, mingames, mincurrent, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemin, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat):
                 if supusr:
                     print "\t%s Didnt pass filter" %membername2
                 continue
@@ -1137,7 +1137,7 @@ def latestTMsOnsite(browser):
     return sorted(zip(*[iter(targetlst)] * 5), key = itemgetter(2), reverse = True)
 
 def memspider(target, silent, browser):
-    if silent == False:
+    if not silent:
         print "\n\nTime      Page\n"
     usrlist = list()
     for tlst in target:
@@ -1149,7 +1149,7 @@ def memspider(target, silent, browser):
             soup = BeautifulSoup(response)
             p2 = str(soup.find_all(class_ = "next-on"))
 
-            if silent == False:
+            if not silent:
                 print "%s    %s" %(ltime(), pointer)
 
                 if supusr:
@@ -1220,8 +1220,8 @@ def selbrowch():
     return browserchoice
 
 def createfileifmissing(filename, ismsg):
-    if os.path.isfile(filename) is False:
-        if ismsg is False:
+    if not os.path.isfile(filename):
+        if not ismsg:
             open(filename, "wb").close()
         else:
             with open(filename, "wb") as mfile:
@@ -1463,7 +1463,7 @@ def olprint(startc, endc, inchar, endn, nline):
         sys.stdout.write(inchar)
     sys.stdout.write(endc)
     sys.stdout.flush()
-    if nline == True:
+    if nline:
         print ""
 
 def enterint(text):
@@ -1506,7 +1506,7 @@ def notesfriendscheck(tocheck, checkfor, choice):
                 notfriends = False
                 break
 
-        if notfriends == True:
+        if notfriends:
             notpresent.append(member)
 
     return present, notpresent
@@ -1670,7 +1670,7 @@ def inviter(targetlist, endless):
     redo = True
     counter = 1
     while redo == True:
-        if endless == False:
+        if not endless:
             redo = False
 
         for target in targetlist:
@@ -1793,7 +1793,7 @@ def inviter(targetlist, endless):
 
             if priolst == True or standardlst == True:
                 msglist = fileopen(msgliststand, True)
-            elif deserterlst == True:
+            elif deserterlst:
                 msglist = fileopen(msglistleft, True)
 
             msgstr = u""
@@ -1836,7 +1836,7 @@ def inviter(targetlist, endless):
 
                 if choice2 == "y" and standardlst == True:
                     try:
-                        if memberprocesser(soup, member, minpoints, minrat, maxrat, mingames, mincurrent, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemin, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat) is False:
+                        if not memberprocesser(soup, member, minpoints, minrat, maxrat, mingames, mincurrent, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemin, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat):
                             try:
                                 memtinv.remove(member)
                                 if supusr:
@@ -2047,7 +2047,7 @@ def vcman(vclinklist, yourside):
                     break
                 print "\n\n%sReopening %s\n\n" %(ltime(), vcmatch)
 
-        if skipmatch == True:
+        if skipmatch:
             print"\n\n\n%sFailed to load page and therefore skipped the match, %s\n\n\n" %(ltime(), vcmatch)
             continue
 
@@ -2301,7 +2301,7 @@ def fileopen(filename, message):
         open(filename, "wb").close()
         sys.exit("\n\n%s doesn't exist, it has now been created!!!\n\n" %filename)
 
-    if message == True:
+    if message:
         return [(msglist[counter],msglist[counter + 1]) for counter in range(0, len(msglist), 2)]
     else:
         return msglist
@@ -2413,7 +2413,7 @@ def memberprocesser(soup, targetx, minpoints, minrat, maxrat, mingames, mincurre
                     return False
 
         if avatarch == "y":
-            if AvatarCheck(soup) == False:
+            if not AvatarCheck(soup):
                 return False
 
         if youngeryear != "" or olderyear != "":
@@ -2710,14 +2710,14 @@ def file_or_input(mult, fdiag1, fdiag2, idiag1, idiag2):
             list1 = raw_input(fdiag1)
         list1 = readFile(list1)
 
-        if mult == True:
+        if mult:
             while list2 not in flist:
                 list2 = raw_input(fdiag2)
             list2 = readFile(list2)
 
     elif choice == "1":
         list1 = streplacer(raw_input(idiag1), ([" ", ""], ["(", ""], [")", ""], ["]", ""], ["[", ""], ["'", ""])).split(",")
-        if mult == True:
+        if mult:
             list2 = streplacer(raw_input(idiag2), ([" ", ""], ["(", ""], [")", ""], ["]", ""], ["[", ""], ["'", ""])).split(",")
 
     return list1, list2
@@ -2872,7 +2872,7 @@ def sigstrength(template):
 
         for line in cmd.split("\n"):
             if "ESSID:" in line:
-                if supusr == True:
+                if supusr:
                     interf = line[0: line.index(" ")].replace("ESSID:", "")[:9]
 
             if "Link Quality" in line:
