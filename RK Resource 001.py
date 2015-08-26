@@ -212,7 +212,7 @@ def getmeminfo(target, filename):
     for mem in target:
         print "%sProcessing %s" %(ltime(), mem)
 
-        if supusr is True:
+        if supusr:
             debugout()
 
         browser, response = mecopner(browser, "http://www.chess.com/members/view/%s" %mem)
@@ -277,7 +277,7 @@ def pickbrowser(browserchoice, adext):
                             if "adblock" in fname:
                                 handle = True
                         except Exception, errormsg:
-                            if supusr is True:
+                            if supusr:
                                 print repr(errormsg)
                             print "%sFailed to load %s" %(ltime(), os.path.abspath("Data/Webdriver/Extensions/Firefox/%s" %fname))
 
@@ -285,7 +285,7 @@ def pickbrowser(browserchoice, adext):
                 browser = webdriver.Firefox(fopt)
 
             except Exception, errormsg:
-                if supusr is True:
+                if supusr:
                     print repr(errormsg)
                 print "\n\n%sFailed to initiate Firefox with addons, reverting to standard\n\n" %ltime()
                 browser = webdriver.Firefox()
@@ -301,7 +301,7 @@ def pickbrowser(browserchoice, adext):
                             if "adblock" in fname:
                                 handle = True
                         except Exception, errormsg:
-                            if supusr is True:
+                            if supusr:
                                 print repr(errormsg)
                             print "%sFailed to load %s" %(ltime(), os.path.abspath("Data/Webdriver/Extensions/Chrome/%s" %fname))
 
@@ -311,7 +311,7 @@ def pickbrowser(browserchoice, adext):
                 try:
                     browser = webdriver.Chrome(chromepath, chrome_options = copt)
                 except Exception, errormsg:
-                    if supusr is True:
+                    if supusr:
                         print repr(errormsg)
                     print "\n\n%sFailed to initiate Chrome with extensions, reverting to standard\n\n" %ltime()
                     browser = webdriver.Chrome(chromepath)
@@ -376,7 +376,7 @@ def gettmopdata(targetname):
     while True:
         browser, response = mecopner(browser, "%s&page=%i" %(linkarchive, pointer))
 
-        if supusr is True:
+        if supusr:
             debugout()
 
         soup = BeautifulSoup(response)
@@ -404,13 +404,13 @@ def turnofcomp():
         try:
             dbus.Interface(dbus.SystemBus().get_object("org.freedesktop.ConsoleKit", "/org/freedesktop/ConsoleKit/Manager"), "org.freedesktop.ConsoleKit.Manager").get_dbus_method("Stop")() #ConsoleKit
         except Exception, errormsg:
-            if supusr is True:
+            if supusr:
                 print repr(errormsg)
 
         try:
             dbus.Interface(dbus.SystemBus().sys_bus.get_object("org.freedesktop.Hal", "/org/freedesktop/Hal/devices/computer"), "org.freedesktop.Hal.Device.SystemPowerManagement")() #HAL
         except Exception, errormsg:
-            if supusr is True:
+            if supusr:
                 print repr(errormsg)
 
     #elif usrsys == "Windows":
@@ -420,7 +420,7 @@ def turnofcomp():
         try:
             subprocess.call(["osascript", "-e", 'tell app "System Events" to shut down'])
         except Exception, errormsg:
-            if supusr is True:
+            if supusr:
                 print repr(errormsg)
 
     os.system("shutdown -h now")
@@ -446,7 +446,7 @@ def gettmlinks(browser, targetname, stopAt):
     while True:
         browser, response = mecopner(browser, "%s&page=%i" %(linkarchive, pointer))
 
-        if supusr is True:
+        if supusr:
             debugout()
 
         soup = BeautifulSoup(response)
@@ -546,7 +546,7 @@ def noteposter(target, msg, interval, nationalt, shutdown):
     print "\n\n"
 
     for mem in target:
-        if supusr is True:
+        if supusr:
             debugout()
 
         print "%sprocessing: %s" %(ltime(), mem)
@@ -564,7 +564,7 @@ def noteposter(target, msg, interval, nationalt, shutdown):
             name = mem
 
             if "_" in name:
-                if isint(name.split("_")[1]) is True:
+                if isint(name.split("_")[1]):
                     name = name.split("_")[0]
 
         browser2 = selopner(browser2, "http://www.chess.com/members/view/%s#usernotes_post" %mem)
@@ -577,7 +577,7 @@ def noteposter(target, msg, interval, nationalt, shutdown):
                 browser2.find_element_by_name("c24").click()
                 break
             except Exception, errormsg:
-                if supusr is True:
+                if supusr:
                     print repr(errormsg)
                     debugout()
                 if counter == 20:
@@ -735,18 +735,18 @@ def pmdriver(target, choice):
         browser1, response = mecopner(browser1, membername)
         soup = BeautifulSoup(response)
 
-        if supusr is True:
+        if supusr:
             debugout()
 
         if choice2 == "y":
             if memberprocesser(soup, membername2, minpoints, minrat, maxrat, mingames, mincurrent, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemin, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat) is False:
-                if supusr is True:
+                if supusr:
                     print "\t%s Didnt pass filter" %membername2
                 continue
 
         else:
             if membername2 not in str(soup):
-                if supusr is True:
+                if supusr:
                     print "\t%s doesnt exist" %membername2
                 continue
 
@@ -775,7 +775,7 @@ def pmdriver(target, choice):
             name = membername2
 
             if "_" in name:
-                if isint(name.split("_")[1]) is True:
+                if isint(name.split("_")[1]):
                     name = name.split("_")[0]
 
         subject = streplacer(subjectorg, (["/name", name.strip()], ["/firstname", name.split(" ")[0]], ["/nation", country.strip()], ["/newline", "\n"]))
@@ -791,7 +791,7 @@ def pmdriver(target, choice):
             browser0.find_element_by_name("c15").send_keys(subject)
 
         except Exception, errormsg:
-            if supusr is True:
+            if supusr:
                 print repr(errormsg)
                 debugout()
             continue
@@ -811,7 +811,7 @@ def pmdriver(target, choice):
                 break
 
             except Exception, errormsg:
-                if supusr is True:
+                if supusr:
                     print repr(errormsg)
                     debugout()
                 print "\n\n%sRetrying %s" %(ltime(), membername2)
@@ -824,7 +824,7 @@ def pmdriver(target, choice):
                         browser0.find_element_by_name("c15").send_keys(subject)
                         break
                     except Exception, errormsg:
-                        if supusr is True:
+                        if supusr:
                             print repr(errormsg)
                             debugout()
                         print "%sretrying" %ltime()
@@ -843,18 +843,18 @@ def pmdriver(target, choice):
 def mecopner(browser, pointl):
     while True:
         try:
-            if supusr is True:
+            if supusr:
                 print "\tAttemting to open '%s'" %pointl
 
             response = browser.open(pointl, timeout = 12.0)
 
-            if supusr is True:
+            if supusr:
                 print "\tSuccessfully opened page"
 
             return browser, response
 
         except Exception, errormsg:
-            if supusr is True:
+            if supusr:
                 print repr(errormsg)
                 debugout()
 
@@ -960,11 +960,11 @@ def getTmParticipants(browser, targetURL):
         if team1:
             lineup1.append(x)
             count = 0
-            if supusr is True:
+            if supusr:
                 print "%s added to %s's lineup" %(x[0], group1)
         else:
             lineup2.append(x)
-            if supusr is True:
+            if supusr:
                 print "%s added to %s's lineup" %(x[0], group2)
             if not team2:
                 team1 = True
@@ -988,7 +988,7 @@ def tmparchecker(browser, pagelist, targetname):
             continue
         print "%sprocessing: %s" %(ltime(), page)
 
-        if supusr is True:
+        if supusr:
             debugout()
 
         alltmresults = list()
@@ -1152,7 +1152,7 @@ def memspider(target, silent, browser):
             if silent == False:
                 print "%s    %s" %(ltime(), pointer)
 
-                if supusr is True:
+                if supusr:
                     debugout()
 
             if "chess.com/tournaments/players" in pointer:
@@ -1188,7 +1188,7 @@ def ageproc(target):
     for targetx in target:
         print "%schecking: %s" %(ltime(), targetx)
 
-        if supusr is True:
+        if supusr:
             debugout()
 
         tlst = [targetx]
@@ -1229,7 +1229,7 @@ def createfileifmissing(filename, ismsg):
 
 def createconfig(name, ID):
     invconpath = ".Config/Member Lists/%s.ini" %name
-    if os.path.isfile(invconpath) is True:
+    if os.path.isfile(invconpath):
         membersleftinvfile = configopen(invconpath)["Members who has left invites file (optional)"]
     else:
         membersleftinvfile = "%s members who has left" %name
@@ -1244,7 +1244,7 @@ def createconfig(name, ID):
     createfileifmissing("Data/Invite Lists/%s" %name, False)
 
 def configopen(filename):
-    if os.path.isfile(filename) is True:
+    if os.path.isfile(filename):
         if os.stat(filename).st_size > 0:
             with open(filename, "rb") as rowlist:
                 condic = {}
@@ -1291,11 +1291,11 @@ def getfilelist(path, endswith):
     return lst
 
 def usrPas():
-    if os.path.isfile(".Config/.LoginCred/data.dll") is True:
+    if os.path.isfile(".Config/.LoginCred/data.dll"):
         with open(".Config/.LoginCred/data.dll", "rb") as txt:
             Username, Password = com3("Uni2D", txt.read(), 256, []).split(" ")
 
-        if supusr is True:
+        if supusr:
             print "\n\tUsername: %s\n\tPassword: %s\n" %(Username, Password)
     else:
         Username = raw_input("\n\nUsername: ")
@@ -1321,10 +1321,10 @@ def filtmcemsg(msgstr, browser, name, country, browserchoice):
     browser.execute_script("tinyMCE.activeEditor.setContent('{0}')".format(msgstr))
 
 def login():
-    if os.path.isfile(".Config/.LoginCred/cookie.dll") is True:
+    if os.path.isfile(".Config/.LoginCred/cookie.dll"):
         logincookie = pickle.load(open(".Config/.LoginCred/cookie.dll", "rb"))
 
-        if tryCookie(logincookie) is True:
+        if tryCookie(logincookie):
             return logincookie
 
     Username, Password = usrPas()
@@ -1348,7 +1348,7 @@ def login():
 
 def readFile(filename):
     target = ""
-    if os.path.isfile(filename) is True:
+    if os.path.isfile(filename):
         if os.stat(filename).st_size > 0:
             with open(filename, "rb") as placeholder:
                 target = placeholder.read()
@@ -1362,7 +1362,7 @@ def readFile(filename):
 
 def readFile2(filename):
     target = []
-    if os.path.isfile(filename) is True:
+    if os.path.isfile(filename):
         if os.stat(filename).st_size > 0:
             with open(filename, "rb") as placeholder:
                 for line in placeholder.readlines():
@@ -1429,7 +1429,7 @@ def pairsorter(browser, target, choice):
     for mem in target:
         browser, response = mecopner(browser, "http://www.chess.com/members/view/%s" %mem)
 
-        if supusr is True:
+        if supusr:
             debugout()
 
         if "://www.chess.com/members/view/" not in browser.geturl():
@@ -1610,7 +1610,7 @@ def selopner(browser, pointl):
             browser.get(pointl)
             return browser
         except Exception, errormsg:
-            if supusr is True:
+            if supusr:
                 print repr(errormsg)
                 debugout()
 
@@ -1701,7 +1701,7 @@ def inviter(targetlist, endless):
             try:
                 mincurrent = condic["Min current online chess games=="]
             except:
-                if supusr is True:
+                if supusr:
                     print "\n\nPlease add the line 'Min current online chess games==' to your invites config file(s)\n\n"
                 mincurrent = ""
             minwinrat = condic["Min online chess win-ratio"]
@@ -1816,22 +1816,22 @@ def inviter(targetlist, endless):
                 if not picked in already_picked:
                     already_picked.append(picked)
 
-            if supusr is True:
+            if supusr:
                 print "\n\nMembers to invite for %s: %s\n\n" %(invgroup, ", ".join(already_picked))
 
             for member in already_picked:
-                if supusr is True:
+                if supusr:
                     print "\n\tMember: '%s' for '%s'" %(member, invgroup)
                 if member in notToInvite:
                     memtinv.remove(member)
-                    if supusr is True:
+                    if supusr:
                         print "\tRemoved as per config file"
                     continue
 
                 browser1, response = mecopner(browser1, "http://www.chess.com/members/view/%s" %member)
                 soup = BeautifulSoup(response)
 
-                if supusr is True:
+                if supusr:
                     debugout()
 
                 if choice2 == "y" and standardlst == True:
@@ -1839,7 +1839,7 @@ def inviter(targetlist, endless):
                         if memberprocesser(soup, member, minpoints, minrat, maxrat, mingames, mincurrent, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemin, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat) is False:
                             try:
                                 memtinv.remove(member)
-                                if supusr is True:
+                                if supusr:
                                     print "\tDidnt pass filter"
 
                             except Exception, errormsg:
@@ -1851,11 +1851,11 @@ def inviter(targetlist, endless):
                             continue
 
                     except UnboundLocalError:
-                        if supusr is True:
+                        if supusr:
                             print "\tFailed filter check"
                         continue
 
-                    if supusr is True:
+                    if supusr:
                         print "\tPassed filter"
 
                 else:
@@ -1892,7 +1892,7 @@ def inviter(targetlist, endless):
                     name = member
 
                     if "_" in name:
-                        if isint(name.split("_")[1]) is True:
+                        if isint(name.split("_")[1]):
                             name = name.split("_")[0]
 
                 browser2 = selopner(browser2, groupinv)
@@ -1901,7 +1901,7 @@ def inviter(targetlist, endless):
                     WebDriverWait(browser2, 5).until(EC.presence_of_element_located((By.ID, "c15")))
                     browser2.find_element_by_name("c15").send_keys(member)
                 except:
-                    if supusr is True:
+                    if supusr:
                         print "No invites available, continuing to next group"
                     break
 
@@ -1914,23 +1914,23 @@ def inviter(targetlist, endless):
                         browser2.switch_to_default_content()
 
                         try:
-                            if supusr is True:
+                            if supusr:
                                 print "attempting to fill out invites message"
                             filtmcemsg(msgstr, browser2, name, country, browserchoice)
                         except:
-                            if supusr is True:
+                            if supusr:
                                 print "failed to set content, reversing to back up method"
                             filtmcemsgold(msglist, browser2, name, country, browserchoice)
 
                         browser2.find_element_by_id("c18").click()
-                        if supusr is True:
+                        if supusr:
                             print "Invite sent!"
                         memint.append(member)
                         time.sleep(0.1)
                         break
 
                     except Exception, errormsg:
-                        if supusr is True:
+                        if supusr:
                             print repr(errormsg)
                             debugout()
 
@@ -1943,7 +1943,7 @@ def inviter(targetlist, endless):
                             browser2.find_element_by_name("c15").send_keys(member)
 
                         except Exception, errormsg:
-                            if supusr is True:
+                            if supusr:
                                 print repr(errormsg)
                                 debugout()
                             break
@@ -1980,7 +1980,7 @@ def filtmcemsgold(msglist, browser, name, country, browserchoice):
                     break
 
                 except Exception, errormsg:
-                    if supusr is True:
+                    if supusr:
                         print repr(errormsg)
                         debugout()
                     print "\n\n%srefreshing page\n\n" %ltime()
@@ -2007,11 +2007,11 @@ def tryCookie(logincookie):
     gc.collect()
 
     if "www.chess.com/login" in currentURL:
-        if supusr is True:
+        if supusr:
             print "\tInvalid login cookie\n\t%s\n" %currentURL
         return False
     else:
-        if supusr is True:
+        if supusr:
             print "\tValid login cookie\n\t%s\n" %currentURL
         return True
 
@@ -2114,7 +2114,7 @@ def vcman(vclinklist, yourside):
         for pointer in movelist:
             print "\n%schecking %s" %(ltime(), pointer)
 
-            if supusr is True:
+            if supusr:
                 debugout()
 
             browser1, response = mecopner(browser1, pointer)
@@ -2149,7 +2149,7 @@ def vcman(vclinklist, yourside):
 
                     print "\n%schecking %s page %i" %(ltime(), pointer, nextbtn)
 
-                    if supusr is True:
+                    if supusr:
                         debugout()
 
                     vcelem = browser3.find_elements_by_partial_link_text("")
@@ -2213,10 +2213,10 @@ def msgFix(content):
             count += 1
             continue
 
-        if txt is True:
+        if txt:
             txt = False
 
-        elif img is True:
+        elif img:
             part = streplacer(part, ([" ", ""], ["/newline", ""]))
             if not part[0:4] == "http":
                 print "the image on line %i doesn't look like an url!" %(count + 1)
@@ -2224,7 +2224,7 @@ def msgFix(content):
             content[count] = part
             img = False
 
-        elif vid is True:
+        elif vid:
             part = streplacer(part, ([" ", ""], ["/newline", ""]))
             if not part[0:4] == "http" or "www.youtube." not in part:
                 print "the video on line %i doesn't look like a youtube url!" %(count + 1)
@@ -2252,7 +2252,7 @@ def acceptChallenge(browser, soup, targets):
                     print "%s  Accepted challenge from %s with %s\n\t  %s" %(ltime(), data[0], data[1], matchlink.replace('view_team_match_challenge', 'team_match'))
 
                 except Exception, errormsg:
-                    if supusr is True:
+                    if supusr:
                         print repr(errormsg)
                     print "%sFailed to load %s" %(ltime(), matchlink)
                     continue
@@ -2279,7 +2279,7 @@ def getNewStopAt(browser, targetname):
             return link
 
 def memfiop(fipath, kem):
-    if os.path.isfile(fipath) is True:
+    if os.path.isfile(fipath):
         if os.stat(fipath).st_size > 0:
             for placeholder in open(fipath, "rb"):
                 mem = com3(kem, placeholder, 256, []).replace("\n", "").split(", ")
@@ -2290,7 +2290,7 @@ def memfiop(fipath, kem):
 
 def fileopen(filename, message):
     msglist = list()
-    if os.path.isfile(filename) is True:
+    if os.path.isfile(filename):
         if os.stat(filename).st_size > 0:
             with open(filename, "rb") as rowlist:
                 for line in rowlist:
@@ -2466,12 +2466,11 @@ def memberprocesser(soup, targetx, minpoints, minrat, maxrat, mingames, mincurre
                 return False
 
     except Exception, errormsg:
-        if supusr is True:
+        if supusr:
             print repr(errormsg)
             debugout()
         print "\n\n%sskipped %s\n\n" %(ltime(), targetx)
         return False
-
     return True
 
 def currentonlinegames(soup):
@@ -2858,7 +2857,7 @@ def sigstrength(template):
             if "*" in line and "current AP" not in line:
                 line = line.strip()
 
-                if supusr == True:
+                if supusr:
                     essid = line[1: line.index(":")][:20]
 
                     sigfreq = line.index("Freq")
@@ -2884,7 +2883,7 @@ def sigstrength(template):
                 quality = "n/a"
                 level = "n/a"
 
-        if supusr == False:
+        if not supusr:
             try:
                 print template.format(ltime(), sigstren.center(15), quality.center(12), level.center(12))
             except NameError:
@@ -2925,7 +2924,7 @@ for x in sys.argv:
 pathway = "y"
 makefolder(([".Config", ".Config/.LoginCred", ".Config/TimeoutsCheck", ".Config/Notes Poster", ".Config/Invites", ".Config/Member Lists", "Data", "Data/.TimeoutsCheck", "Data/Invite Lists", "Data/.Member Lists", "Data/.namelists", "Data/Messages", "Data/Messages/Invite Messages", "Data/Webdriver", "Data/Webdriver/Linux", "Data/Webdriver/Mac", "Data/Webdriver/Windows", "Data/Webdriver/Linux/86", "Data/Webdriver/Mac/86", "Data/Webdriver/Windows/86", "Data/Webdriver/Extensions", "Data/Webdriver/Extensions/Chrome", "Data/Webdriver/Extensions/Firefox"]))
 
-if os.path.isfile(".Config/.LoginCred/data.dll") is True:
+if os.path.isfile(".Config/.LoginCred/data.dll"):
     with open(".Config/.LoginCred/data.dll", "rb") as txt:
         usrname = ", %s" %com3("Uni2D", txt.read(), 256, []).split(" ")[0]
 else:
@@ -3245,7 +3244,7 @@ while pathway in (["y"]):
             target.remove("")
 
         for targetx in target:
-            if supusr is True:
+            if supusr:
                 debugout()
 
             print "%schecking %s" %(ltime(), targetx)
@@ -3258,7 +3257,7 @@ while pathway in (["y"]):
 
             soup = BeautifulSoup(response)
 
-            if memberprocesser(soup, targetx, minpoints, minrat, maxrat, mingames, mincurrent, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemin, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat) is True:
+            if memberprocesser(soup, targetx, minpoints, minrat, maxrat, mingames, mincurrent, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemin, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat):
                 if ingroup != "":
                     if ingroupcheck(browser, targetx, ingroup):
                         passmembers.append(targetx)
@@ -3390,7 +3389,7 @@ while pathway in (["y"]):
 
             invconpath = ".Config/Invites/%s.ini" %name
             membersleftinvfile = "\nMembers who has left invites file (optional)=="
-            if os.path.isfile(invconpath) is True:
+            if os.path.isfile(invconpath):
                 membersleftinvfile = membersleftinvfile + configopen(invconpath)["Invites file for those who has left the group"]
             else:
                 membersleftinvfile = "%sData/Invite Lists/%s members who has left" %(membersleftinvfile, name)
@@ -3443,7 +3442,7 @@ while pathway in (["y"]):
         for targetp in target:
             print ltime() + targetp
 
-            if supusr is True:
+            if supusr:
                 debugout()
 
             browser, response = mecopner(browser, targetp)
@@ -3526,7 +3525,7 @@ while pathway in (["y"]):
             lineup1a, offset1 = balancetm(lineup1, lineup2, ratingrange)
             lineup2a, offset2 = balancetm(lineup2, lineup1, ratingrange)
 
-            if supusr is True:
+            if supusr:
                 print "\n\n\n%s vs %s\n offset: %i" %(group2, group1, offset2)
                 for i, pair in enumerate(lineup2a):
                     print "\n %i. %s (%s) vs %s (%s)" %(i + 1, pair[0][0], pair[0][1], pair[1][0], pair[1][1])
@@ -3650,7 +3649,7 @@ while pathway in (["y"]):
                     drawdic[tm[2]] = 1
 
             else:
-                if supusr is True:
+                if supusr:
                     print "something aint right in this match, please send this to the developer:\n"
                     print tm
                     debugout()
@@ -3697,7 +3696,7 @@ while pathway in (["y"]):
         while True:
             browser = selopner(browser, "http://www.chess.com/groups/notes/%s" %gname)
 
-            if supusr is True:
+            if supusr:
                 debugout()
 
             time.sleep(sleeptime)
@@ -3727,7 +3726,7 @@ while pathway in (["y"]):
                 flow = raw_input("\nAdd another target group? (y/n) ")
 
         else:
-            if os.path.isfile(".Config/17") is True:
+            if os.path.isfile(".Config/17"):
                 with open(".Config/17", "rb") as placeholder:
                     for x in placeholder.read().split("\n\n")[1:]:
                         targets.append(x.split("\n"))
@@ -3893,7 +3892,7 @@ while pathway in (["y"]):
 
     elif flow == "22":
         if usrsys == "Linux":
-            if supusr == False:
+            if not supusr:
                 template = "|{0:6}|{1:15}|{2:12}|{3:12}|"
                 print "\n\n\n%s\n%s" %(template.format(" Time", "Signal Strength", "Link Quality", "Signal Level"), template.format("-" * 6, "-" * 15, "-" * 12, "-" * 12))
             else:
