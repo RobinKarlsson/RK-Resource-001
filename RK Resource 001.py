@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 # RK resource 001
 # developed by Robin Karlsson
-# contact: http://www.chess.com/members/view/SudoRoot
-# version 0.9.1.3 Alfa
+# contact email: "r.robin.karlsson@gmail.com"
+# contact chess.com profile: "http://www.chess.com/members/view/SudoRoot"
+# version 0.9.1.4 Alfa
 
 import os
 from os.path import isfile, join
@@ -920,27 +921,47 @@ def getTmParticipants(browser, targetURL):
     lineup1 = list()
     lineup2 = list()
 
+    team1 = True
+    team2 = False
+
+    count = 0
+
     browser, response = mecopner(browser, targetURL)
     soup = BeautifulSoup(response)
     souppar = soup.find_all(class_ = "align-left")
 
     group1, group2 = re.findall("/groups/home/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", str(soup.find_all(class_ = "default border-top alternate")))
 
-    for placeholder in souppar[0::4]:
-        try:
-            placeholder = str(placeholder.text)
-        except UnicodeEncodeError:
+    for x in souppar:
+        x = x.text
+        if x == "":
+            continue
+        if "Waiting" in x:
             break
-        if "(" in placeholder and "(Waiting...)" not in placeholder:
-            lineup1.append(streplacer(placeholder, ([" ", ""], [")", ""])).split("("))
 
-    for placeholder in souppar[3::4]:
-        try:
-            placeholder = str(placeholder.text)
-        except UnicodeEncodeError:
-            break
-        if "(" in placeholder and "(Waiting...)" not in placeholder:
-            lineup2.append(streplacer(placeholder, ([" ", ""], [")", ""])).split("("))
+        if x.strip() == "":
+            count += 1
+            continue
+
+        if count >= 2:
+            team2 = True
+            team1 = False
+
+        if x == "vs.":
+            team1 = False
+            continue
+
+        x = streplacer(x, (["(", ""], [")", ""])).split(" ")[1:]
+        if x[1] == "Unrated":
+            x[1] = 1200
+
+        if team1:
+            lineup1.append(x)
+            count = 0
+        else:
+            lineup2.append(x)
+            if not team2:
+                team1 = True
 
     return group1[13:].replace("-", " "), lineup1, group2[13:].replace("-", " "), lineup2
 
@@ -1362,12 +1383,14 @@ def balancetm(lineup1, lineup2, ratingrange):
                     if ratingrange < abs(int(player[1]) - int(lineup2[i + 1][1])):
 
                         pairs.append([player, lineup2[i]])
+                        del lineup2[i]
                         offset += ratingdif
                         mem_i = i
                         break
 
                 if ratingdif >= oldif:
                     pairs.append([player, lineup2[i - 1]])
+                    del lineup2[i-1]
                     oldif = ratingdif
                     offset += ratingdif
                     mem_i = i
@@ -2908,7 +2931,7 @@ while pathway in (["y"]):
         olprint2("{0: ^70}", content, "|", "|")
     olprint("|", "|", "-", 72, True)
 
-    for content in (["", "", "developed by Robin Karlsson", "", "", "Contact information", "", "http://www.chess.com/members/view/SudoRoot", "", ""]):
+    for content in (["", "", "developed by Robin Karlsson", "", "", "Contact information", "", "r.robin.karlsson@gmail.com", "http://www.chess.com/members/view/SudoRoot", "", ""]):
         olprint2("{0: ^70}", content, "|", "|")
     olprint("|", "|", "-", 72, True)
 
@@ -3493,22 +3516,33 @@ while pathway in (["y"]):
             ratingrange = enterint("Rating range: ")
             group1, lineup1, group2, lineup2 = getTmParticipants(browser, tmURL)
 
+
             lineup1a, offset1 = balancetm(lineup1, lineup2, ratingrange)
             lineup2a, offset2 = balancetm(lineup2, lineup1, ratingrange)
 
-            if offset2 < offset1:
-                temp = group2
-                group2 = group1
-                group1 = temp
-                lineup = lineup2a
-                offset = offset2
-            else:
-                lineup = lineup1a
-                offset = offset1
+            if supusr is True:
+                print "\n\n\n%s vs %s\n offset: %i" %(group2, group1, offset2)
+                for i, pair in enumerate(lineup2a):
+                    print "\n %i. %s (%s) vs %s (%s)" %(i + 1, pair[0][0], pair[0][1], pair[1][0], pair[1][1])
 
-            print "\n\n\n%s vs %s" %(group1, group2)
-            for i, pair in enumerate(lineup):
-                print "\n %i. %s (%s) vs %s (%s)" %(i + 1, pair[0][0], pair[0][1], pair[1][0], pair[1][1])
+                print "\n\n\n%s vs %s\n offset: %i" %(group1, group2, offset1)
+                for i, pair in enumerate(lineup1a):
+                    print "\n %i. %s (%s) vs %s (%s)" %(i + 1, pair[0][0], pair[0][1], pair[1][0], pair[1][1])
+                
+            else:
+                if offset2 < offset1:
+                    temp = group2
+                    group2 = group1
+                    group1 = temp
+                    lineup = lineup2a
+                    offset = offset2
+                else:
+                    lineup = lineup1a
+                    offset = offset1
+
+                print "\n\n\n%s vs %s" %(group1, group2)
+                for i, pair in enumerate(lineup):
+                    print "\n %i. %s (%s) vs %s (%s)" %(i + 1, pair[0][0], pair[0][1], pair[1][0], pair[1][1])
 
             pathway = runagain()
             continue
