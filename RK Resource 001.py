@@ -1225,7 +1225,7 @@ def createfileifmissing(filename, ismsg):
             open(filename, "wb").close()
         else:
             with open(filename, "wb") as mfile:
-                mfile.write("<Text>\nHello this is an example message\n<Image>\nhttp://d1lalstwiwz2br.cloudfront.net/images_users/avatars/RobinKarlsson_large.4.jpeg\n<Video>\nhttp://www.youtube.com/watch?v=GY8YBF8dHQo")
+                mfile.write("<Text>\nHello this is an example message\n<Image>\nhttp://images.chesscomfiles.com/uploads/user/10117446.a001a3bf.600x450i.a24be423b414.jpeg\n<Video>\nhttp://www.youtube.com/watch?v=GY8YBF8dHQo")
 
 def createconfig(name, ID):
     invconpath = ".Config/Member Lists/%s.ini" %name
@@ -1656,10 +1656,6 @@ def ingroupcheck(browser, member, group):
 
 def inviter(targetlist, endless):
     invitenum = 140
-    choice2 = ""
-    while choice2 not in (["y", "n"]):
-        choice2 = raw_input("\n\nOnly invite those who fill a few requirements (only names from the standard list will be affected)? (y/n) ")
-
     browserchoice = selbrowch()
     Username, Password = usrPas()
     browser2, handle = pickbrowser(browserchoice, True)
@@ -1834,7 +1830,7 @@ def inviter(targetlist, endless):
                 if supusr:
                     debugout()
 
-                if choice2 == "y" and standardlst == True:
+                if standardlst:
                     try:
                         if not memberprocesser(soup, member, minpoints, minrat, maxrat, mingames, mincurrent, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemin, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat):
                             try:
