@@ -306,15 +306,22 @@ def pickbrowser(browserchoice, adext):
                             print "%sFailed to load %s" %(ltime(), os.path.abspath("Data/Webdriver/Extensions/Chrome/%s" %fname))
 
             if usrsys == "Linux":
-                chromepath = os.path.abspath("Data/Webdriver/Linux/86/chromedriver")
-                os.environ["webdriver.chrome.driver"] = chromepath
+                chromepath32 = os.path.abspath("Data/Webdriver/Linux/86/chromedriver")
+                chromepath64 = os.path.abspath("Data/Webdriver/Linux/64/chromedriver")
+                os.environ["webdriver.chrome.driver"] = chromepath32
                 try:
-                    browser = webdriver.Chrome(chromepath, chrome_options = copt)
-                except Exception, errormsg:
-                    if supusr:
-                        print repr(errormsg)
-                    print "\n\n%sFailed to initiate Chrome with extensions, reverting to standard\n\n" %ltime()
-                    browser = webdriver.Chrome(chromepath)
+                    browser = webdriver.Chrome(chromepath32, chrome_options = copt)
+                except Exception:
+                    try:
+                        os.environ["webdriver.chrome.driver"] = chromepath64
+                        browser = webdriver.Chrome(chromepath64, chrome_options = copt)
+                    except Exception:
+                        print "\n\n%sFailed to initiate Chrome with extensions, reverting to standard\n\n" %ltime()
+                        try:
+                            browser = webdriver.Chrome(chromepath64)
+                        except Exception:
+                            os.environ["webdriver.chrome.driver"] = chromepath32
+                            browser = webdriver.Chrome(chromepath32)
                 break
 
             elif usrsys == "Windows":
@@ -1151,7 +1158,6 @@ def memspider(target, silent, browser):
 
             if not silent:
                 print "%s    %s" %(ltime(), pointer)
-
                 if supusr:
                     debugout()
 
@@ -2918,7 +2924,7 @@ for x in sys.argv:
             print "\n\n\tWARNING: couldn't import psutil, RAM and CPU checks might not work properly!!!\n\n"
 
 pathway = "y"
-makefolder(([".Config", ".Config/.LoginCred", ".Config/TimeoutsCheck", ".Config/Notes Poster", ".Config/Invites", ".Config/Member Lists", "Data", "Data/.TimeoutsCheck", "Data/Invite Lists", "Data/.Member Lists", "Data/.namelists", "Data/Messages", "Data/Messages/Invite Messages", "Data/Webdriver", "Data/Webdriver/Linux", "Data/Webdriver/Mac", "Data/Webdriver/Windows", "Data/Webdriver/Linux/86", "Data/Webdriver/Mac/86", "Data/Webdriver/Windows/86", "Data/Webdriver/Extensions", "Data/Webdriver/Extensions/Chrome", "Data/Webdriver/Extensions/Firefox"]))
+makefolder(([".Config", ".Config/.LoginCred", ".Config/TimeoutsCheck", ".Config/Notes Poster", ".Config/Invites", ".Config/Member Lists", "Data", "Data/.TimeoutsCheck", "Data/Invite Lists", "Data/.Member Lists", "Data/.namelists", "Data/Messages", "Data/Messages/Invite Messages", "Data/Webdriver", "Data/Webdriver/Linux", "Data/Webdriver/Mac", "Data/Webdriver/Windows", "Data/Webdriver/Linux/86", "Data/Webdriver/Linux/64", "Data/Webdriver/Mac/86", "Data/Webdriver/Windows/86", "Data/Webdriver/Extensions", "Data/Webdriver/Extensions/Chrome", "Data/Webdriver/Extensions/Firefox"]))
 
 if os.path.isfile(".Config/.LoginCred/data.dll"):
     with open(".Config/.LoginCred/data.dll", "rb") as txt:
