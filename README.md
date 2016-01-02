@@ -4,27 +4,6 @@ contact: http://www.chess.com/members/view/SudoRoot
 
 ===============
 
-NEWS:
-
-Windows users can now download a prepacked, executable version of the script from: https://www.dropbox.com/s/zsedtxhcn8ywagz/RK%20Resource%20001.zip?dl=1
-
-And can thus skip step 1 - 2 in the instructions
-
-
-*** binary Dependencies for executable version ***
-
- - OLEAUT32.dll, C:\Windows\system32\OLEAUT32.dll
- - USER32.dll, C:\Windows\system32\USER32.dll
- - SHELL32.dll, C:\Windows\system32\SHELL32.dll
- - KERNEL32.dll, C:\Windows\system32\KERNEL32.dll
- - ADVAPI32.dll, C:\Windows\system32\ADVAPI32.dll
- - WS2_32.dll, C:\Windows\system32\WS2_32.dll
- - GDI32.dll, C:\Windows\system32\GDI32.dll
- - VERSION.dll, C:\Windows\system32\VERSION.dll
- - ole32.dll, C:\Windows\system32\ole32.dll
-
-===============
-
 Requirements
 
 - Python 2.7
@@ -51,7 +30,7 @@ Step 2.
 
 Step 3.
 A few functions in the script requires a webdriver to function properly. The firefox driver comes with the selenium library so if you have firefox installed you're good to go.
-If you prefer chrome over firefox you can download a chromedriver from http://chromedriver.storage.googleapis.com/index.html (or for ie, http://selenium-release.storage.googleapis.com/index.html).
+If you prefer chrome over firefox you can download a chromedriver from http://chromedriver.storage.googleapis.com/index.html
 Place the webdriver(s) in the folder /Data/Webdriver/YOUR_OS/86
 
 
