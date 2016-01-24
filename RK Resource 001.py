@@ -2,7 +2,7 @@
 # RK resource 001
 # developed by Robin Karlsson
 # contact email: "r.robin.karlsson@gmail.com"
-# contact chess.com profile: "http://www.chess.com/members/view/SudoRoot"
+# contact chess.com profile: "https://www.chess.com/members/view/SudoRoot"
 # version 0.9.1.4 Alfa
 
 import os
@@ -215,14 +215,25 @@ def getmeminfo(target, filename):
         if supusr:
             debugout()
 
-        browser, response = mecopner(browser, "http://www.chess.com/members/view/%s" %mem)
+        while True:
+            try:
+                browser, response = mecopner(browser, "https://www.chess.com/members/view/%s" %mem)
+                soup = BeautifulSoup(response)
+                break
+            except Exception, errormsg:
+                print repr(errormsg)
+                time.sleep(1)
         if "://www.chess.com/members/view/" not in browser.geturl():
             continue
 
-        soup = BeautifulSoup(response)
-
-        browser, response = mecopner(browser, "http://www.chess.com/members/trophy_room/%s" %mem)
-        awardsoup = BeautifulSoup(response)
+        while True:
+            try:
+                browser, response = mecopner(browser, "https://www.chess.com/members/trophy_room/%s" %mem)
+                awardsoup = BeautifulSoup(response)
+                break
+            except Exception, errormsg:
+                print repr(errormsg)
+                time.sleep(1)
 
         sawards, tourneytrophy, gametrophy, funtrophy = getawards(awardsoup)
         timemove = TimeMoveChecker(soup)
@@ -381,12 +392,18 @@ def gettmopdata(targetname):
     pointer = 1
 
     while True:
-        browser, response = mecopner(browser, "%s&page=%i" %(linkarchive, pointer))
+        while True:
+            try:
+                browser, response = mecopner(browser, "%s&page=%i" %(linkarchive, pointer))
 
-        if supusr:
-            debugout()
+                if supusr:
+                    debugout()
 
-        soup = BeautifulSoup(response)
+                soup = BeautifulSoup(response)
+                break
+            except Exception, errormsg:
+                print repr(errormsg)
+                time.sleep(1)
         soupbrake = str(soup.find_all(class_ = "next-on"))
 
         evenmtch = soup.find_all(class_ = "even")
@@ -451,12 +468,18 @@ def gettmlinks(browser, targetname, stopAt):
     pointer = 1
 
     while True:
-        browser, response = mecopner(browser, "%s&page=%i" %(linkarchive, pointer))
+        while True:
+            try:
+                browser, response = mecopner(browser, "%s&page=%i" %(linkarchive, pointer))
 
-        if supusr:
-            debugout()
+                if supusr:
+                    debugout()
 
-        soup = BeautifulSoup(response)
+                soup = BeautifulSoup(response)
+                break
+            except Exception, errormsg:
+                print repr(errormsg)
+                time.sleep(1)
 
         soupbrake = str(soup.find_all(class_ = "next-on"))
         souplinks = re.findall("/groups/team_match(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]i|(?:%[0-9a-fA-F][0-9a-fA-F]))+", str(soup.find_all("a")))
@@ -470,7 +493,7 @@ def gettmlinks(browser, targetname, stopAt):
 
                 return linklist
 
-            linklist.append("http://www.chess.com%s" %link)
+            linklist.append("https://www.chess.com%s" %link)
 
         soup.decompose()
         response.close()
@@ -500,11 +523,17 @@ def getvclinks(yourside):
     browser = mecbrowser("")
 
     for pagenum in range(1, 101):
-        browser, response = mecopner(browser, "http://www.chess.com/groups/votechess_diagrams/%s/?sortby=completed&page=%i" %(yourside, pagenum))
-        soup = BeautifulSoup(response)
+        while True:
+            try:
+                browser, response = mecopner(browser, "https://www.chess.com/groups/votechess_diagrams/%s/?sortby=completed&page=%i" %(yourside, pagenum))
+                soup = BeautifulSoup(response)
+                break
+            except Exception, errormsg:
+                print repr(errormsg)
+                time.sleep(1)
         souplinks = re.findall("/votechess/game(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", str(soup.find_all("a")))
         for link in souplinks:
-            linklist.append("http://www.chess.com%s" %link)
+            linklist.append("https://www.chess.com%s" %link)
 
         soupbrake = str(soup.find_all(class_ = "next-on"))
 
@@ -557,8 +586,14 @@ def noteposter(target, msg, interval, nationalt, shutdown):
             debugout()
 
         print "%sprocessing: %s" %(ltime(), mem)
-        browser, response = mecopner(browser, "http://www.chess.com/members/view/%s" %mem)
-        soup = BeautifulSoup(response)
+        while True:
+            try:
+                browser, response = mecopner(browser, "https://www.chess.com/members/view/%s" %mem)
+                soup = BeautifulSoup(response)
+                break
+            except Exception, errormsg:
+                print repr(errormsg)
+                time.sleep(1)
 
         for placeholder in soup.find_all(class_ = "flag"):
             country = placeholder["title"]
@@ -574,7 +609,7 @@ def noteposter(target, msg, interval, nationalt, shutdown):
                 if isint(name.split("_")[1]):
                     name = name.split("_")[0]
 
-        browser2 = selopner(browser2, "http://www.chess.com/members/view/%s#usernotes_post" %mem)
+        browser2 = selopner(browser2, "https://www.chess.com/members/view/%s#usernotes_post" %mem)
         time.sleep(interval)
         counter = 1
 
@@ -737,10 +772,16 @@ def pmdriver(target, choice):
     for membername2 in memtpm:
         if membername2 == "":
             continue
-        membername = "http://www.chess.com/members/view/%s" %membername2
+        membername = "https://www.chess.com/members/view/%s" %membername2
 
-        browser1, response = mecopner(browser1, membername)
-        soup = BeautifulSoup(response)
+        while True:
+            try:
+                browser1, response = mecopner(browser1, membername)
+                soup = BeautifulSoup(response)
+                break
+            except Exception, errormsg:
+                print repr(errormsg)
+                time.sleep(1)
 
         if supusr:
             debugout()
@@ -790,7 +831,7 @@ def pmdriver(target, choice):
         for link in soup.find_all("a", href = True):
             if link.text == "Send a Message":
                 memlink = link["href"]
-                browser0 = selopner(browser0, "http://www.chess.com%s" %memlink)
+                browser0 = selopner(browser0, "https://www.chess.com%s" %memlink)
                 time.sleep(2)
 
         try:
@@ -824,7 +865,7 @@ def pmdriver(target, choice):
                 print "\n\n%sRetrying %s" %(ltime(), membername2)
 
                 while True:
-                    browser0 = selopner(browser0, "http://www.chess.com%s" %memlink)
+                    browser0 = selopner(browser0, "https://www.chess.com%s" %memlink)
 
                     try:
                         WebDriverWait(browser0, 10).until(EC.presence_of_element_located((By.ID, "c15")))
@@ -874,7 +915,7 @@ def nineworker(infile, inid, browser, key):
     memlistorg = memfiop(infile, key)
 
     for counter in range(1, 101):
-        target.append("http://www.chess.com/groups/managemembers?id=%s&page=%i" %(inid, counter))
+        target.append("https://www.chess.com/groups/managemembers?id=%s&page=%i" %(inid, counter))
 
     un = sorted(memspider([target], True, browser))
 
@@ -890,8 +931,14 @@ def nineworker(infile, inid, browser, key):
     return memlist, len(un), len(memlistorg)
 
 def getTmTimouts(browser, groupname, tmpage):
-    browser, response = mecopner(browser, tmpage)
-    soup = BeautifulSoup(response)
+    while True:
+        try:
+            browser, response = mecopner(browser, tmpage)
+            soup = BeautifulSoup(response)
+            break
+        except Exception, errormsg:
+            print repr(errormsg)
+            time.sleep(1)
 
     soupgroup = re.findall("/groups/home/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", str(soup.find_all(class_ = "default border-top alternate")))
 
@@ -905,7 +952,7 @@ def getTmTimouts(browser, groupname, tmpage):
 
                 if "menu-icons timeline right-8" in placeholder:
                     timeouts = placeholder.count('class="menu-icons timeline right-8" title="Timeout"')
-                    timeouter = str(re.findall("http://www.chess.com/members/view/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", placeholder)[0]).replace("http://www.chess.com/members/view/", "")
+                    timeouter = str(re.findall("https://www.chess.com/members/view/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", placeholder)[0]).replace("https://www.chess.com/members/view/", "")
                     timeouters.append([tmpage, timeouter, str(timeouts)])
 
         elif groupname == str(soupgroup[1]).replace("/groups/home/", ""):
@@ -914,14 +961,13 @@ def getTmTimouts(browser, groupname, tmpage):
 
                 if "menu-icons timeline left-8" in placeholder:
                     timeouts = placeholder.count('class="menu-icons timeline left-8" title="Timeout"')
-                    timeouter = str(re.findall("http://www.chess.com/members/view/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", placeholder)[3]).replace("http://www.chess.com/members/view/", "")
+                    timeouter = str(re.findall("https://www.chess.com/members/view/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", placeholder)[3]).replace("https://www.chess.com/members/view/", "")
                     timeouters.append([tmpage, timeouter, str(timeouts)])
 
         else:
             sys.exit("\n\n%sfailed to find your group!!!\n" %ltime())
-    except IndexError:
-        None
-
+    except IndexError, errormsg:
+        print errormsg
     return timeouters
 
 def getTmParticipants(browser, targetURL):
@@ -933,8 +979,14 @@ def getTmParticipants(browser, targetURL):
 
     count = 0
 
-    browser, response = mecopner(browser, targetURL)
-    soup = BeautifulSoup(response)
+    while True:
+        try:
+            browser, response = mecopner(browser, targetURL)
+            soup = BeautifulSoup(response)
+            break
+        except Exception, errormsg:
+            print repr(errormsg)
+            time.sleep(1)
     souppar = soup.find_all(class_ = "align-left")
 
     group1, group2 = re.findall("/groups/home/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", str(soup.find_all(class_ = "default border-top alternate")))
@@ -991,7 +1043,7 @@ def tmparchecker(browser, pagelist, targetname):
     print "\n\n"
 
     for page in pagelist:
-        if "http://www.chess.com/groups/team_match?id=" not in page:
+        if "https://www.chess.com/groups/team_match?id=" not in page:
             continue
         print "%sprocessing: %s" %(ltime(), page)
 
@@ -1000,8 +1052,14 @@ def tmparchecker(browser, pagelist, targetname):
 
         alltmresults = list()
         counter2 = 0
-        browser, response = mecopner(browser, page)
-        soup = BeautifulSoup(response)
+        while True:
+            try:
+                browser, response = mecopner(browser, page)
+                soup = BeautifulSoup(response)
+                break
+            except Exception, errormsg:
+                print repr(errormsg)
+                time.sleep(1)
 
         if tmyear != "":
             regopen = soup.find_all(class_ = "simple border-top clearfix alternate")
@@ -1033,9 +1091,9 @@ def tmparchecker(browser, pagelist, targetname):
             if targetname == str(soupgroup[0]).replace("/groups/home/", ""):
                 for placeholder in souppar[0::4]:
                     placeholder = str(placeholder)
-                    placeholder = re.findall("http://www.chess.com/members/view/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", placeholder)
+                    placeholder = re.findall("https://www.chess.com/members/view/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", placeholder)
                     try:
-                        placeholder = str(placeholder[0]).replace("http://www.chess.com/members/view/", "")
+                        placeholder = str(placeholder[0]).replace("https://www.chess.com/members/view/", "")
                         tmpar.append(placeholder)
 
                         if placeholder in winssdic:
@@ -1059,16 +1117,16 @@ def tmparchecker(browser, pagelist, targetname):
                         timeouts = placeholder.count('class="menu-icons timeline right-8" title="Timeout"')
                         counter = 0
                         while counter < timeouts:
-                            timeouters1 = str(re.findall("http://www.chess.com/members/view/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", placeholder)[0]).replace("http://www.chess.com/members/view/", "")
+                            timeouters1 = str(re.findall("https://www.chess.com/members/view/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", placeholder)[0]).replace("https://www.chess.com/members/view/", "")
                             timeoutlist.append(timeouters1)
                             counter += 1
 
             elif targetname == str(soupgroup[1]).replace("/groups/home/", ""):
                 for placeholder in souppar[3::4]:
                     placeholder = str(placeholder)
-                    placeholder = re.findall("http://www.chess.com/members/view/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", placeholder)
+                    placeholder = re.findall("https://www.chess.com/members/view/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", placeholder)
                     try:
-                        placeholder = str(placeholder[0]).replace("http://www.chess.com/members/view/", "")
+                        placeholder = str(placeholder[0]).replace("https://www.chess.com/members/view/", "")
                         tmpar.append(placeholder)
 
                         if placeholder in winssdic:
@@ -1093,7 +1151,7 @@ def tmparchecker(browser, pagelist, targetname):
                         counter = 0
 
                         while counter < timeouts:
-                            timeouters1 = str(re.findall("http://www.chess.com/members/view/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", placeholder)[3]).replace("http://www.chess.com/members/view/", "")
+                            timeouters1 = str(re.findall("https://www.chess.com/members/view/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", placeholder)[3]).replace("https://www.chess.com/members/view/", "")
                             timeoutlist.append(timeouters1)
                             counter += 1
 
@@ -1114,11 +1172,17 @@ def latestTMsOnsite(browser):
     targetlst = []
 
     for x in xrange(1, 101):
-        targetpage = "http://www.chess.com/groups/team_matches?page=%i" %x
+        targetpage = "https://www.chess.com/groups/team_matches?page=%i" %x
         print "%schecking: %s" %(ltime(), targetpage)
-        browser, response = mecopner(browser, targetpage)
 
-        soup = BeautifulSoup(response)
+        while True:
+            try:
+                browser, response = mecopner(browser, targetpage)
+                soup = BeautifulSoup(response)
+                break
+            except Exception, errormsg:
+                print repr(errormsg)
+                time.sleep(1)
 
         counter = 1
         for content in soup.find_all("td"):
@@ -1131,7 +1195,7 @@ def latestTMsOnsite(browser):
 
                 else:
                     content = str(content.contents[0])
-                    content = "http://www.chess.com%s" %content[9: content.index('"><')]
+                    content = "https://www.chess.com%s" %content[9: content.index('"><')]
                     counter = 1
 
                 targetlst.append(content)
@@ -1149,11 +1213,18 @@ def memspider(target, silent, browser):
     usrlist = list()
     for tlst in target:
         for pointer in tlst:
-            browser, response = mecopner(browser, pointer)
+            while True:
+                try:
+                    browser, response = mecopner(browser, pointer)
+                    soup = BeautifulSoup(response)
+                    break
+                except Exception, errormsg:
+                    print repr(errormsg)
+                    time.sleep(1)
 
-            if "http://www.chess.com/groups/view/" in browser.geturl():
+            if "https://www.chess.com/groups/view/" in browser.geturl():
                 break
-            soup = BeautifulSoup(response)
+
             p2 = str(soup.find_all(class_ = "next-on"))
 
             if not silent:
@@ -1198,11 +1269,18 @@ def ageproc(target):
             debugout()
 
         tlst = [targetx]
-        browser, response = mecopner(browser, "http://www.chess.com/members/view/%s" %targetx)
+
+        while True:
+            try:
+                browser, response = mecopner(browser, "https://www.chess.com/members/view/%s" %targetx)
+                soup = BeautifulSoup(response)
+                break
+            except Exception, errormsg:
+                print repr(errormsg)
+                time.sleep(1)
 
         if "://www.chess.com/members/view/" not in browser.geturl():
             continue
-        soup = BeautifulSoup(response)
 
         birthdate = birthlister(soup)
         if birthdate == "":
@@ -1241,7 +1319,7 @@ def createconfig(name, ID):
         membersleftinvfile = "%s members who has left" %name
 
     with open(".Config/Invites/%s.ini" %name, "wb") as setupfile:
-        setupfile.write("What to use if members nation is set to International==\nMin online chess rating==\nMax online chess rating==\nMin 960 chess rating==\nMax 960 chess rating==\nMin online chess games plaid==\nMin current online chess games==\nMin online chess win-ratio==\nLast logged in within days==\nMember on chess.com for days==\nBorn after date (YYYY-MM-DD)==\nBorn before date (YYYY-MM-DD)==\nMax timeout-ratio allowed==\nMax number of groups member can be in==\nMin number of groups member can be in==\nMin number of activity points allowed==\nMin time/move (days-hours-minutes)==\nMax time/move (days-hours-minutes)==\nOnly invite those with a custom avatar (y/n)==\nMember should be from nation==\nGender (m/f)==\nLink to groups invite members page==http://www.chess.com/groups/invite_members?id=%i\nFile containing the main invites list==Data/Invite Lists/%s\nFile containing those who should receive priority invites (circumvents filter)==Data/Invite Lists/%s priority\nInvites file for those who has left the group==Data/Invite Lists/%s\nFile containing those who has received an invite==Data/Invite Lists/%s already invited\nFile containing your invites message for members who has left your group==Data/Messages/Invite Messages/%s Deserter message\nFile containing your invites message for standard and priority invites lists==Data/Messages/Invite Messages/%s Standard Message\nComma seperated list of usernames that should not be invited==" %(ID, name, name, membersleftinvfile, name, name, name))
+        setupfile.write("What to use if members nation is set to International==\nMin online chess rating==\nMax online chess rating==\nMin 960 chess rating==\nMax 960 chess rating==\nMin online chess games plaid==\nMin current online chess games==\nMin online chess win-ratio==\nLast logged in within days==\nMember on chess.com for days==\nBorn after date (YYYY-MM-DD)==\nBorn before date (YYYY-MM-DD)==\nMax timeout-ratio allowed==\nMax number of groups member can be in==\nMin number of groups member can be in==\nMin number of activity points allowed==\nMin time/move (days-hours-minutes)==\nMax time/move (days-hours-minutes)==\nOnly invite those with a custom avatar (y/n)==\nMember should be from nation==\nGender (m/f)==\nLink to groups invite members page==https://www.chess.com/groups/invite_members?id=%i\nFile containing the main invites list==Data/Invite Lists/%s\nFile containing those who should receive priority invites (circumvents filter)==Data/Invite Lists/%s priority\nInvites file for those who has left the group==Data/Invite Lists/%s\nFile containing those who has received an invite==Data/Invite Lists/%s already invited\nFile containing your invites message for members who has left your group==Data/Messages/Invite Messages/%s Deserter message\nFile containing your invites message for standard and priority invites lists==Data/Messages/Invite Messages/%s Standard Message\nComma seperated list of usernames that should not be invited==" %(ID, name, name, membersleftinvfile, name, name, name))
     createfileifmissing("Data/Messages/Invite Messages/%s Standard Message" %name, True)
     createfileifmissing("Data/Messages/Invite Messages/%s Deserter message" %name, True)
     createfileifmissing("Data/Invite Lists/%s already invited" %name, False)
@@ -1421,7 +1499,14 @@ def remcomelem(lst1, lst2):
 def pairsorter(browser, target, choice):
     partup = list()
     for mem in target:
-        browser, response = mecopner(browser, "http://www.chess.com/members/view/%s" %mem)
+        while True:
+            try:
+                browser, response = mecopner(browser, "https://www.chess.com/members/view/%s" %mem)
+                soup = BeautifulSoup(response)
+                break
+            except Exception, errormsg:
+                print repr(errormsg)
+                time.sleep(1)
 
         if supusr:
             debugout()
@@ -1429,7 +1514,6 @@ def pairsorter(browser, target, choice):
         if "://www.chess.com/members/view/" not in browser.geturl():
             continue
 
-        soup = BeautifulSoup(response)
         if choice == "1":
             rating = lstanratingchecker(soup)
         elif choice == "2":
@@ -1480,10 +1564,10 @@ def notesfriendscheck(tocheck, checkfor, choice):
         templst = list()
         if choice == "1":
             for count in xrange(1, 101):
-                templst.append("http://www.chess.com/members/notes/%s?page=%i" %(member, count))
+                templst.append("https://www.chess.com/members/notes/%s?page=%i" %(member, count))
         elif choice == "2":
             for count in xrange(1, 101):
-                templst.append("http://www.chess.com/home/friends?username=%s&general=&name=&country=&sortby=alphabetical&page=%i" %(member, count))
+                templst.append("https://www.chess.com/home/friends?username=%s&general=&name=&country=&sortby=alphabetical&page=%i" %(member, count))
 
         targetdic[member] = templst
 
@@ -1578,11 +1662,18 @@ def makefolder(flst):
 def gettmlinklist(targetname, browser):
     linklist = list()
 
-    browser, response = mecopner(browser, "http://www.chess.com/groups/matches/%s?show_all_current=1" %targetname)
-    soup = BeautifulSoup(response)
+    while True:
+        try:
+            browser, response = mecopner(browser, "https://www.chess.com/groups/matches/%s?show_all_current=1" %targetname)
+            soup = BeautifulSoup(response)
+            break
+        except Exception, errormsg:
+            print repr(errormsg)
+            time.sleep(1)
+
     souplinks = re.findall("/groups/team_match(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", str(soup.find_all("a")))
     for link in souplinks:
-        linklist.append("http://www.chess.com%s" %link)
+        linklist.append("https://www.chess.com%s" %link)
 
     if len(linklist) == 0:
         print "\n\n\t Invalid group name!!!\n\n"
@@ -1636,8 +1727,14 @@ def isint(number):
 
 def ingroupcheck(browser, member, group):
     for pagenum in range(1, 101, 1):
-        browser, response = mecopner(browser, "http://www.chess.com/groups/mygroups?username=%s&page=%i" %(member, pagenum))
-        soup = BeautifulSoup(response)
+        while True:
+            try:
+                browser, response = mecopner(browser, "https://www.chess.com/groups/mygroups?username=%s&page=%i" %(member, pagenum))
+                soup = BeautifulSoup(response)
+                break
+            except Exception, errormsg:
+                print repr(errormsg)
+                time.sleep(1)
 
         for x in soup.find_all(class_ = "bottom-8"):
             if group == x.text:
@@ -1818,8 +1915,14 @@ def inviter(targetlist, endless):
                         print "\tRemoved as per config file"
                     continue
 
-                browser1, response = mecopner(browser1, "http://www.chess.com/members/view/%s" %member)
-                soup = BeautifulSoup(response)
+                while True:
+                    try:
+                        browser1, response = mecopner(browser1, "https://www.chess.com/members/view/%s" %member)
+                        soup = BeautifulSoup(response)
+                        break
+                    except Exception, errormsg:
+                        print repr(errormsg)
+                        time.sleep(1)
 
                 if supusr:
                     debugout()
@@ -1988,7 +2091,7 @@ def filtmcemsgold(msglist, browser, name, country, browserchoice):
 
 def tryCookie(logincookie):
     browser = mecbrowser(logincookie)
-    browser, response = mecopner(browser, "http://www.chess.com/messages")
+    browser, response = mecopner(browser, "https://www.chess.com/messages")
     currentURL = response.geturl()
 
     response.close()
@@ -2044,8 +2147,14 @@ def vcman(vclinklist, yourside):
         browser3.find_element_by_id("c33").click()
         time.sleep(2)
 
-        browser1, response = mecopner(browser1, vcmatch)
-        soup = BeautifulSoup(response)
+        while True:
+            try:
+                browser1, response = mecopner(browser1, vcmatch)
+                soup = BeautifulSoup(response)
+                break
+            except Exception, errormsg:
+                print repr(errormsg)
+                time.sleep(1)
 
         if '      initialSetup: "",' not in str(soup):
             print "\n\n\n%sskipped %s\n\n\n" %(ltime(), vcmatch)
@@ -2146,8 +2255,8 @@ def vcman(vclinklist, yourside):
                     for curvcparmem in vcelem:
                         memsellink = curvcparmem.get_attribute("href") or ""
 
-                        if "http://www.chess.com/members/view/" in memsellink:
-                            user = re.sub(r"^http?:\/\/.*[\r\n]*", "", memsellink.replace("http://www.chess.com/members/view/", " ")).strip()
+                        if "https://www.chess.com/members/view/" in memsellink:
+                            user = re.sub(r"^http?:\/\/.*[\r\n]*", "", memsellink.replace("https://www.chess.com/members/view/", " ")).strip()
                             if user == "":
                                 continue
                             if user in parmemvc:
@@ -2165,7 +2274,7 @@ def vcman(vclinklist, yourside):
     return parmemvc
 
 def sendChallenge(browser, matchName, target, myGroup, tmDescription):
-    browser = selopner(browser, "http://www.chess.com/groups/match_challenge")
+    browser = selopner(browser, "https://www.chess.com/groups/match_challenge")
 
     #print [o.text for o in Select(browser.find_element_by_id("c14")).options]
     Select(browser.find_element_by_id("c14")).select_by_visible_text(myGroup)
@@ -2232,7 +2341,7 @@ def acceptChallenge(browser, soup, targets):
 
         for data in targets:
             if data[0] in groupName:
-                matchlink = "http://www.chess.com%s" %x[x.index('/groups/view_team_match_challenge?id='): x.index('"><strong>View</strong>')]
+                matchlink = "https://www.chess.com%s" %x[x.index('/groups/view_team_match_challenge?id='): x.index('"><strong>View</strong>')]
                 try:
                     browser = selopner(browser, matchlink)
 
@@ -2248,18 +2357,29 @@ def acceptChallenge(browser, soup, targets):
                     continue
 
 def getNewStopAt(browser, targetname):
-    browser, response = mecopner(browser, "http://www.chess.com/groups/matches/%s?show_all_current=1" %targetname)
-    soup = BeautifulSoup(response)
+    while True:
+        try:
+            browser, response = mecopner(browser, "https://www.chess.com/groups/matches/%s?show_all_current=1" %targetname)
+            soup = BeautifulSoup(response)
+            break
+        except Exception, errormsg:
+            print repr(errormsg)
+            time.sleep(1)
     tmarchive = re.findall("/groups/team_match_archive(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", str(soup.find_all("a")))[0]
 
     soup.decompose()
 
-    browser, response = mecopner(browser, "http://www.chess.com%s&page=1" %tmarchive)
+    while True:
+        try:
+            browser, response = mecopner(browser, "https://www.chess.com%s&page=1" %tmarchive)
+            soup = BeautifulSoup(response)
+            break
+        except Exception, errormsg:
+            print repr(errormsg)
+            time.sleep(1)
 
-    soup = BeautifulSoup(response)
     souplinks = re.findall("/groups/team_match(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]i|(?:%[0-9a-fA-F][0-9a-fA-F]))+", str(soup.find_all("a")))
 
-    soup = BeautifulSoup(response)
     response.close()
     browser.clear_history()
     gc.collect()
@@ -2665,11 +2785,11 @@ def memremoverf(inlist, logincookie):
         choice = raw_input("\nCollect this groups memberslist from\n 1. Manage members pages (requires login)\n 2. New member pages\nEnter choice: ")
 
     if choice == "1":
-        target = "http://www.chess.com/groups/managemembers?id=%s&page=" %targetID
+        target = "https://www.chess.com/groups/managemembers?id=%s&page=" %targetID
         if logincookie == "":
             logincookie = login()
     elif choice == "2":
-        target = "http://www.chess.com/groups/membersearch?allnew=1&id=%s&page=" %targetID
+        target = "https://www.chess.com/groups/membersearch?allnew=1&id=%s&page=" %targetID
 
     for counter in range(1, 101):
         templst.append(target + str(counter))
@@ -2742,8 +2862,14 @@ def notclosedcheck(memlist, browser):
     memlist2 = list()
 
     for mem in memlist:
-        browser, response = mecopner(browser, "http://www.chess.com/members/view/%s" %mem)
-        soup = BeautifulSoup(response)
+        while True:
+            try:
+                browser, response = mecopner(browser, "https://www.chess.com/members/view/%s" %mem)
+                soup = BeautifulSoup(response)
+                break
+            except Exception, errormsg:
+                print repr(errormsg)
+                time.sleep(1)
         soupstr = str(soup)
 
         if mem in soupstr:
@@ -2763,7 +2889,7 @@ def getgrouphome(targetlst, browser):
         browser, response = mecopner(browser, target[0])
 
         for link in browser.links(url_regex="groups/home/"):
-            grouphomelist.append("http://www.chess.com%s" %link.url)
+            grouphomelist.append("https://www.chess.com%s" %link.url)
 
         response.close()
         browser.clear_history()
@@ -2776,8 +2902,14 @@ def getadmins(targetlst, browser):
     superadminlist = list()
 
     for link in targetlst:
-        browser, response = mecopner(browser, link)
-        soup = BeautifulSoup(response)
+        while True:
+            try:
+                browser, response = mecopner(browser, link)
+                soup = BeautifulSoup(response)
+                break
+            except Exception, errormsg:
+                print repr(errormsg)
+                time.sleep(1)
 
         superadmins = soup.find_all(id = "c14")
         for line in str(superadmins).split("\n"):
@@ -2926,7 +3058,7 @@ while pathway in (["y"]):
         olprint2("{0: ^70}", content, "|", "|")
     olprint("|", "|", "-", 72, True)
 
-    for content in (["", "", "developed by Robin Karlsson", "", "", "Contact information", "", "r.robin.karlsson@gmail.com", "http://www.chess.com/members/view/SudoRoot", "", ""]):
+    for content in (["", "", "developed by Robin Karlsson", "", "", "Contact information", "", "r.robin.karlsson@gmail.com", "https://www.chess.com/members/view/SudoRoot", "", ""]):
         olprint2("{0: ^70}", content, "|", "|")
     olprint("|", "|", "-", 72, True)
 
@@ -2986,7 +3118,7 @@ while pathway in (["y"]):
 
     if flow == "1":
         print "\n\n\nchess.com members list extractor\n"
-        print "Locate the members list url of the group you wish to target.\n\n  example: http://www.chess.com/groups/membersearch?allnew=1&id=8893\n\nCopy the url.\n"
+        print "Locate the members list url of the group you wish to target.\n\n  example: https://www.chess.com/groups/membersearch?allnew=1&id=8893\n\nCopy the url.\n"
         target = tlstcreator()
 
         noadmins = ""
@@ -3148,7 +3280,7 @@ while pathway in (["y"]):
                 pathtm = raw_input("\n\n 1. Check the tm for results\n 2. Check match for members with a timeout-ratio above a specific value\nYour choice: ")
             pagelist = raw_input("team match id: ")
             targetnameorgf = "team match: %s ... " %pagelist
-            pagelist = (["http://www.chess.com/groups/team_match?id=%s" %pagelist])
+            pagelist = (["https://www.chess.com/groups/team_match?id=%s" %pagelist])
 
         tmpar, tmtimeout, winssdic, losedic = tmparchecker(browser, pagelist, targetname)
 
@@ -3201,10 +3333,17 @@ while pathway in (["y"]):
             deadbeatlist = list()
             for member in tmpar:
                 print "%schecking %s" %(ltime(), member)
-                browser, response = mecopner(browser, "http://www.chess.com/members/view/%s" %member)
+                while True:
+                    try:
+                        browser, response = mecopner(browser, "https://www.chess.com/members/view/%s" %member)
+                        soup = BeautifulSoup(response)
+                        break
+                    except Exception, errormsg:
+                        print repr(errormsg)
+                        time.sleep(1)
+
                 if "://www.chess.com/members/view/" not in browser.geturl():
                     continue
-                soup = BeautifulSoup(response)
                 if timeoutchecker(soup) > maxtmrat:
                     deadbeatlist.append(member)
 
@@ -3239,13 +3378,18 @@ while pathway in (["y"]):
 
             print "%schecking %s" %(ltime(), targetx)
 
-            browser, response = mecopner(browser, "http://www.chess.com/members/view/%s" %targetx)
+            while True:
+                try:
+                    browser, response = mecopner(browser, "https://www.chess.com/members/view/%s" %targetx)
+                    soup = BeautifulSoup(response)
+                    break
+                except Exception, errormsg:
+                    print repr(errormsg)
+                    time.sleep(1)
 
             if "://www.chess.com/members/view/" not in browser.geturl():
-                print "\n\nfailed to open page, http://www.chess.com/members/view/%s" %targetx
+                print "\n\nfailed to open page, https://www.chess.com/members/view/%s" %targetx
                 continue
-
-            soup = BeautifulSoup(response)
 
             if memberprocesser(soup, targetx, minpoints, minrat, maxrat, mingames, mincurrent, minwinrat, lastloginyear, lastloginmonth, lastloginday, membersinceyear, membersincemonth, membersinceday, youngeryear, youngermonth, youngerday, olderyear, oldermonth, olderday, timemin, timemax, maxgroup, mingroup, timovchoicemin, timovchoicemax, avatarch, heritage, memgender, minranrat, maxranrat):
                 if ingroup != "":
@@ -3419,7 +3563,7 @@ while pathway in (["y"]):
         grcheck = raw_input("group to check: ")
         grcheck = re.sub(r"[^a-z A-Z 0-9 -]","", grcheck)
         grcheck = grcheck.replace(" ", "-").lower()
-        grcheck = "http://www.chess.com/groups/notes/%s?page=" %grcheck
+        grcheck = "https://www.chess.com/groups/notes/%s?page=" %grcheck
         logincookie = login()
 
         browser = mecbrowser(logincookie)
@@ -3435,8 +3579,14 @@ while pathway in (["y"]):
             if supusr:
                 debugout()
 
-            browser, response = mecopner(browser, targetp)
-            soup = BeautifulSoup(response)
+            while True:
+                try:
+                    browser, response = mecopner(browser, targetp)
+                    soup = BeautifulSoup(response)
+                    break
+                except Exception, errormsg:
+                    print repr(errormsg)
+                    time.sleep(1)
 
             links1 = browser.links()
             for link in links1:
@@ -3684,7 +3834,7 @@ while pathway in (["y"]):
         browser = sellogin(Username, Password, browser)
 
         while True:
-            browser = selopner(browser, "http://www.chess.com/groups/notes/%s" %gname)
+            browser = selopner(browser, "https://www.chess.com/groups/notes/%s" %gname)
 
             if supusr:
                 debugout()
@@ -3746,9 +3896,15 @@ while pathway in (["y"]):
         browser1 = mecbrowser(logincookie)
 
         while True:
-            browser1, response = mecopner(browser1, "http://www.chess.com/groups/team_match_challenges")
+            while True:
+                try:
+                    browser1, response = mecopner(browser1, "https://www.chess.com/groups/team_match_challenges")
+                    soup = BeautifulSoup(response)
+                    break
+                except Exception, errormsg:
+                    print repr(errormsg)
+                    time.sleep(1)
 
-            soup = BeautifulSoup(response)
             acceptChallenge(browser, soup, targets)
 
             time.sleep(3)
@@ -3835,7 +3991,7 @@ while pathway in (["y"]):
                 note = [x for x in note.replace("\n\n", "\n").split("\n") if x.replace("\n", "").replace(" ", "") != ""]
                 note = random.choice(note)
 
-                browser = selopner(browser, "http://www.chess.com/groups/notes/%s" %cfile[1][: -5])
+                browser = selopner(browser, "https://www.chess.com/groups/notes/%s" %cfile[1][: -5])
                 browser.find_element_by_id("c17").send_keys(note)
                 browser.find_element_by_id("c18").click()
 
