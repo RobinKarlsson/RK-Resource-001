@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 # RK resource 001
 # developed by Robin Karlsson
-# contact email: "r.robin.karlsson@gmail.com"
 # contact chess.com profile: "https://www.chess.com/members/view/SudoRoot"
 # version 0.9.1.4 Alfa
 
@@ -221,7 +220,8 @@ def getmeminfo(target, filename):
                 soup = BeautifulSoup(response)
                 break
             except Exception, errormsg:
-                print repr(errormsg)
+                if supusr:
+                    print repr(errormsg)
                 time.sleep(1)
         if "://www.chess.com/members/view/" not in browser.geturl():
             continue
@@ -232,7 +232,8 @@ def getmeminfo(target, filename):
                 awardsoup = BeautifulSoup(response)
                 break
             except Exception, errormsg:
-                print repr(errormsg)
+                if supusr:
+                    print repr(errormsg)
                 time.sleep(1)
 
         sawards, tourneytrophy, gametrophy, funtrophy = getawards(awardsoup)
@@ -402,7 +403,8 @@ def gettmopdata(targetname):
                 soup = BeautifulSoup(response)
                 break
             except Exception, errormsg:
-                print repr(errormsg)
+                if supusr:
+                    print repr(errormsg)
                 time.sleep(1)
         soupbrake = str(soup.find_all(class_ = "next-on"))
 
@@ -478,7 +480,8 @@ def gettmlinks(browser, targetname, stopAt):
                 soup = BeautifulSoup(response)
                 break
             except Exception, errormsg:
-                print repr(errormsg)
+                if supusr:
+                    print repr(errormsg)
                 time.sleep(1)
 
         soupbrake = str(soup.find_all(class_ = "next-on"))
@@ -529,7 +532,8 @@ def getvclinks(yourside):
                 soup = BeautifulSoup(response)
                 break
             except Exception, errormsg:
-                print repr(errormsg)
+                if supusr:
+                    print repr(errormsg)
                 time.sleep(1)
         souplinks = re.findall("/votechess/game(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", str(soup.find_all("a")))
         for link in souplinks:
@@ -592,7 +596,8 @@ def noteposter(target, msg, interval, nationalt, shutdown):
                 soup = BeautifulSoup(response)
                 break
             except Exception, errormsg:
-                print repr(errormsg)
+                if supusr:
+                    print repr(errormsg)
                 time.sleep(1)
 
         for placeholder in soup.find_all(class_ = "flag"):
@@ -780,7 +785,8 @@ def pmdriver(target, choice):
                 soup = BeautifulSoup(response)
                 break
             except Exception, errormsg:
-                print repr(errormsg)
+                if supusr:
+                    print repr(errormsg)
                 time.sleep(1)
 
         if supusr:
@@ -937,7 +943,8 @@ def getTmTimouts(browser, groupname, tmpage):
             soup = BeautifulSoup(response)
             break
         except Exception, errormsg:
-            print repr(errormsg)
+            if supusr:
+                print repr(errormsg)
             time.sleep(1)
 
     soupgroup = re.findall("/groups/home/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", str(soup.find_all(class_ = "default border-top alternate")))
@@ -967,7 +974,8 @@ def getTmTimouts(browser, groupname, tmpage):
         else:
             sys.exit("\n\n%sfailed to find your group!!!\n" %ltime())
     except IndexError, errormsg:
-        print errormsg
+        if supusr:
+            print repr(errormsg)
     return timeouters
 
 def getTmParticipants(browser, targetURL):
@@ -985,7 +993,8 @@ def getTmParticipants(browser, targetURL):
             soup = BeautifulSoup(response)
             break
         except Exception, errormsg:
-            print repr(errormsg)
+            if supusr:
+                    print repr(errormsg)
             time.sleep(1)
     souppar = soup.find_all(class_ = "align-left")
 
@@ -1058,7 +1067,8 @@ def tmparchecker(browser, pagelist, targetname):
                 soup = BeautifulSoup(response)
                 break
             except Exception, errormsg:
-                print repr(errormsg)
+                if supusr:
+                    print repr(errormsg)
                 time.sleep(1)
 
         if tmyear != "":
@@ -1181,7 +1191,8 @@ def latestTMsOnsite(browser):
                 soup = BeautifulSoup(response)
                 break
             except Exception, errormsg:
-                print repr(errormsg)
+                if supusr:
+                    print repr(errormsg)
                 time.sleep(1)
 
         counter = 1
@@ -1219,7 +1230,8 @@ def memspider(target, silent, browser):
                     soup = BeautifulSoup(response)
                     break
                 except Exception, errormsg:
-                    print repr(errormsg)
+                    if supusr:
+                        print repr(errormsg)
                     time.sleep(1)
 
             if "https://www.chess.com/groups/view/" in browser.geturl():
@@ -1276,7 +1288,8 @@ def ageproc(target):
                 soup = BeautifulSoup(response)
                 break
             except Exception, errormsg:
-                print repr(errormsg)
+                if supusr:
+                    print repr(errormsg)
                 time.sleep(1)
 
         if "://www.chess.com/members/view/" not in browser.geturl():
@@ -1505,7 +1518,8 @@ def pairsorter(browser, target, choice):
                 soup = BeautifulSoup(response)
                 break
             except Exception, errormsg:
-                print repr(errormsg)
+                if supusr:
+                    print repr(errormsg)
                 time.sleep(1)
 
         if supusr:
@@ -1668,7 +1682,8 @@ def gettmlinklist(targetname, browser):
             soup = BeautifulSoup(response)
             break
         except Exception, errormsg:
-            print repr(errormsg)
+            if supusr:
+                print repr(errormsg)
             time.sleep(1)
 
     souplinks = re.findall("/groups/team_match(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", str(soup.find_all("a")))
@@ -1703,15 +1718,18 @@ def selopner(browser, pointl):
             time.sleep(2)
 
 def sellogin(Username, Password, browser):
-    browser = selopner(browser, "https://www.chess.com/login")
-    WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.ID, "btnLogin")))
+    while True:
+        browser = selopner(browser, "https://www.chess.com/login")
+        WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.ID, "btnLogin")))
 
-    browser.find_element_by_name("c1").send_keys(Username)
-    browser.find_element_by_name("loginpassword").send_keys(Password)
+        browser.find_element_by_name("c1").send_keys(Username)
+        browser.find_element_by_name("loginpassword").send_keys(Password)
 
-    browser.find_element_by_id("btnLogin").click()
-    time.sleep(5)
-    return browser
+        browser.find_element_by_id("btnLogin").click()
+        time.sleep(4)
+
+        if "https://www.chess.com/home/" in browser.current_url:
+            return browser
 
 def olprint2(tlen, middle, right, left):
     print right,
@@ -1733,7 +1751,8 @@ def ingroupcheck(browser, member, group):
                 soup = BeautifulSoup(response)
                 break
             except Exception, errormsg:
-                print repr(errormsg)
+                if supusr:
+                    print repr(errormsg)
                 time.sleep(1)
 
         for x in soup.find_all(class_ = "bottom-8"):
@@ -1921,7 +1940,8 @@ def inviter(targetlist, endless):
                         soup = BeautifulSoup(response)
                         break
                     except Exception, errormsg:
-                        print repr(errormsg)
+                        if supusr:
+                            print repr(errormsg)
                         time.sleep(1)
 
                 if supusr:
@@ -2153,7 +2173,8 @@ def vcman(vclinklist, yourside):
                 soup = BeautifulSoup(response)
                 break
             except Exception, errormsg:
-                print repr(errormsg)
+                if supusr:
+                    print repr(errormsg)
                 time.sleep(1)
 
         if '      initialSetup: "",' not in str(soup):
@@ -2363,7 +2384,8 @@ def getNewStopAt(browser, targetname):
             soup = BeautifulSoup(response)
             break
         except Exception, errormsg:
-            print repr(errormsg)
+            if supusr:
+                print repr(errormsg)
             time.sleep(1)
     tmarchive = re.findall("/groups/team_match_archive(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", str(soup.find_all("a")))[0]
 
@@ -2868,7 +2890,8 @@ def notclosedcheck(memlist, browser):
                 soup = BeautifulSoup(response)
                 break
             except Exception, errormsg:
-                print repr(errormsg)
+                if supusr:
+                    print repr(errormsg)
                 time.sleep(1)
         soupstr = str(soup)
 
@@ -2908,7 +2931,8 @@ def getadmins(targetlst, browser):
                 soup = BeautifulSoup(response)
                 break
             except Exception, errormsg:
-                print repr(errormsg)
+                if supusr:
+                    print repr(errormsg)
                 time.sleep(1)
 
         superadmins = soup.find_all(id = "c14")
@@ -3339,7 +3363,8 @@ while pathway in (["y"]):
                         soup = BeautifulSoup(response)
                         break
                     except Exception, errormsg:
-                        print repr(errormsg)
+                        if supusr:
+                            print repr(errormsg)
                         time.sleep(1)
 
                 if "://www.chess.com/members/view/" not in browser.geturl():
@@ -3384,7 +3409,8 @@ while pathway in (["y"]):
                     soup = BeautifulSoup(response)
                     break
                 except Exception, errormsg:
-                    print repr(errormsg)
+                    if supusr:
+                        print repr(errormsg)
                     time.sleep(1)
 
             if "://www.chess.com/members/view/" not in browser.geturl():
@@ -3585,7 +3611,8 @@ while pathway in (["y"]):
                     soup = BeautifulSoup(response)
                     break
                 except Exception, errormsg:
-                    print repr(errormsg)
+                    if supusr:
+                        print repr(errormsg)
                     time.sleep(1)
 
             links1 = browser.links()
@@ -3902,7 +3929,8 @@ while pathway in (["y"]):
                     soup = BeautifulSoup(response)
                     break
                 except Exception, errormsg:
-                    print repr(errormsg)
+                    if supusr:
+                        print repr(errormsg)
                     time.sleep(1)
 
             acceptChallenge(browser, soup, targets)
